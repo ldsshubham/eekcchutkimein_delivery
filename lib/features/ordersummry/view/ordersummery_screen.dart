@@ -1,0 +1,203 @@
+import 'package:eekcchutkimein_delivery/constants/colors.dart';
+import 'package:eekcchutkimein_delivery/features/orders/util/slidetostart_btn.dart';
+import 'package:eekcchutkimein_delivery/features/ordersummry/util/uploadimage.dart';
+import 'package:eekcchutkimein_delivery/features/towards_customer/model/deliveryorder_model.dart';
+import 'package:eekcchutkimein_delivery/features/towards_customer/view/towardscustomer_screen.dart';
+import 'package:flutter/material.dart';
+
+class OrderSummery extends StatelessWidget {
+  const OrderSummery({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.white,
+
+      appBar: AppBar(
+        backgroundColor: AppColors.primaryColor,
+        elevation: 0,
+        leading: const BackButton(color: Colors.white),
+      ),
+
+      body: Column(
+        children: [
+          /// CONTENT
+          Expanded(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  /// STATUS BANNER
+                  Container(
+                    padding: const EdgeInsets.all(14),
+                    decoration: BoxDecoration(
+                      color: Colors.orange.shade50,
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    child: Row(
+                      children: const [
+                        Icon(Icons.pedal_bike, color: Colors.orange),
+                        SizedBox(width: 8),
+                        Text(
+                          "Heading to pickup location",
+                          style: TextStyle(fontWeight: FontWeight.w600),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  const SizedBox(height: 20),
+
+                  /// VENDOR DETAILS
+                  const Text(
+                    "Vendor Details",
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                  ),
+                  const SizedBox(height: 8),
+
+                  _infoTile(
+                    title: "Gupta Grocery Store",
+                    subtitle: "Sector 21, Gurgaon",
+                    trailing: Icons.navigation,
+                    trailingColor: Colors.green,
+                  ),
+
+                  const SizedBox(height: 20),
+
+                  /// CUSTOMER DETAILS
+                  const Text(
+                    "Customer Details",
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                  ),
+                  const SizedBox(height: 8),
+
+                  _infoTile(
+                    title: "Rahul Sharma",
+                    subtitle: "DLF Phase 3, Gurgaon",
+                  ),
+
+                  const SizedBox(height: 20),
+
+                  /// ITEMS
+                  const Text(
+                    "Items",
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                  ),
+                  const SizedBox(height: 8),
+
+                  _itemRow("Milk 1L", "x2"),
+                  _itemRow("Bread", "x1"),
+                  _itemRow("Eggs (12 pcs)", "x1"),
+                ],
+              ),
+            ),
+          ),
+
+          /// 🔥 SLIDE BUTTON FIXED AT BOTTOM
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: SlideToStartButton(
+              textTitle: "Slide to confirm order picked up!",
+              onSlideComplete: () {
+                _showUploadSheet(context);
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// INFO TILE (Vendor / Customer)
+  Widget _infoTile({
+    required String title,
+    required String subtitle,
+    IconData? trailing,
+    Color? trailingColor,
+  }) {
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: Colors.grey.shade100,
+        borderRadius: BorderRadius.circular(14),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(subtitle, style: TextStyle(color: Colors.grey.shade600)),
+              ],
+            ),
+          ),
+          if (trailing != null) Icon(trailing, color: trailingColor),
+        ],
+      ),
+    );
+  }
+
+  /// ITEM ROW
+  Widget _itemRow(String name, String qty) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(name),
+          Text(qty, style: const TextStyle(fontWeight: FontWeight.bold)),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _showUploadSheet(BuildContext context) async {
+    final bool? result = await showModalBottomSheet<bool>(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (_) => const UploadPackageSheet(),
+    );
+
+    // 👇 THIS RUNS AFTER SHEET IS CLOSED
+
+    if (result == true) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => TowardsCustomerScreen(
+            order: DeliveryOrder(
+              customerName: "Rahul Sharma",
+              phone: "9876543210",
+              address:
+                  "Flat 402, Sunshine Apartments, Near Star Mall, Gurugram",
+              orderId: "#ECM23456",
+              paymentMode: "Online",
+              amount: 249,
+              items: 1,
+            ),
+          ),
+        ),
+      );
+    } else {
+      _showToast(context, 'Please upload package photo');
+    }
+  }
+
+  void _showToast(BuildContext context, String msg) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(msg), duration: const Duration(seconds: 2)),
+    );
+  }
+}

@@ -5,24 +5,63 @@ import 'package:eekcchutkimein_delivery/features/homepage/controller/mydrawercon
 import 'package:eekcchutkimein_delivery/features/homepage/view/pages.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:iconsax/iconsax.dart';
 
 class CompleteAdminPanel extends StatelessWidget {
-  final controller = Get.put(MyDrawerController());
-  // final LoginController logOutController = Get.put(LoginController());
-  final BottomNavController navController = Get.put(BottomNavController());
   CompleteAdminPanel({super.key});
+
+  final controller = Get.put(MyDrawerController());
+  final BottomNavController navController = Get.put(BottomNavController());
+
+  final GetStorage box = GetStorage();
+
+  final RxBool isOnline = true.obs;
 
   @override
   Widget build(BuildContext context) {
+    isOnline.value = box.read('isOnline') ?? true;
+
     return Scaffold(
       key: controller.scaffoldKey,
       appBar: AppBar(
         leading: IconButton(
           onPressed: controller.openDrawer,
-          icon: Icon(Iconsax.menu),
+          icon: const Icon(Iconsax.menu),
         ),
+
+        actions: [
+          Obx(
+            () => Row(
+              children: [
+                Text(
+                  isOnline.value ? 'ONLINE' : 'OFFLINE',
+                  style: TextStyle(
+                    fontWeight: FontWeight.w600,
+                    color: isOnline.value ? AppColors.success : Colors.red,
+                  ),
+                ),
+                Switch(
+                  value: isOnline.value,
+                  activeColor: AppColors.success,
+                  onChanged: (value) {
+                    /// ONLINE → OFFLINE (show alert)
+                    if (!value && isOnline.value) {
+                      _showOfflineAlert(context);
+                    } else {
+                      /// OFFLINE → ONLINE (direct)
+                      isOnline.value = true;
+                      box.write('isOnline', true);
+                    }
+                  },
+                ),
+                const SizedBox(width: 8),
+              ],
+            ),
+          ),
+        ],
       ),
+
       drawer: Drawer(
         child: ListView(
           padding: EdgeInsets.zero,
@@ -36,81 +75,105 @@ class CompleteAdminPanel extends StatelessWidget {
             ),
 
             ListTile(
-              leading: Icon(Iconsax.home),
-              title: Text('Dashboard'),
+              leading: const Icon(Iconsax.activity),
+              title: const Text('Order'),
               onTap: () {
                 navController.changePage(0);
                 controller.closeDrawer();
               },
             ),
             ListTile(
-              leading: Icon(Iconsax.activity),
-              title: Text('Order'),
+              leading: const Icon(Iconsax.location),
+              title: const Text('Map'),
               onTap: () {
                 navController.changePage(1);
                 controller.closeDrawer();
               },
             ),
             ListTile(
-              leading: Icon(Iconsax.location),
-              title: Text('Map'),
+              leading: const Icon(Iconsax.wallet),
+              title: const Text('Balance'),
               onTap: () {
-                navController.changePage(0);
+                navController.changePage(2);
                 controller.closeDrawer();
               },
             ),
             ListTile(
-              leading: Icon(Iconsax.user),
-              title: Text('Profile'),
+              leading: const Icon(Iconsax.user),
+              title: const Text('Profile'),
               onTap: () {
-                navController.changePage(1);
+                navController.changePage(3);
                 controller.closeDrawer();
               },
             ),
             ListTile(
-              leading: Icon(Iconsax.logout),
-              title: Text('Logout'),
+              leading: const Icon(Iconsax.logout),
+              title: const Text('Logout'),
               onTap: () {
-                // logOutController.logOutUser();
                 controller.closeDrawer();
               },
             ),
           ],
         ),
       ),
+
       body: Obx(
         () => IndexedStack(
           index: navController.currentPage.value,
           children: pages,
         ),
       ),
+
       bottomNavigationBar: Obx(
         () => BottomNavigationBar(
           currentIndex: navController.currentPage.value,
           onTap: navController.changePage,
-
           type: BottomNavigationBarType.fixed,
-
-          enableFeedback: false,
-          items: [
-            BottomNavigationBarItem(
-              icon: Icon(Iconsax.home),
-              label: 'Dashboard',
-            ),
+          items: const [
             BottomNavigationBarItem(
               icon: Icon(Iconsax.activity),
               label: 'Orders',
             ),
-            BottomNavigationBarItem(icon: Icon(Iconsax.box), label: 'Map'),
-
-            // BottomNavigationBarItem(
-            //   icon: Icon(Iconsax.message_question),
-            //   label: '',
-            // ),
-            // BottomNavigationBarItem(icon: Icon(Iconsax.setting), label: ''),
+            BottomNavigationBarItem(icon: Icon(Iconsax.map), label: 'Map'),
+            BottomNavigationBarItem(
+              icon: Icon(Iconsax.wallet),
+              label: 'Balance',
+            ),
             BottomNavigationBarItem(icon: Icon(Iconsax.user), label: 'Profile'),
           ],
         ),
+      ),
+    );
+  }
+
+  void _showOfflineAlert(BuildContext context) {
+    Get.dialog(
+      AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        title: const Text(
+          'Go Offline?',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+        content: const Text(
+          'You will stop receiving new orders while you are offline.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Get.back(); // cancel
+            },
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            onPressed: () {
+              isOnline.value = false;
+              box.write('isOnline', false); // ✅ store offline
+              Get.back();
+            },
+            child: const Text('Go Offline'),
+          ),
+        ],
       ),
     );
   }

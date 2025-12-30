@@ -1,8 +1,17 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+<uses-permission android:name="android.permission.CAMERA"/>
+<uses-permission android:name="android.permission.READ_MEDIA_IMAGES"/>
+
+
     <application
         android:label="eekcchutkimein_delivery"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
+    <meta-data
+    android:name="com.google.android.geo.API_KEY"
+    android:value="AIzaSyD7KZ3dujsZuhVn8E0uagRyQ65_YvpGJcM"/>
+
         <activity
             android:name=".MainActivity"
             android:exported="true"
