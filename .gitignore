@@ -1,0 +1,29 @@
+# Flutter/Dart/Pub related
+.dart_tool/
+.packages
+.pub-cache/
+build/
+.flutter-plugins
+.flutter-plugins-dependencies
+Generated.xcconfig
+*.iml
+.idea/
+ 
+# Android
+android/.gradle
+android/app/debug
+android/app/release
+ 
+# iOS
+ios/Flutter/Generated.xcconfig
+ios/Pods
+ios/Runner.xcworkspace
+ 
+# VS Code & Xcode
+.vscode/
+*.xcuserstate
+*.xcworkspace
+*.lock
+ 
+# Others
+.env
