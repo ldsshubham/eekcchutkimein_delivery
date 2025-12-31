@@ -1,7 +1,6 @@
 import 'package:eekcchutkimein_delivery/constants/colors.dart';
 import 'package:eekcchutkimein_delivery/features/orders/util/slidetostart_btn.dart';
 import 'package:eekcchutkimein_delivery/features/ordersummry/view/ordersummery_screen.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
 
@@ -15,7 +14,6 @@ class OrderDetails extends StatelessWidget {
       padding: const EdgeInsets.all(12),
       child: Column(
         children: [
-          /// Assigned order info
           Container(
             width: double.infinity,
             padding: const EdgeInsets.all(14),

@@ -1,3 +1,6 @@
 {
-  "cmake.sourceDirectory": "/Users/lds/Downloads/eekcchutkimein_delivery/git/eekcchutkimein_delivery/linux"
+  "cmake.sourceDirectory": "/Users/lds/Downloads/eekcchutkimein_delivery/git/eekcchutkimein_delivery/linux",
+  "editor.fontFamily": "times new roman",
+  "editor.fontSize": 16,
+  "editor.fontWeight": "100"
 }

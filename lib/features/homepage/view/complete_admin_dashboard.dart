@@ -43,7 +43,7 @@ class CompleteAdminPanel extends StatelessWidget {
                 ),
                 Switch(
                   value: isOnline.value,
-                  activeColor: AppColors.success,
+                  activeThumbColor: AppColors.success,
                   onChanged: (value) {
                     /// ONLINE → OFFLINE (show alert)
                     if (!value && isOnline.value) {
