@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import '../../payment_history/view/payment_history_screen.dart';
 
 class BalanceScreen extends StatelessWidget {
   const BalanceScreen({super.key});
@@ -89,7 +91,7 @@ class BalanceScreen extends StatelessWidget {
               ),
               TextButton(
                 onPressed: () {
-                  // Navigate to full payment history
+                  Get.to(() => const PaymentHistoryScreen());
                 },
                 child: const Text("View All"),
               ),
