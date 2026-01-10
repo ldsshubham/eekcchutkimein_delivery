@@ -12,3 +12,11 @@ GeneratedPluginRegistrant.java
 key.properties
 **/*.keystore
 **/*.jks
+
+build/
+.dart_tool/
+*.apk
+*.aab
+*.so
+*.dill
+

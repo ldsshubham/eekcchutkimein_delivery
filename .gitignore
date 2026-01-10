@@ -27,3 +27,10 @@ ios/Runner.xcworkspace
  
 # Others
 .env
+
+build/
+.dart_tool/
+*.apk
+*.aab
+*.so
+*.dill
