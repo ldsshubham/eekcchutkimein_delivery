@@ -115,12 +115,7 @@ class CompleteAdminPanel extends StatelessWidget {
         ),
       ),
 
-      body: Obx(
-        () => IndexedStack(
-          index: navController.currentPage.value,
-          children: pages,
-        ),
-      ),
+      body: Obx(() => pages[navController.currentPage.value]),
 
       bottomNavigationBar: Obx(
         () => BottomNavigationBar(

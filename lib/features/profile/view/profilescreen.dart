@@ -272,8 +272,6 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
-  // ---------------- COMMON ----------------
-
   Widget _divider() {
     return const Divider(height: 1, thickness: 0.7, color: Color(0xffE6E6E6));
   }

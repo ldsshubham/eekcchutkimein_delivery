@@ -1,16 +1,22 @@
 import 'package:eekcchutkimein_delivery/constants/colors.dart';
 import 'package:eekcchutkimein_delivery/features/orders/util/slidetostart_btn.dart';
+import 'package:eekcchutkimein_delivery/features/towards_customer/controller/towardscustomer_controller.dart';
 import 'package:eekcchutkimein_delivery/features/towards_customer/model/deliveryorder_model.dart';
 import 'package:eekcchutkimein_delivery/features/towards_customer/util/otpverification.dart';
+import 'package:eekcchutkimein_delivery/features/towards_customer/view/paymentpage_cod.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class TowardsCustomerScreen extends StatelessWidget {
   final DeliveryOrder order;
-
   const TowardsCustomerScreen({super.key, required this.order});
 
   @override
   Widget build(BuildContext context) {
+    // var paymentReceivedLocal = false; // Simulated payment status
+    //     if (order.paymentMode == "online") {
+    //       paymentReceivedLocal=true;
+    //     }
     return Scaffold(
       backgroundColor: const Color(0xffF6F7F9),
 
@@ -37,6 +43,8 @@ class TowardsCustomerScreen extends StatelessWidget {
                   const SizedBox(height: 16),
                   _orderDetailsCard(),
                   const SizedBox(height: 16),
+                  if (order.paymentMode != "Online") _codPaymentOption(context),
+                  const SizedBox(height: 16),
                   _mapPreview(),
                 ],
               ),
@@ -50,33 +58,7 @@ class TowardsCustomerScreen extends StatelessWidget {
               onSlideComplete: () {
                 showOtpSheet(context);
                 final otp = generateOtp();
-
-                /// LOG OTP FOR NOW
                 debugPrint("DELIVERY OTP: $otp");
-
-                // showModalBottomSheet(
-                //   context: context,
-                //   isScrollControlled: true,
-                //   shape: const RoundedRectangleBorder(
-                //     borderRadius: BorderRadius.vertical(
-                //       top: Radius.circular(20),
-                //     ),
-                //   ),
-                //   builder: (_) => OtpVerificationSheet(
-                //     generatedOtp: otp,
-
-                //     onVerified: () {
-                //       print('THIS IS OTP $otp');
-                //       Navigator.pop(context); // close sheet
-                //       Navigator.pushReplacement(
-                //         context,
-                //         MaterialPageRoute(
-                //           builder: (_) => const OrderCompletedScreen(),
-                //         ),
-                //       );
-                //     },
-                //   ),
-                // );
               },
             ),
           ),
@@ -85,7 +67,6 @@ class TowardsCustomerScreen extends StatelessWidget {
     );
   }
 
-  /// 👤 CUSTOMER CARD
   Widget _customerCard() {
     return _card(
       child: Row(
@@ -117,7 +98,6 @@ class TowardsCustomerScreen extends StatelessWidget {
     );
   }
 
-  /// 📍 ADDRESS CARD
   Widget _addressCard() {
     return _card(
       child: Column(
@@ -148,7 +128,6 @@ class TowardsCustomerScreen extends StatelessWidget {
     );
   }
 
-  /// 📦 ORDER DETAILS
   Widget _orderDetailsCard() {
     return _card(
       child: Column(
@@ -173,7 +152,106 @@ class TowardsCustomerScreen extends StatelessWidget {
     );
   }
 
-  /// 🗺 MAP PREVIEW
+  Widget _codPaymentOption(context) {
+    // Inject controller
+    final TowardsCustomerController paymentController = Get.put(
+      TowardsCustomerController(),
+    );
+
+    return _card(
+      child: Obx(() {
+        final isPaymentDone =
+            paymentController.isPaymentCollected.value ||
+            paymentController.isPaymentVerified.value;
+
+        return Column(
+          children: [
+            _detailRow("Cash on Delivery", "₹${50}"),
+            const SizedBox(height: 18),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                // SHOW QR BUTTON
+                InkWell(
+                  onTap: () async {
+                    // Navigate to PaymentPage and wait for result
+                    final result = await Get.to(() => const PaymentpageCod());
+                    if (result == true) {
+                      paymentController.confirmQrPayment();
+                    }
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 8,
+                      horizontal: 44,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.amber.shade300,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: const Text(
+                      "Show QR",
+                      style: TextStyle(color: Colors.black54),
+                    ),
+                  ),
+                ),
+
+                // COLLECT CASH BUTTON (Toggle)
+                InkWell(
+                  onTap: () {
+                    // Pass 'true' to indicate payment success
+                    // Get.back(result: true);
+                    Get.snackbar(
+                      "Success",
+                      "Payment marked as collected",
+                      backgroundColor: Colors.green,
+                      colorText: Colors.white,
+                      snackPosition: SnackPosition.BOTTOM,
+                      margin: const EdgeInsets.all(20),
+                    );
+                    paymentController.toggleCashCollection();
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 8,
+                      horizontal: 28,
+                    ),
+                    decoration: BoxDecoration(
+                      color: paymentController.isPaymentCollected.value
+                          ? Colors
+                                .green
+                                .shade600 // Green if collected
+                          : Colors.blue.shade300, // Blue if pending
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text(
+                      paymentController.isPaymentCollected.value
+                          ? "Collected"
+                          : "Collect Cash",
+                      style: const TextStyle(color: Colors.white),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 20),
+
+            // PAYMENT RECEIVED INDICATOR
+            if (isPaymentDone)
+              Text(
+                'Payment Received!',
+                style: TextStyle(
+                  color: AppColors.green,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                ),
+              ),
+          ],
+        );
+      }),
+    );
+  }
+
   Widget _mapPreview() {
     return Container(
       height: 180,

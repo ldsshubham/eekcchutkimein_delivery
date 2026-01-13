@@ -183,7 +183,7 @@ class OrderSummery extends StatelessWidget {
               address:
                   "Flat 402, Sunshine Apartments, Near Star Mall, Gurugram",
               orderId: "#ECM23456",
-              paymentMode: "Online",
+              paymentMode: "Cash on delivery",
               amount: 249,
               items: 1,
             ),
