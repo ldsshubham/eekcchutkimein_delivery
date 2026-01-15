@@ -111,7 +111,6 @@ class _RegistrationPageState extends State<RegistrationPage> {
             Expanded(
               child: PageView(
                 controller: _pageController,
-                physics: const NeverScrollableScrollPhysics(),
                 onPageChanged: (int page) {
                   setState(() {
                     _currentStep = page;
