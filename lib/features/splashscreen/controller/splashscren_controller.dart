@@ -10,7 +10,7 @@ class SplashController extends GetxController {
 
   void _navigateToHome() {
     Future.delayed(Duration(seconds: 2), () {
-      Get.offNamed(AppRoutes.homepage);
+      Get.offNamed(AppRoutes.registration);
     });
   }
 }
