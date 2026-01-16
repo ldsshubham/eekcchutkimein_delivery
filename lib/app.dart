@@ -13,8 +13,8 @@ class MyApp extends StatelessWidget {
       child: GetMaterialApp(
         theme: AppTheme.lightTheme,
         debugShowCheckedModeBanner: false,
-        title: 'Eek Cchutki Mein - Delivery',
-        initialRoute: AppRoutes.verifyPhone,
+        title: 'Delivery',
+        initialRoute: AppRoutes.notReg,
         getPages: AppRoutes.routes,
       ),
     );

@@ -1,15 +1,19 @@
 import 'package:eekcchutkimein_delivery/constants/colors.dart';
-import 'package:eekcchutkimein_delivery/features/orders/util/slidetostart_btn.dart';
+import 'package:eekcchutkimein_delivery/features/orders_home/model/order_model.dart';
+import 'package:eekcchutkimein_delivery/features/orders_home/util/slidetostart_btn.dart';
 import 'package:eekcchutkimein_delivery/features/ordersummry/util/uploadimage.dart';
 import 'package:eekcchutkimein_delivery/features/towards_customer/model/deliveryorder_model.dart';
 import 'package:eekcchutkimein_delivery/features/towards_customer/view/towardscustomer_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class OrderSummery extends StatelessWidget {
-  const OrderSummery({super.key});
+  final OrderModel? order;
+  const OrderSummery({super.key, this.order});
 
   @override
   Widget build(BuildContext context) {
+    final currentOrder = order ?? Get.arguments as OrderModel;
     return Scaffold(
       backgroundColor: Colors.white,
 
@@ -57,8 +61,8 @@ class OrderSummery extends StatelessWidget {
                   const SizedBox(height: 8),
 
                   _infoTile(
-                    title: "Gupta Grocery Store",
-                    subtitle: "Sector 21, Gurgaon",
+                    title: currentOrder.vendorName,
+                    subtitle: currentOrder.vendorAddress,
                     trailing: Icons.navigation,
                     trailingColor: Colors.green,
                   ),
@@ -73,8 +77,8 @@ class OrderSummery extends StatelessWidget {
                   const SizedBox(height: 8),
 
                   _infoTile(
-                    title: "Rahul Sharma",
-                    subtitle: "DLF Phase 3, Gurgaon",
+                    title: currentOrder.customerName,
+                    subtitle: currentOrder.customerAddress,
                   ),
 
                   const SizedBox(height: 20),
@@ -86,21 +90,25 @@ class OrderSummery extends StatelessWidget {
                   ),
                   const SizedBox(height: 8),
 
-                  _itemRow("Milk 1L", "x2"),
-                  _itemRow("Bread", "x1"),
-                  _itemRow("Eggs (12 pcs)", "x1"),
+                  ...currentOrder.productList
+                      .map(
+                        (item) => _itemRow(
+                          item.productName,
+                          "x${item.productQuantity}",
+                        ),
+                      )
+                      .toList(),
                 ],
               ),
             ),
           ),
 
-          /// 🔥 SLIDE BUTTON FIXED AT BOTTOM
           Padding(
             padding: const EdgeInsets.all(16),
             child: SlideToStartButton(
               textTitle: "Slide to confirm order picked up!",
               onSlideComplete: () {
-                _showUploadSheet(context);
+                _showUploadSheet(context, currentOrder);
               },
             ),
           ),
@@ -160,7 +168,10 @@ class OrderSummery extends StatelessWidget {
     );
   }
 
-  Future<void> _showUploadSheet(BuildContext context) async {
+  Future<void> _showUploadSheet(
+    BuildContext context,
+    OrderModel currentOrder,
+  ) async {
     final bool? result = await showModalBottomSheet<bool>(
       context: context,
       isScrollControlled: true,
@@ -178,14 +189,13 @@ class OrderSummery extends StatelessWidget {
         MaterialPageRoute(
           builder: (_) => TowardsCustomerScreen(
             order: DeliveryOrder(
-              customerName: "Rahul Sharma",
-              phone: "9876543210",
-              address:
-                  "Flat 402, Sunshine Apartments, Near Star Mall, Gurugram",
-              orderId: "#ECM23456",
+              customerName: currentOrder.customerName,
+              phone: currentOrder.customerPhone,
+              address: currentOrder.customerAddress,
+              orderId: "#${currentOrder.orderId}",
               paymentMode: "Cash on delivery",
-              amount: 249,
-              items: 1,
+              amount: currentOrder.orderAmount,
+              items: currentOrder.productList.length,
             ),
           ),
         ),

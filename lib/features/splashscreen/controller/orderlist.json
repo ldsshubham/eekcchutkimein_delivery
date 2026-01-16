@@ -1,0 +1,21 @@
+{
+    "data": [
+        {
+            "orderid": 1,
+            "orderdate": "2022-01-01",
+            "orderamount": 100,
+            "ordertime": "10:00 AM",
+            "orderstatus": "Pending",
+            "productList" : [{
+                "productid": 1,
+                "productimage": "https://via.placeholder.com/150",
+                "productname": "Product 1",
+                "productquantity": 1
+            }],
+            "vendorid": 1,
+            "vendorname": "Vendor 1",
+            "vendoraddress": "Vendor Address",
+            "vendorphone": "1234567890"
+     }
+    ]
+}

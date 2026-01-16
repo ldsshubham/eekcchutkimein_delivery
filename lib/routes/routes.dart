@@ -9,7 +9,7 @@ class AppRoutes {
   static const String notReg = '/splashscreen';
   static const String homepage = '/homepage';
   static const String verifyPhone = '/authentication/registration';
-  static const String registration = '/authentication/registration';
+  static const String registration = '/authentication';
   static const String orderSummery = '/ordersummry';
 
   static final routes = [
