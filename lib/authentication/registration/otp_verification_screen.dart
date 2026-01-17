@@ -1,7 +1,5 @@
 import 'package:eekcchutkimein_delivery/authentication/registration/controller/registration_controller.dart';
-import 'package:eekcchutkimein_delivery/authentication/registration/registration_page.dart';
 import 'package:eekcchutkimein_delivery/features/towards_customer/util/textinput.dart';
-import 'package:eekcchutkimein_delivery/features/towards_customer/util/toastification_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -101,14 +99,8 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                   elevation: 0,
                 ),
                 onPressed: () {
-                  if (_otpController.text == widget.otp) {
-                    Get.to(() => const RegistrationPage());
-                    ToastHelper.showSuccessToast(
-                      message: "OTP Verified Successfully",
-                    );
-                  } else {
-                    ToastHelper.showErrorToast(message: "Invalid OTP");
-                  }
+                  final controller = Get.find<RegistrationController>();
+                  controller.verifyOtp(widget.phoneNumber, _otpController.text);
                 },
                 child: const Text(
                   "Verify & Continue",

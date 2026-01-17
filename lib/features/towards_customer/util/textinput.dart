@@ -9,6 +9,7 @@ class MinimalInput extends StatelessWidget {
   final int maxLines;
   final TextCapitalization textCapitalization;
   final Widget? prefixIcon;
+  final bool readOnly;
 
   const MinimalInput({
     super.key,
@@ -19,6 +20,7 @@ class MinimalInput extends StatelessWidget {
     this.maxLines = 1,
     this.textCapitalization = TextCapitalization.none,
     this.prefixIcon,
+    this.readOnly = false,
   });
 
   @override
@@ -38,6 +40,7 @@ class MinimalInput extends StatelessWidget {
         TextFormField(
           controller: controller,
           obscureText: obscure,
+          readOnly: readOnly,
           keyboardType: keyboardType,
           maxLines: maxLines,
           textCapitalization: textCapitalization,

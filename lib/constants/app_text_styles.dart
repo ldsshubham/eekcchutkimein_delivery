@@ -4,8 +4,6 @@ import 'package:eekcchutkimein_delivery/constants/colors.dart';
 import 'package:flutter/material.dart';
 
 class AppTextStyles {
-  // static const String _fontFamily = 'Poppins';
-
   static const TextStyle heading1 = TextStyle(
     fontSize: AppSizes.fontXXL,
     fontWeight: AppFontWeight.bold,

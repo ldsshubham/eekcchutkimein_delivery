@@ -31,8 +31,6 @@ class _PhoneVerifyScreenState extends State<PhoneVerifyScreen> {
           height: MediaQuery.of(context).size.height,
           child: Column(
             children: [
-              // Top 75% Image
-              // Spacer(),
               const SizedBox(height: 80),
               Expanded(
                 child: Container(
@@ -125,14 +123,6 @@ class _PhoneVerifyScreenState extends State<PhoneVerifyScreen> {
                                 message:
                                     "Invalid Number \nPlease enter a valid 10-digit mobile number",
                               );
-                              // Get.snackbar(
-                              //   "Invalid Number",
-                              //   "Please enter a valid 10-digit mobile number",
-                              //   snackPosition: SnackPosition.BOTTOM,
-                              //   backgroundColor: Colors.redAccent,
-                              //   colorText: Colors.white,
-                              //   margin: const EdgeInsets.all(10),
-                              // );
                             } else {
                               controller.sendOtp(_phoneController.text);
                               ToastHelper.showSuccessToast(

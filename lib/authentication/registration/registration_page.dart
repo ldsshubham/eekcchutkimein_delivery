@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:eekcchutkimein_delivery/authentication/registration/controller/registration_controller.dart';
 import 'package:eekcchutkimein_delivery/features/towards_customer/util/textinput.dart';
 import 'package:eekcchutkimein_delivery/features/towards_customer/util/toastification_helper.dart';
@@ -6,7 +8,8 @@ import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 
 class RegistrationPage extends StatefulWidget {
-  const RegistrationPage({super.key});
+  final String? phoneNumber;
+  const RegistrationPage({super.key, this.phoneNumber});
 
   @override
   State<RegistrationPage> createState() => _RegistrationPageState();
@@ -21,6 +24,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
   final TextEditingController _lastnameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _panController = TextEditingController();
+  final TextEditingController _aadharController = TextEditingController();
   final TextEditingController _addressline1Controller = TextEditingController();
   final TextEditingController _addressline2Controller = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
@@ -50,6 +54,14 @@ class _RegistrationPageState extends State<RegistrationPage> {
   ];
 
   @override
+  void initState() {
+    super.initState();
+    if (widget.phoneNumber != null) {
+      _phoneController.text = widget.phoneNumber!;
+    }
+  }
+
+  @override
   void dispose() {
     _pageController.dispose();
     _firstnameController.dispose();
@@ -67,6 +79,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
     _vehicleNameController.dispose();
     _vehicleNumberController.dispose();
     _licenseNumberController.dispose();
+    _aadharController.dispose();
     super.dispose();
   }
 
@@ -155,11 +168,17 @@ class _RegistrationPageState extends State<RegistrationPage> {
       );
       return false;
     }
-    if (_controller.selfieImage.value == null) {
+    if (_aadharController.text.trim().isEmpty) {
+      ToastHelper.showWarningToast(
+        message: "Error: Please enter your Aadhar number",
+      );
+      return false;
+    }
+    if (_controller.selfieImageId.value == null) {
       ToastHelper.showWarningToast(message: "Error: Please upload a selfie");
       return false;
     }
-    if (_controller.panImage.value == null) {
+    if (_controller.panImageId.value == null) {
       ToastHelper.showWarningToast(
         message: "Error: Please upload PAN card image",
       );
@@ -217,14 +236,16 @@ class _RegistrationPageState extends State<RegistrationPage> {
         'email': _emailController.text.trim(),
         'Addressline_1': _addressline1Controller.text.trim(),
         'Addressline_2': _addressline2Controller.text.trim(),
-        'city': _cityController.text.trim(),
-        'state': _stateController.text.trim(),
-        'pinCode': int.tryParse(_pinCodeController.text.trim()) ?? 0,
-        'vehicleType': _selectedVehicleType ?? "Not Selected",
-        'vehicleName': _vehicleNameController.text.trim(),
-        'vehicleNumber': _vehicleNumberController.text.trim(),
-        'license_number': _licenseNumberController.text.trim(),
+        'user_image_id': _controller.selfieImageId.value?.toInt(),
         'pancard_number': _panController.text.trim(),
+        'aadharcard_number': _aadharController.text.trim(),
+        'vehicleType': _selectedVehicleType ?? "Not Selected",
+        'vehicleNumber': _vehicleNumberController.text.trim(),
+        'vehicleName': _vehicleNameController.text.trim(),
+        'license_number': _licenseNumberController.text.trim(),
+        'city': _cityController.text.trim(),
+        'pinCode': int.tryParse(_pinCodeController.text.trim()) ?? 0,
+        'state': _stateController.text.trim(),
       };
 
       debugPrint('Collected Registration Data: $data');
@@ -353,6 +374,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
             label: 'Phone Number',
             controller: _phoneController,
             keyboardType: TextInputType.phone,
+            readOnly: widget.phoneNumber != null,
           ),
           const SizedBox(height: 20),
           MinimalInput(
@@ -533,13 +555,23 @@ class _RegistrationPageState extends State<RegistrationPage> {
             textCapitalization: TextCapitalization.characters,
             prefixIcon: const Icon(Icons.credit_card),
           ),
+          const SizedBox(height: 20),
+          MinimalInput(
+            label: 'Aadhar Number',
+            controller: _aadharController,
+            textCapitalization: TextCapitalization.characters,
+            prefixIcon: const Icon(Icons.badge_outlined),
+          ),
           const SizedBox(height: 30),
           Obx(
             () => _buildUploadCard(
               "Selfie",
               Icons.camera_alt_outlined,
               _controller.selfieImage.value,
+              _controller.selfieImageId.value,
+              _controller.isSelfieUploading.value,
               () => _showImageSourceDialog('selfie'),
+              () => _controller.uploadCapturedImage('selfie'),
             ),
           ),
           Obx(
@@ -547,7 +579,10 @@ class _RegistrationPageState extends State<RegistrationPage> {
               "PAN Card Image",
               Icons.credit_card_outlined,
               _controller.panImage.value,
+              _controller.panImageId.value,
+              _controller.isPanUploading.value,
               () => _showImageSourceDialog('pan'),
+              () => _controller.uploadCapturedImage('pan'),
             ),
           ),
           const SizedBox(height: 20),
@@ -591,66 +626,122 @@ class _RegistrationPageState extends State<RegistrationPage> {
     String title,
     IconData icon,
     XFile? image,
-    VoidCallback onTap,
+    int? id,
+    bool isUploading,
+    VoidCallback onPick,
+    VoidCallback onUpload,
   ) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        margin: const EdgeInsets.only(bottom: 16),
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: Colors.grey.shade50,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: image != null ? Colors.green.shade300 : Colors.grey.shade200,
-            width: image != null ? 2 : 1,
-          ),
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.grey.shade50,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: id != null ? Colors.green.shade300 : Colors.grey.shade200,
+          width: id != null ? 2 : 1,
         ),
-        child: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                color: image != null
-                    ? Colors.green.shade50
-                    : Colors.grey.shade100,
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Icon(
-                image != null ? Icons.check_circle : icon,
-                color: image != null ? Colors.green : Colors.black54,
-              ),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                    ),
+      ),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              GestureDetector(
+                onTap: onPick,
+                child: Container(
+                  width: 50,
+                  height: 50,
+                  decoration: BoxDecoration(
+                    color: id != null
+                        ? Colors.green.shade50
+                        : Colors.grey.shade100,
+                    borderRadius: BorderRadius.circular(10),
+                    image: image != null
+                        ? DecorationImage(
+                            image: FileImage(File(image.path)),
+                            fit: BoxFit.cover,
+                          )
+                        : null,
                   ),
-                  Text(
-                    image != null ? "Image captured" : "Tap to upload image",
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: image != null
-                          ? Colors.green.shade700
-                          : Colors.grey.shade500,
-                    ),
-                  ),
-                ],
+                  child: image == null
+                      ? Icon(icon, color: Colors.black54)
+                      : null,
+                ),
               ),
-            ),
-            Icon(
-              image != null ? Icons.edit : Icons.add_circle_outline,
-              color: Colors.black,
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    Text(
+                      id != null
+                          ? "Uploaded Successfully"
+                          : image != null
+                          ? "Ready to upload"
+                          : "Tap icon to select",
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: id != null
+                            ? Colors.green.shade700
+                            : image != null
+                            ? Colors.blue.shade700
+                            : Colors.grey.shade500,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              if (id != null)
+                const Icon(Icons.check_circle, color: Colors.green)
+              else if (image != null && !isUploading)
+                IconButton(
+                  onPressed: onPick,
+                  icon: const Icon(Icons.edit, color: Colors.black54, size: 20),
+                ),
+            ],
+          ),
+          if (image != null && id == null) ...[
+            const SizedBox(height: 12),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: isUploading ? null : onUpload,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blue.shade700,
+                  foregroundColor: Colors.white,
+                  disabledBackgroundColor: Colors.grey.shade300,
+                  elevation: 0,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                child: isUploading
+                    ? const SizedBox(
+                        height: 20,
+                        width: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Colors.white,
+                        ),
+                      )
+                    : const Text(
+                        "Upload Now",
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+              ),
             ),
           ],
-        ),
+        ],
       ),
     );
   }

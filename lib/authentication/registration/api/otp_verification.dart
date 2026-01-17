@@ -12,4 +12,13 @@ class OtpVerificationService extends GetConnect {
       return Future.value(Response(statusCode: 500, statusText: e.toString()));
     }
   }
+
+  Future<Response> verifyOtp(String phone, String otp) async {
+    try {
+      final body = {"phone": phone, "otp": otp};
+      return post('$_baseUrl/auth/customer/verify-otp', body);
+    } catch (e) {
+      return Future.value(Response(statusCode: 500, statusText: e.toString()));
+    }
+  }
 }
