@@ -5,14 +5,17 @@ class TokenService {
 
   static const _accessTokenKey = 'accessToken';
   static const _refreshTokenKey = 'refreshToken';
+  static const _phoneNumber = 'phoneNumber';
 
   /// Save both access and refresh tokens
   static Future<void> saveTokens({
     required String accessToken,
     required String refreshToken,
+    required String phone,
   }) async {
     await _storage.write(key: _accessTokenKey, value: accessToken);
     await _storage.write(key: _refreshTokenKey, value: refreshToken);
+    await _storage.write(key: _phoneNumber, value: phone);
   }
 
   /// Get cumulative access token
@@ -25,9 +28,14 @@ class TokenService {
     return await _storage.read(key: _refreshTokenKey);
   }
 
+  static Future<String?> getSavedPhoneNumber() async {
+    return await _storage.read(key: _phoneNumber);
+  }
+
   /// Delete all stored tokens
   static Future<void> clearTokens() async {
     await _storage.delete(key: _accessTokenKey);
     await _storage.delete(key: _refreshTokenKey);
+    await _storage.delete(key: _phoneNumber);
   }
 }

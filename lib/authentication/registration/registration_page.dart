@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:eekcchutkimein_delivery/authentication/registration/controller/registration_controller.dart';
 import 'package:eekcchutkimein_delivery/features/towards_customer/util/textinput.dart';
 import 'package:eekcchutkimein_delivery/features/towards_customer/util/toastification_helper.dart';
+import 'package:eekcchutkimein_delivery/services/token_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
@@ -56,8 +57,17 @@ class _RegistrationPageState extends State<RegistrationPage> {
   @override
   void initState() {
     super.initState();
+    _loadInitialData();
+  }
+
+  Future<void> _loadInitialData() async {
     if (widget.phoneNumber != null) {
       _phoneController.text = widget.phoneNumber!;
+    } else {
+      final savedPhone = await TokenService.getSavedPhoneNumber();
+      if (savedPhone != null) {
+        _phoneController.text = savedPhone;
+      }
     }
   }
 
@@ -174,16 +184,16 @@ class _RegistrationPageState extends State<RegistrationPage> {
       );
       return false;
     }
-    if (_controller.selfieImageId.value == null) {
-      ToastHelper.showWarningToast(message: "Error: Please upload a selfie");
-      return false;
-    }
-    if (_controller.panImageId.value == null) {
-      ToastHelper.showWarningToast(
-        message: "Error: Please upload PAN card image",
-      );
-      return false;
-    }
+    // if (_controller.selfieImageId.value == null) {
+    //   ToastHelper.showWarningToast(message: "Error: Please upload a selfie");
+    //   return false;
+    // }
+    // if (_controller.panImageId.value == null) {
+    //   ToastHelper.showWarningToast(
+    //     message: "Error: Please upload PAN card image",
+    //   );
+    //   return false;
+    // }
     return true;
   }
 
@@ -236,7 +246,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
         'email': _emailController.text.trim(),
         'Addressline_1': _addressline1Controller.text.trim(),
         'Addressline_2': _addressline2Controller.text.trim(),
-        'user_image_id': _controller.selfieImageId.value?.toInt(),
+        'user_image_id': _controller.selfieImageId.value?.toInt() ?? 23,
         'pancard_number': _panController.text.trim(),
         'aadharcard_number': _aadharController.text.trim(),
         'vehicleType': _selectedVehicleType ?? "Not Selected",

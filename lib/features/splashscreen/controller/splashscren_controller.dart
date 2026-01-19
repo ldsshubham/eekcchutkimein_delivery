@@ -22,6 +22,9 @@ class SplashController extends GetxController {
 
     await Future.delayed(const Duration(seconds: 2));
     if (token != null && token.isNotEmpty) {
+      print('PROFILE WE GET : ${profileResponse.body}');
+      print('STATUS ${profileResponse.statusCode}');
+
       if (profileResponse.statusCode == 200 &&
           profileResponse.body['status'] == 'success') {
         Get.offNamed(AppRoutes.homepage);

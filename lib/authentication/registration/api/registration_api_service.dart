@@ -1,9 +1,10 @@
+import 'package:eekcchutkimein_delivery/constants/appstring.dart';
 import 'package:eekcchutkimein_delivery/services/token_service.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 
 class RegistrationApiService extends GetConnect {
-  final String _baseUrl = 'http://eekcchutkimein.com:5000';
+  final String _baseUrl = AppString.baseUrl;
 
   Future<Response> uploadImage(XFile file) async {
     try {
@@ -13,7 +14,7 @@ class RegistrationApiService extends GetConnect {
       });
 
       return post(
-        '$_baseUrl/employee/upload-selfie',
+        '${_baseUrl}/uploads/',
         formData,
         headers: {if (token != null) 'Authorization': 'Bearer $token'},
       );
@@ -25,12 +26,20 @@ class RegistrationApiService extends GetConnect {
   Future<Response> register(Map<String, dynamic> data) async {
     try {
       final token = await TokenService.getAccessToken();
+      print(
+        'Registration API issue : ${data.toString()} and ${token.toString()}',
+      );
       return post(
         '$_baseUrl/employee/register',
         data,
-        headers: {if (token != null) 'Authorization': 'Bearer $token'},
+        contentType: 'application/json',
+        headers: {
+          if (token != null) 'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
       );
     } catch (e) {
+      print('Registration API issue : ${e.toString()}');
       return Response(statusCode: 500, statusText: e.toString());
     }
   }

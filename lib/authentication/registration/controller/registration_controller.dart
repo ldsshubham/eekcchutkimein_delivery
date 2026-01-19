@@ -67,21 +67,24 @@ class RegistrationController extends GetxController {
     }
 
     try {
+      debugPrint("STARTING UPLOAD ($type): ${file.path}");
       final response = await _registrationService.uploadImage(file);
-      debugPrint(
-        "UPLOAD RESPONSE ($type): ${response.statusCode} - ${response.body}",
-      );
+      debugPrint("UPLOAD RESPONSE ($type) STATUS: ${response.statusCode}");
+      debugPrint("UPLOAD RESPONSE ($type) BODY: ${response.body}");
 
       if (response.statusCode == 200 && response.body != null) {
         final rawData = response.body['data'];
+        debugPrint("PARSING UPLOAD ID ($type) FROM: $rawData");
         final rawId = rawData != null ? rawData['id'] : null;
 
         // Robust ID parsing (handle String or Int from API)
         int? id;
         if (rawId is int) {
           id = rawId;
+          debugPrint("ID PARSED AS INT: $id");
         } else if (rawId != null) {
           id = int.tryParse(rawId.toString());
+          debugPrint("ID PARSED VIA TRYPARSE: $id");
         }
 
         if (id != null) {
@@ -91,20 +94,26 @@ class RegistrationController extends GetxController {
             panImageId.value = id;
           }
           ToastHelper.showSuccessToast(message: "$type uploaded successfully");
+          debugPrint("UPLOAD SUCCESS ($type): ID set to $id");
         } else {
+          debugPrint("FAILED TO PARSE ID ($type): rawId was $rawId");
           ToastHelper.showErrorToast(
             message: "Failed to parse $type ID from response",
           );
         }
       } else {
         final errorMsg =
-            response.body?['message']?.toString() ?? "Unknown error";
+            (response.body is Map && response.body['message'] != null)
+            ? response.body['message'].toString()
+            : "Server error (${response.statusCode})";
+        debugPrint("UPLOAD FAILED ($type): $errorMsg");
         ToastHelper.showErrorToast(
           message: "Failed to upload $type: $errorMsg",
         );
       }
-    } catch (e) {
-      debugPrint("UPLOAD ERROR ($type): $e");
+    } catch (e, stackTrace) {
+      debugPrint("UPLOAD ERROR ($type) EXCEPTION: $e");
+      debugPrint("UPLOAD ERROR ($type) STACKTRACE: $stackTrace");
       ToastHelper.showErrorToast(message: "Error uploading $type: $e");
     } finally {
       if (type == 'selfie') {
@@ -118,6 +127,7 @@ class RegistrationController extends GetxController {
   Future<void> registerEmployee(Map<String, dynamic> data) async {
     isLoading.value = true;
     try {
+      print('Registration API issue : ${data.toString()}');
       final response = await _registrationService.register(data);
       debugPrint(
         "REGISTER RESPONSE: ${response.statusCode} - ${response.body}",
@@ -130,6 +140,7 @@ class RegistrationController extends GetxController {
       } else {
         final errorMsg =
             response.body?['message']?.toString() ?? "Registration failed";
+
         ToastHelper.showErrorToast(message: errorMsg);
       }
     } catch (e) {
@@ -203,12 +214,14 @@ class RegistrationController extends GetxController {
         await TokenService.saveTokens(
           accessToken: accessToken,
           refreshToken: refreshToken,
+          phone: phone,
         );
 
         ToastHelper.showSuccessToast(message: "OTP Verified Successfully");
 
         // Check if profile exists
         final profileResponse = await _registrationService.getRiderProfile();
+        print("RIDER PROFILE : ${profileResponse.body}");
 
         if (profileResponse.statusCode == 200 &&
             profileResponse.body != null &&
