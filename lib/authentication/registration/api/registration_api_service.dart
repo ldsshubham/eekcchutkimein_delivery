@@ -37,7 +37,10 @@ class RegistrationApiService extends GetConnect {
           if (token != null) 'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',
         },
-      );
+      ).then((value) {
+        print('Registration API issue : ${value.body}');
+        return value;
+      });
     } catch (e) {
       print('Registration API issue : ${e.toString()}');
       return Response(statusCode: 500, statusText: e.toString());
@@ -50,7 +53,10 @@ class RegistrationApiService extends GetConnect {
       return get(
         '$_baseUrl/delivery/employee/rider/profile',
         headers: {if (token != null) 'Authorization': 'Bearer $token'},
-      );
+      ).then((value) {
+        print('Registration API issue : ${value.body}');
+        return value;
+      });
     } catch (e) {
       return Response(statusCode: 500, statusText: e.toString());
     }

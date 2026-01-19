@@ -1,8 +1,10 @@
 import 'package:eekcchutkimein_delivery/constants/appstring.dart';
+import 'package:eekcchutkimein_delivery/routes/routes.dart';
 import 'package:eekcchutkimein_delivery/constants/colors.dart';
 import 'package:eekcchutkimein_delivery/features/homepage/controller/bottomnavcontroller.dart';
 import 'package:eekcchutkimein_delivery/features/homepage/controller/mydrawercontroller.dart';
 import 'package:eekcchutkimein_delivery/features/homepage/view/pages.dart';
+import 'package:eekcchutkimein_delivery/services/token_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
@@ -109,6 +111,7 @@ class CompleteAdminPanel extends StatelessWidget {
               title: const Text('Logout'),
               onTap: () {
                 controller.closeDrawer();
+                _showLogoutAlert(context);
               },
             ),
           ],
@@ -165,6 +168,47 @@ class CompleteAdminPanel extends StatelessWidget {
               Get.back();
             },
             child: const Text('Go Offline'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showLogoutAlert(BuildContext context) {
+    Get.dialog(
+      AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        title: const Text(
+          'Logout?',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+        content: const Text('Are you sure you want to logout?'),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Get.back(); // cancel
+            },
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            onPressed: () async {
+              // 1. Close the dialog immediately
+              Get.back();
+
+              // 2. Perform cleanup
+              try {
+                await TokenService.clearTokens();
+                await box.erase();
+
+                // 3. Navigate away
+                Get.offAllNamed(AppRoutes.notReg);
+              } catch (e) {
+                // If something fails, at least navigate
+                Get.offAllNamed(AppRoutes.notReg);
+              }
+            },
+            child: const Text('Logout', style: TextStyle(color: Colors.white)),
           ),
         ],
       ),

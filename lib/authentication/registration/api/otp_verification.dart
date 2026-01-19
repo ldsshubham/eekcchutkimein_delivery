@@ -1,7 +1,9 @@
+import 'package:eekcchutkimein_delivery/constants/appstring.dart';
 import 'package:get/get.dart';
 
 class OtpVerificationService extends GetConnect {
-  final String _baseUrl = 'http://eekcchutkimein.com:5000';
+  // final String _baseUrl = 'http://eekcchutkimein.com:5000';
+  final String _baseUrl = AppString.baseUrl;
 
   Future<Response> sendOtp(String phone) async {
     try {

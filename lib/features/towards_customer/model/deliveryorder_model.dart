@@ -4,7 +4,7 @@ class DeliveryOrder {
   final String address;
   final String orderId;
   final String paymentMode;
-  final int amount;
+  final double amount;
   final int items;
 
   DeliveryOrder({

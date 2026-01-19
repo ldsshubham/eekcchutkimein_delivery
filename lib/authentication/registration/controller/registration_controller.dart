@@ -137,6 +137,7 @@ class RegistrationController extends GetxController {
         ToastHelper.showSuccessToast(
           message: "Registration completed successfully",
         );
+        Get.to(() => const Homepage());
       } else {
         final errorMsg =
             response.body?['message']?.toString() ?? "Registration failed";
@@ -160,6 +161,7 @@ class RegistrationController extends GetxController {
       );
       if (response.statusCode == 200 && response.body != null) {
         String otpValue = "";
+        print("OTP VALUE: ${response.body['data']}");
         if (response.body['data'] is Map) {
           otpValue = (response.body['data']['otp']).toString();
         } else {

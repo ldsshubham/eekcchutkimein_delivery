@@ -27,6 +27,9 @@ class SplashController extends GetxController {
 
       if (profileResponse.statusCode == 200 &&
           profileResponse.body['status'] == 'success') {
+        print(
+          'PROFILE ${profileResponse.statusCode} AND ${profileResponse.body['status']}',
+        );
         Get.offNamed(AppRoutes.homepage);
       } else {
         Get.offNamed(AppRoutes.registration);

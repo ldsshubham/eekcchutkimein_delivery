@@ -5,73 +5,55 @@ import 'package:eekcchutkimein_delivery/features/ordersummry/view/ordersummery_s
 import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
 
+import 'package:eekcchutkimein_delivery/features/orders_home/controller/order_controller.dart';
+import 'package:get/get.dart';
+
 class OrderDetails extends StatelessWidget {
   const OrderDetails({super.key});
 
   @override
   Widget build(BuildContext context) {
     final status = GetStorage();
-    final List<OrderModel> mockOrders = [
-      OrderModel(
-        orderId: 1024,
-        orderDate: "Jan 16, 2026",
-        orderAmount: 450,
-        orderTime: "10:30 AM",
-        orderStatus: "Pending",
-        productList: [
-          OrderItem(productName: "Fresh Milk", productQuantity: 2),
-          OrderItem(productName: "Brown Bread", productQuantity: 1),
-        ],
-        vendorName: "Gupta Grocery Store",
-        vendorAddress: "Sector 21, Gurgaon",
-        customerName: "Rahul Sharma",
-        customerAddress: "Flat 402, Sunshine Apartments, Gurugram",
-        customerPhone: "9876543210",
-      ),
-      OrderModel(
-        orderId: 1025,
-        orderDate: "Jan 16, 2026",
-        orderAmount: 1200,
-        orderTime: "11:15 AM",
-        orderStatus: "Pending",
-        productList: [
-          OrderItem(productName: "Basmati Rice 5kg", productQuantity: 1),
-          OrderItem(productName: "Cooking Oil 1L", productQuantity: 2),
-        ],
-        vendorName: "SuperMart Central",
-        vendorAddress: "Palam Vihar, Gurgaon",
-        customerName: "Amit Verma",
-        customerAddress: "H.No 123, Sector 15, Gurgaon",
-        customerPhone: "8888888888",
-      ),
-    ];
+    final OrderController controller = Get.put(OrderController());
 
-    return ListView.separated(
-      padding: const EdgeInsets.all(16),
-      itemCount: mockOrders.length,
-      separatorBuilder: (context, index) => const SizedBox(height: 16),
-      itemBuilder: (context, index) {
-        final order = mockOrders[index];
-        return OrderCard(
-          order: order,
-          onTap: () {
-            if (status.read('isOnline')) {
-              showModalBottomSheet(
-                context: context,
-                isScrollControlled: true,
-                backgroundColor: Colors.white,
-                shape: const RoundedRectangleBorder(
-                  borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-                ),
-                builder: (_) => OrderBottomSheet(order: order),
-              );
-            } else {
-              _showOfflineSnackBar(context);
-            }
-          },
-        );
-      },
-    );
+    return Obx(() {
+      if (controller.isLoading.value) {
+        return const Center(child: CircularProgressIndicator());
+      }
+      print('ORDER LIST ${controller.orders}');
+      if (controller.orders.isEmpty) {
+        return const Center(child: Text("No orders found"));
+      }
+
+      return ListView.separated(
+        padding: const EdgeInsets.all(16),
+        itemCount: controller.orders.length,
+        separatorBuilder: (context, index) => const SizedBox(height: 16),
+        itemBuilder: (context, index) {
+          final order = controller.orders[index];
+          return OrderCard(
+            order: order,
+            onTap: () {
+              if (status.read('isOnline')) {
+                showModalBottomSheet(
+                  context: context,
+                  isScrollControlled: true,
+                  backgroundColor: Colors.white,
+                  shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.vertical(
+                      top: Radius.circular(20),
+                    ),
+                  ),
+                  builder: (_) => OrderBottomSheet(order: order),
+                );
+              } else {
+                _showOfflineSnackBar(context);
+              }
+            },
+          );
+        },
+      );
+    });
   }
 
   void _showOfflineSnackBar(BuildContext context) {

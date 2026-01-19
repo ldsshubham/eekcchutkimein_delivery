@@ -1,53 +1,58 @@
+import 'package:eekcchutkimein_delivery/features/profile/api/profile_api_service.dart';
+import 'package:eekcchutkimein_delivery/features/profile/controller/profile_controller.dart';
 import 'package:eekcchutkimein_delivery/features/profile/profile_model.dart';
+import 'package:eekcchutkimein_delivery/routes/routes.dart';
+import 'package:eekcchutkimein_delivery/services/token_service.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final profile = DeliveryPartnerProfile(
-      name: "Rahul Sharma",
-      phone: "+91 98XXXXXX21",
-      partnerId: "DP10234",
-      rating: 4.7,
-      totalOrders: 1240,
-      todayEarnings: 860,
-      vehicleNumber: "DL 3S AB 4321",
-      vehicleType: "Bike",
-      isOnline: true,
-    );
+    final controller = Get.put(ProfileController());
 
     return Container(
       color: const Color(0xffF6F7F9),
-      child: ListView(
-        padding: const EdgeInsets.all(14),
-        children: [
-          _profileHeader(profile),
-          const SizedBox(height: 12),
-          _statsCard(profile),
-          const SizedBox(height: 12),
-          _infoCard("Vehicle Details", [
-            _infoTile(
-              Icons.directions_bike_outlined,
-              "Vehicle Type",
-              profile.vehicleType,
-            ),
-            _divider(),
-            _infoTile(
-              Icons.confirmation_number_outlined,
-              "Vehicle Number",
-              profile.vehicleNumber,
-            ),
-          ]),
-          const SizedBox(height: 12),
-          _actionsCard(),
-        ],
-      ),
+      child: Obx(() {
+        if (controller.isLoading.value) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        final profile = controller.profile.value;
+        if (profile == null) {
+          return const Center(child: Text("Failed to load profile"));
+        }
+
+        return ListView(
+          padding: const EdgeInsets.all(14),
+          children: [
+            _profileHeader(profile),
+            const SizedBox(height: 12),
+            _statsCard(profile),
+            const SizedBox(height: 12),
+            _infoCard("Vehicle Details", [
+              _infoTile(
+                Icons.directions_bike_outlined,
+                "Vehicle Type",
+                profile.vehicleType,
+              ),
+              _divider(),
+              _infoTile(
+                Icons.confirmation_number_outlined,
+                "Vehicle Number",
+                profile.vehicleNumber,
+              ),
+            ]),
+            const SizedBox(height: 12),
+            _actionsCard(context),
+          ],
+        );
+      }),
     );
   }
-
-  // ---------------- HEADER ----------------
 
   Widget _profileHeader(DeliveryPartnerProfile profile) {
     return Container(
@@ -233,41 +238,65 @@ class ProfileScreen extends StatelessWidget {
 
   // ---------------- ACTIONS ----------------
 
-  Widget _actionsCard() {
+  Widget _actionsCard(BuildContext context) {
     return Container(
       decoration: _cardDecoration(),
       child: Column(
         children: [
           // _actionTile(Icons.edit_outlined, "Edit Profile"),
           // _divider(),
-          _actionTile(Icons.account_balance_outlined, "Bank Details"),
+          _actionTile(
+            Icons.account_balance_outlined,
+            "Bank Details",
+            onTap: () {},
+          ),
           _divider(),
-          _actionTile(Icons.support_agent_outlined, "Support"),
+          _actionTile(Icons.support_agent_outlined, "Support", onTap: () {}),
           _divider(),
-          _actionTile(Icons.logout, "Logout", isLogout: true),
+          _actionTile(
+            Icons.logout,
+            "Logout",
+            isLogout: true,
+            onTap: () => _showLogoutAlert(context),
+          ),
+          _divider(),
+          _actionTile(
+            Icons.delete_outline,
+            "Delete Account",
+            isLogout: true, // Reuse red styling
+            onTap: () => _showDeleteAccountAlert(context),
+          ),
         ],
       ),
     );
   }
 
-  Widget _actionTile(IconData icon, String title, {bool isLogout = false}) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-      child: Row(
-        children: [
-          Icon(icon, size: 20, color: isLogout ? Colors.red : Colors.black54),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Text(
-              title,
-              style: TextStyle(
-                fontSize: 15, // +2
-                color: isLogout ? Colors.red : Colors.black87,
+  Widget _actionTile(
+    IconData icon,
+    String title, {
+    bool isLogout = false,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+        child: Row(
+          children: [
+            Icon(icon, size: 20, color: isLogout ? Colors.red : Colors.black54),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                title,
+                style: TextStyle(
+                  fontSize: 15, // +2
+                  color: isLogout ? Colors.red : Colors.black87,
+                ),
               ),
             ),
-          ),
-          const Icon(Icons.chevron_right, size: 20, color: Colors.black38),
-        ],
+            const Icon(Icons.chevron_right, size: 20, color: Colors.black38),
+          ],
+        ),
       ),
     );
   }
@@ -280,6 +309,101 @@ class ProfileScreen extends StatelessWidget {
     return BoxDecoration(
       color: Colors.white,
       borderRadius: BorderRadius.circular(10),
+    );
+  }
+
+  void _showLogoutAlert(BuildContext context) {
+    Get.dialog(
+      AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        title: const Text(
+          'Logout?',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+        content: const Text('Are you sure you want to logout?'),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Get.back(); // cancel
+            },
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            onPressed: () async {
+              // 1. Close the dialog immediately
+              Get.back();
+
+              // 2. Perform cleanup
+              try {
+                await TokenService.clearTokens();
+                await GetStorage().erase();
+
+                // 3. Navigate away
+                Get.offAllNamed(AppRoutes.notReg);
+              } catch (e) {
+                // Return to splash even if cleanup fails
+                Get.offAllNamed(AppRoutes.notReg);
+              }
+            },
+            child: const Text('Logout', style: TextStyle(color: Colors.white)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showDeleteAccountAlert(BuildContext context) {
+    Get.dialog(
+      AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        title: const Text(
+          'Delete Account?',
+          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.red),
+        ),
+        content: const Text(
+          'Are you sure you want to delete your account? This action cannot be undone.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Get.back();
+            },
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            onPressed: () async {
+              // 1. Close dialog
+              Get.back();
+
+              // 2. Call API
+              try {
+                final apiService = ProfileApiService();
+                final response = await apiService.deleteProfile();
+
+                if (response.statusCode == 200) {
+                  // 3. Clear data and navigate to Splash
+                  await TokenService.clearTokens();
+                  await GetStorage().erase();
+                  Get.offAllNamed(AppRoutes.notReg);
+                } else {
+                  Get.snackbar(
+                    "Error",
+                    "Failed to delete account. Please try again.",
+                    snackPosition: SnackPosition.BOTTOM,
+                    backgroundColor: Colors.red,
+                    colorText: Colors.white,
+                  );
+                }
+              } catch (e) {
+                Get.snackbar("Error", "Something went wrong.");
+              }
+            },
+            child: const Text('Delete', style: TextStyle(color: Colors.white)),
+          ),
+        ],
+      ),
     );
   }
 }
