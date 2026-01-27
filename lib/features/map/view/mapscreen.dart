@@ -16,17 +16,19 @@ class _MapScreenState extends State<MapScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return GoogleMap(
-      initialCameraPosition: const CameraPosition(
-        target: _initialLocation,
-        zoom: 14,
+    return SizedBox.expand(
+      child: GoogleMap(
+        initialCameraPosition: const CameraPosition(
+          target: _initialLocation,
+          zoom: 14,
+        ),
+        myLocationEnabled: false,
+        myLocationButtonEnabled: true,
+        zoomControlsEnabled: false,
+        onMapCreated: (controller) {
+          mapController = controller;
+        },
       ),
-      myLocationEnabled: true,
-      myLocationButtonEnabled: true,
-      zoomControlsEnabled: false,
-      onMapCreated: (controller) {
-        mapController = controller;
-      },
     );
   }
 }

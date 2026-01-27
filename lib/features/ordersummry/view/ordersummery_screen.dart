@@ -1,8 +1,10 @@
 import 'package:eekcchutkimein_delivery/constants/colors.dart';
 import 'package:eekcchutkimein_delivery/features/orders_home/model/order_model.dart';
+import 'package:eekcchutkimein_delivery/features/orders_home/controller/order_controller.dart';
 import 'package:eekcchutkimein_delivery/features/orders_home/util/slidetostart_btn.dart';
 import 'package:eekcchutkimein_delivery/features/ordersummry/util/uploadimage.dart';
 import 'package:eekcchutkimein_delivery/features/towards_customer/model/deliveryorder_model.dart';
+import 'package:eekcchutkimein_delivery/features/towards_customer/util/toastification_helper.dart';
 import 'package:eekcchutkimein_delivery/features/towards_customer/view/towardscustomer_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -107,8 +109,41 @@ class OrderSummery extends StatelessWidget {
             padding: const EdgeInsets.all(16),
             child: SlideToStartButton(
               textTitle: "Slide to confirm order picked up!",
-              onSlideComplete: () {
+              onSlideComplete: () async {
                 _showUploadSheet(context, currentOrder);
+                // final OrderController controller = Get.find<OrderController>();
+
+                // // Show loading
+                // Get.dialog(
+                //   const Center(child: CircularProgressIndicator()),
+                //   barrierDismissible: false,
+                // );
+
+                // final response = await controller.startDelivery(
+                //   currentOrder.orderId,
+                // );
+
+                // // Close loading
+                // Get.back();
+
+                // if (response.statusCode == 200) {
+                //   final message =
+                //       response.body['mesaage'] ??
+                //       "Delivery Started Successfully!";
+                //   ToastHelper.showSuccessToast(message: message);
+                //   _showUploadSheet(context, currentOrder);
+                // } else {
+                //   ToastHelper.showErrorToast(
+                //     message: "Failed to start delivery: ${response.statusText}",
+                //   );
+                //   // Get.snackbar(
+                //   //   "Error",
+                //   //   "Failed to start delivery: ${response.statusText}",
+                //   //   backgroundColor: Colors.red,
+                //   //   colorText: Colors.white,
+                //   //   snackPosition: SnackPosition.BOTTOM,
+                //   // );
+                // }
               },
             ),
           ),
@@ -184,22 +219,44 @@ class OrderSummery extends StatelessWidget {
     // 👇 THIS RUNS AFTER SHEET IS CLOSED
 
     if (result == true) {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (_) => TowardsCustomerScreen(
-            order: DeliveryOrder(
-              customerName: currentOrder.customerName,
-              phone: currentOrder.customerPhone,
-              address: currentOrder.customerAddress,
-              orderId: "#${currentOrder.orderId}",
-              paymentMode: "Cash on delivery",
-              amount: currentOrder.orderAmount,
-              items: currentOrder.productList.length,
+      final OrderController controller = Get.find<OrderController>();
+
+      // Show loading
+      Get.dialog(
+        const Center(child: CircularProgressIndicator()),
+        barrierDismissible: false,
+      );
+
+      final response = await controller.startDelivery(currentOrder.orderId);
+
+      // Close loading
+      Get.back();
+
+      if (response.statusCode == 200) {
+        final message =
+            response.body['mesaage'] ?? "Delivery Started Successfully!";
+        ToastHelper.showSuccessToast(message: message);
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => TowardsCustomerScreen(
+              order: DeliveryOrder(
+                customerName: currentOrder.customerName,
+                phone: currentOrder.customerPhone,
+                address: currentOrder.customerAddress,
+                orderId: "#${currentOrder.orderId}",
+                paymentMode: "Cash on delivery",
+                amount: currentOrder.orderAmount,
+                items: currentOrder.productList.length,
+              ),
             ),
           ),
-        ),
-      );
+        );
+      } else {
+        ToastHelper.showErrorToast(
+          message: "Failed to start delivery: ${response.statusText}",
+        );
+      }
     } else {
       _showToast(context, 'Please upload package photo');
     }

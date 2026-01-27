@@ -166,7 +166,7 @@ class TowardsCustomerScreen extends StatelessWidget {
 
         return Column(
           children: [
-            _detailRow("Cash on Delivery", "₹${50}"),
+            _detailRow("Cash on Delivery", "₹${(order.amount)}"),
             const SizedBox(height: 18),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -175,7 +175,9 @@ class TowardsCustomerScreen extends StatelessWidget {
                 InkWell(
                   onTap: () async {
                     // Navigate to PaymentPage and wait for result
-                    final result = await Get.to(() => const PaymentpageCod());
+                    final result = await Get.to(
+                      () => PaymentpageCod(order.amount),
+                    );
                     if (result == true) {
                       paymentController.confirmQrPayment();
                     }

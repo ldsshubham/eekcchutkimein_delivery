@@ -10,7 +10,22 @@ class OrderApiService extends GetConnect {
       final token = await TokenService.getAccessToken();
       return get(
         '$_baseUrl/delivery/employee/rider/order-list',
-        // body: {},
+        headers: {
+          if (token != null) 'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+      );
+    } catch (e) {
+      return Response(statusCode: 500, statusText: e.toString());
+    }
+  }
+
+  Future<Response> startDelivery(int orderId) async {
+    try {
+      final token = await TokenService.getAccessToken();
+      return post(
+        '$_baseUrl/delivery/employee/start',
+        {'orderId': orderId},
         headers: {
           if (token != null) 'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',

@@ -1,6 +1,7 @@
 import 'package:eekcchutkimein_delivery/features/profile/api/profile_api_service.dart';
 import 'package:eekcchutkimein_delivery/features/profile/controller/profile_controller.dart';
 import 'package:eekcchutkimein_delivery/features/profile/profile_model.dart';
+import 'package:eekcchutkimein_delivery/features/profile/view/update_profile_screen.dart';
 import 'package:eekcchutkimein_delivery/routes/routes.dart';
 import 'package:eekcchutkimein_delivery/services/token_service.dart';
 import 'package:flutter/material.dart';
@@ -47,7 +48,7 @@ class ProfileScreen extends StatelessWidget {
               ),
             ]),
             const SizedBox(height: 12),
-            _actionsCard(context),
+            _actionsCard(context, profile),
           ],
         );
       }),
@@ -94,25 +95,19 @@ class ProfileScreen extends StatelessWidget {
                 Text(
                   profile.name,
                   style: const TextStyle(
-                    fontSize: 16, // +2
+                    fontSize: 16,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
                 const SizedBox(height: 2),
                 Text(
                   profile.phone,
-                  style: const TextStyle(
-                    fontSize: 14, // +2
-                    color: Colors.black54,
-                  ),
+                  style: const TextStyle(fontSize: 14, color: Colors.black54),
                 ),
                 const SizedBox(height: 2),
                 Text(
                   "Partner ID: ${profile.partnerId}",
-                  style: const TextStyle(
-                    fontSize: 13, // +2
-                    color: Colors.black45,
-                  ),
+                  style: const TextStyle(fontSize: 13, color: Colors.black45),
                 ),
               ],
             ),
@@ -238,13 +233,17 @@ class ProfileScreen extends StatelessWidget {
 
   // ---------------- ACTIONS ----------------
 
-  Widget _actionsCard(BuildContext context) {
+  Widget _actionsCard(BuildContext context, DeliveryPartnerProfile? profile) {
     return Container(
       decoration: _cardDecoration(),
       child: Column(
         children: [
-          // _actionTile(Icons.edit_outlined, "Edit Profile"),
-          // _divider(),
+          _actionTile(
+            Icons.edit_outlined,
+            "Edit Profile",
+            onTap: () => Get.to(() => UpdateProfileScreen(profile: profile!)),
+          ),
+          _divider(),
           _actionTile(
             Icons.account_balance_outlined,
             "Bank Details",

@@ -39,4 +39,17 @@ class OrderController extends GetxController {
       isLoading.value = false;
     }
   }
+
+  Future<Response> startDelivery(int orderId) async {
+    try {
+      isLoading.value = true;
+      final response = await _apiService.startDelivery(orderId);
+      return response;
+    } catch (e) {
+      debugPrint("ERROR STARTING DELIVERY: $e");
+      return Response(statusCode: 500, statusText: e.toString());
+    } finally {
+      isLoading.value = false;
+    }
+  }
 }

@@ -34,7 +34,7 @@ class OrderDetails extends StatelessWidget {
           return OrderCard(
             order: order,
             onTap: () {
-              if (status.read('isOnline')) {
+              if (status.read('isOnline') ?? true) {
                 showModalBottomSheet(
                   context: context,
                   isScrollControlled: true,

@@ -1,6 +1,6 @@
 import 'package:eekcchutkimein_delivery/authentication/registration/api/otp_verification.dart';
 import 'package:eekcchutkimein_delivery/authentication/registration/api/registration_api_service.dart';
-import 'package:eekcchutkimein_delivery/authentication/registration/otp_verification_screen.dart';
+import 'package:eekcchutkimein_delivery/authentication/registration/otp_verify.dart';
 import 'package:eekcchutkimein_delivery/authentication/registration/registration_page.dart';
 import 'package:eekcchutkimein_delivery/features/homepage/view/homepage.dart';
 import 'package:eekcchutkimein_delivery/features/towards_customer/util/toastification_helper.dart';
@@ -24,105 +24,105 @@ class RegistrationController extends GetxController {
   var selfieImageId = Rxn<int>();
   var panImageId = Rxn<int>();
 
-  // Granular loading states for uploads
-  var isSelfieUploading = false.obs;
-  var isPanUploading = false.obs;
+  // // Granular loading states for uploads
+  // var isSelfieUploading = false.obs;
+  // var isPanUploading = false.obs;
 
-  Future<void> pickImage(ImageSource source, String type) async {
-    try {
-      final XFile? pickedFile = await _picker.pickImage(
-        source: source,
-        imageQuality: 80,
-      );
-      if (pickedFile != null) {
-        if (type == 'selfie') {
-          selfieImage.value = pickedFile;
-          selfieImageId.value = null; // Reset ID if new image picked
-        } else if (type == 'pan') {
-          panImage.value = pickedFile;
-          panImageId.value = null; // Reset ID if new image picked
-        }
-      }
-    } catch (e) {
-      Get.snackbar(
-        "Error",
-        "Failed to pick image: $e",
-        backgroundColor: Colors.redAccent,
-        colorText: Colors.white,
-      );
-    }
-  }
+  // Future<void> pickImage(ImageSource source, String type) async {
+  //   try {
+  //     final XFile? pickedFile = await _picker.pickImage(
+  //       source: source,
+  //       imageQuality: 80,
+  //     );
+  //     if (pickedFile != null) {
+  //       if (type == 'selfie') {
+  //         selfieImage.value = pickedFile;
+  //         selfieImageId.value = null; // Reset ID if new image picked
+  //       } else if (type == 'pan') {
+  //         panImage.value = pickedFile;
+  //         panImageId.value = null; // Reset ID if new image picked
+  //       }
+  //     }
+  //   } catch (e) {
+  //     Get.snackbar(
+  //       "Error",
+  //       "Failed to pick image: $e",
+  //       backgroundColor: Colors.redAccent,
+  //       colorText: Colors.white,
+  //     );
+  //   }
+  // }
 
-  Future<void> uploadCapturedImage(String type) async {
-    final file = type == 'selfie' ? selfieImage.value : panImage.value;
-    if (file == null) {
-      ToastHelper.showErrorToast(message: "No $type image selected");
-      return;
-    }
+  // Future<void> uploadCapturedImage(String type) async {
+  //   final file = type == 'selfie' ? selfieImage.value : panImage.value;
+  //   if (file == null) {
+  //     ToastHelper.showErrorToast(message: "No $type image selected");
+  //     return;
+  //   }
 
-    if (type == 'selfie') {
-      isSelfieUploading.value = true;
-    } else {
-      isPanUploading.value = true;
-    }
+  //   if (type == 'selfie') {
+  //     isSelfieUploading.value = true;
+  //   } else {
+  //     isPanUploading.value = true;
+  //   }
 
-    try {
-      debugPrint("STARTING UPLOAD ($type): ${file.path}");
-      final response = await _registrationService.uploadImage(file);
-      debugPrint("UPLOAD RESPONSE ($type) STATUS: ${response.statusCode}");
-      debugPrint("UPLOAD RESPONSE ($type) BODY: ${response.body}");
+  //   try {
+  //     debugPrint("STARTING UPLOAD ($type): ${file.path}");
+  //     final response = await _registrationService.uploadImage(file);
+  //     debugPrint("UPLOAD RESPONSE ($type) STATUS: ${response.statusCode}");
+  //     debugPrint("UPLOAD RESPONSE ($type) BODY: ${response.body}");
 
-      if (response.statusCode == 200 && response.body != null) {
-        final rawData = response.body['data'];
-        debugPrint("PARSING UPLOAD ID ($type) FROM: $rawData");
-        final rawId = rawData != null ? rawData['id'] : null;
+  //     if (response.statusCode == 200 && response.body != null) {
+  //       final rawData = response.body['data'];
+  //       debugPrint("PARSING UPLOAD ID ($type) FROM: $rawData");
+  //       final rawId = rawData != null ? rawData['id'] : null;
 
-        // Robust ID parsing (handle String or Int from API)
-        int? id;
-        if (rawId is int) {
-          id = rawId;
-          debugPrint("ID PARSED AS INT: $id");
-        } else if (rawId != null) {
-          id = int.tryParse(rawId.toString());
-          debugPrint("ID PARSED VIA TRYPARSE: $id");
-        }
+  //       // Robust ID parsing (handle String or Int from API)
+  //       int? id;
+  //       if (rawId is int) {
+  //         id = rawId;
+  //         debugPrint("ID PARSED AS INT: $id");
+  //       } else if (rawId != null) {
+  //         id = int.tryParse(rawId.toString());
+  //         debugPrint("ID PARSED VIA TRYPARSE: $id");
+  //       }
 
-        if (id != null) {
-          if (type == 'selfie') {
-            selfieImageId.value = id;
-          } else if (type == 'pan') {
-            panImageId.value = id;
-          }
-          ToastHelper.showSuccessToast(message: "$type uploaded successfully");
-          debugPrint("UPLOAD SUCCESS ($type): ID set to $id");
-        } else {
-          debugPrint("FAILED TO PARSE ID ($type): rawId was $rawId");
-          ToastHelper.showErrorToast(
-            message: "Failed to parse $type ID from response",
-          );
-        }
-      } else {
-        final errorMsg =
-            (response.body is Map && response.body['message'] != null)
-            ? response.body['message'].toString()
-            : "Server error (${response.statusCode})";
-        debugPrint("UPLOAD FAILED ($type): $errorMsg");
-        ToastHelper.showErrorToast(
-          message: "Failed to upload $type: $errorMsg",
-        );
-      }
-    } catch (e, stackTrace) {
-      debugPrint("UPLOAD ERROR ($type) EXCEPTION: $e");
-      debugPrint("UPLOAD ERROR ($type) STACKTRACE: $stackTrace");
-      ToastHelper.showErrorToast(message: "Error uploading $type: $e");
-    } finally {
-      if (type == 'selfie') {
-        isSelfieUploading.value = false;
-      } else {
-        isPanUploading.value = false;
-      }
-    }
-  }
+  //       if (id != null) {
+  //         if (type == 'selfie') {
+  //           selfieImageId.value = id;
+  //         } else if (type == 'pan') {
+  //           panImageId.value = id;
+  //         }
+  //         ToastHelper.showSuccessToast(message: "$type uploaded successfully");
+  //         debugPrint("UPLOAD SUCCESS ($type): ID set to $id");
+  //       } else {
+  //         debugPrint("FAILED TO PARSE ID ($type): rawId was $rawId");
+  //         ToastHelper.showErrorToast(
+  //           message: "Failed to parse $type ID from response",
+  //         );
+  //       }
+  //     } else {
+  //       final errorMsg =
+  //           (response.body is Map && response.body['message'] != null)
+  //           ? response.body['message'].toString()
+  //           : "Server error (${response.statusCode})";
+  //       debugPrint("UPLOAD FAILED ($type): $errorMsg");
+  //       ToastHelper.showErrorToast(
+  //         message: "Failed to upload $type: $errorMsg",
+  //       );
+  //     }
+  //   } catch (e, stackTrace) {
+  //     debugPrint("UPLOAD ERROR ($type) EXCEPTION: $e");
+  //     debugPrint("UPLOAD ERROR ($type) STACKTRACE: $stackTrace");
+  //     ToastHelper.showErrorToast(message: "Error uploading $type: $e");
+  //   } finally {
+  //     if (type == 'selfie') {
+  //       isSelfieUploading.value = false;
+  //     } else {
+  //       isPanUploading.value = false;
+  //     }
+  //   }
+  // }
 
   Future<void> registerEmployee(Map<String, dynamic> data) async {
     isLoading.value = true;

@@ -20,7 +20,7 @@ class MainLoginScreen extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: const [
                   Text(
-                    "Blinkit",
+                    "Eekcchutkimein-Delivery",
                     style: TextStyle(
                       fontSize: 34,
                       fontWeight: FontWeight.w900,

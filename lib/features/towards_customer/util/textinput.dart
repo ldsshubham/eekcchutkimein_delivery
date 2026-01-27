@@ -10,6 +10,8 @@ class MinimalInput extends StatelessWidget {
   final TextCapitalization textCapitalization;
   final Widget? prefixIcon;
   final bool readOnly;
+  final bool? enabled;
+  final String? hintText;
 
   const MinimalInput({
     super.key,
@@ -21,6 +23,8 @@ class MinimalInput extends StatelessWidget {
     this.textCapitalization = TextCapitalization.none,
     this.prefixIcon,
     this.readOnly = false,
+    this.enabled,
+    this.hintText,
   });
 
   @override
@@ -41,6 +45,7 @@ class MinimalInput extends StatelessWidget {
           controller: controller,
           obscureText: obscure,
           readOnly: readOnly,
+          enabled: enabled,
           keyboardType: keyboardType,
           maxLines: maxLines,
           textCapitalization: textCapitalization,
@@ -50,7 +55,7 @@ class MinimalInput extends StatelessWidget {
             color: AppColors.primaryColorText,
           ),
           decoration: InputDecoration(
-            hintText: "Enter $label",
+            hintText: hintText ?? "Enter $label",
             hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 12),
             prefixIcon: prefixIcon,
             filled: true,

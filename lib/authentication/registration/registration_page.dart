@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:eekcchutkimein_delivery/authentication/registration/controller/pickimage.dart';
 import 'package:eekcchutkimein_delivery/authentication/registration/controller/registration_controller.dart';
 import 'package:eekcchutkimein_delivery/features/towards_customer/util/textinput.dart';
 import 'package:eekcchutkimein_delivery/features/towards_customer/util/toastification_helper.dart';
@@ -18,6 +19,9 @@ class RegistrationPage extends StatefulWidget {
 
 class _RegistrationPageState extends State<RegistrationPage> {
   final PageController _pageController = PageController();
+  final PickImageController _pickImageController = Get.put(
+    PickImageController(),
+  );
   final RegistrationController _controller = Get.put(RegistrationController());
   int _currentStep = 0;
 
@@ -579,9 +583,9 @@ class _RegistrationPageState extends State<RegistrationPage> {
               Icons.camera_alt_outlined,
               _controller.selfieImage.value,
               _controller.selfieImageId.value,
-              _controller.isSelfieUploading.value,
+              _pickImageController.isSelfieUploading.value,
               () => _showImageSourceDialog('selfie'),
-              () => _controller.uploadCapturedImage('selfie'),
+              () => _pickImageController.uploadCapturedImage('selfie'),
             ),
           ),
           Obx(
@@ -590,9 +594,9 @@ class _RegistrationPageState extends State<RegistrationPage> {
               Icons.credit_card_outlined,
               _controller.panImage.value,
               _controller.panImageId.value,
-              _controller.isPanUploading.value,
+              _pickImageController.isPanUploading.value,
               () => _showImageSourceDialog('pan'),
-              () => _controller.uploadCapturedImage('pan'),
+              () => _pickImageController.uploadCapturedImage('pan'),
             ),
           ),
           const SizedBox(height: 20),
@@ -615,7 +619,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
               title: const Text('Take a Photo'),
               onTap: () {
                 Navigator.pop(context);
-                _controller.pickImage(ImageSource.camera, type);
+                _pickImageController.pickImage(ImageSource.camera, type);
               },
             ),
             ListTile(
@@ -623,7 +627,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
               title: const Text('Choose from Gallery'),
               onTap: () {
                 Navigator.pop(context);
-                _controller.pickImage(ImageSource.gallery, type);
+                _pickImageController.pickImage(ImageSource.gallery, type);
               },
             ),
           ],

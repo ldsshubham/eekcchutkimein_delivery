@@ -1,16 +1,17 @@
 import 'package:eekcchutkimein_delivery/constants/colors.dart';
+import 'package:eekcchutkimein_delivery/features/towards_customer/util/toastification_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
 
 class PaymentpageCod extends StatelessWidget {
-  const PaymentpageCod({super.key});
-
+  const PaymentpageCod(this.amount, {super.key});
+  final double amount;
   @override
   Widget build(BuildContext context) {
     // You might want to pass these as arguments
-    final String amountToCollect = "156.00";
+    final String amountToCollect = "${amount.toStringAsFixed(2)}";
     final String upiId = "9876543210@upi";
     final String qrUrl =
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQSo1TY8WIttz1a84hfX9QekgytK0-OqQPoiQ&s";
@@ -184,14 +185,17 @@ class PaymentpageCod extends StatelessWidget {
                 onPressed: () {
                   // Pass 'true' to indicate payment success
                   Get.back(result: true);
-                  Get.snackbar(
-                    "Success",
-                    "Payment marked as collected",
-                    backgroundColor: Colors.green,
-                    colorText: Colors.white,
-                    snackPosition: SnackPosition.BOTTOM,
-                    margin: const EdgeInsets.all(20),
+                  ToastHelper.showSuccessToast(
+                    message: "Payment marked as collected",
                   );
+                  // Get.snackbar(
+                  //   "Success",
+                  //   "Payment marked as collected",
+                  //   backgroundColor: Colors.green,
+                  //   colorText: Colors.white,
+                  //   snackPosition: SnackPosition.BOTTOM,
+                  //   margin: const EdgeInsets.all(20),
+                  // );
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.green,
