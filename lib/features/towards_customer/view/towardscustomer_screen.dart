@@ -323,7 +323,7 @@ class TowardsCustomerScreen extends StatelessWidget {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      builder: (_) => const OtpVerificationSheet(),
+      builder: (_) => OtpVerificationSheet(orderId: order.orderId),
     );
   }
 }

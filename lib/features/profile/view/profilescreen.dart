@@ -34,18 +34,20 @@ class ProfileScreen extends StatelessWidget {
             const SizedBox(height: 12),
             _statsCard(profile),
             const SizedBox(height: 12),
-            _infoCard("Vehicle Details", [
+            _infoCard("Personal Details", [
               _infoTile(
-                Icons.directions_bike_outlined,
-                "Vehicle Type",
-                profile.vehicleType,
+                Icons.person_outline,
+                "Father's Name",
+                profile.fatherName,
               ),
               _divider(),
               _infoTile(
-                Icons.confirmation_number_outlined,
-                "Vehicle Number",
-                profile.vehicleNumber,
+                Icons.calendar_today_outlined,
+                "Date of Birth",
+                profile.dob,
               ),
+              _divider(),
+              _infoTile(Icons.email_outlined, "Email Address", profile.email),
             ]),
             const SizedBox(height: 12),
             _actionsCard(context, profile),

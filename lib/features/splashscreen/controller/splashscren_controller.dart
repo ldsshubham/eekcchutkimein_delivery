@@ -5,7 +5,9 @@ import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 
 class SplashController extends GetxController {
-  final RegistrationApiService _registrationService = RegistrationApiService();
+  final RegistrationApiService _registrationService = Get.put(
+    RegistrationApiService(),
+  );
 
   @override
   void onReady() {

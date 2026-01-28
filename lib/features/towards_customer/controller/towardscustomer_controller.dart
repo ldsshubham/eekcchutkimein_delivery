@@ -1,9 +1,15 @@
+import 'package:eekcchutkimein_delivery/features/orders_home/api/order_api_service.dart';
+import 'package:eekcchutkimein_delivery/features/towards_customer/util/toastification_helper.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class TowardsCustomerController extends GetxController {
+  final OrderApiService _apiService = OrderApiService();
+
   // Observable variables for payment state
   RxBool isPaymentCollected = false.obs;
   RxBool isPaymentVerified = false.obs;
+  RxBool isLoading = false.obs;
 
   // Toggle "Collect Cash" state
   void toggleCashCollection() {
@@ -29,5 +35,53 @@ class TowardsCustomerController extends GetxController {
   void resetPaymentState() {
     isPaymentCollected.value = false;
     isPaymentVerified.value = false;
+  }
+
+  Future<bool> endDelivery({
+    required int orderId,
+    required int otp,
+    required bool deliveryStatus,
+    required String message,
+  }) async {
+    try {
+      isLoading.value = true;
+      final response = await _apiService.endDelivery(
+        orderId: orderId,
+        otp: otp,
+        deliveryStatus: deliveryStatus,
+        message: message,
+      );
+
+      if (response.statusCode == 200) {
+        Get.snackbar(
+          "Success",
+          response.body['message'] ?? "Operation successful",
+          backgroundColor: Colors.green,
+          colorText: Colors.white,
+          snackPosition: SnackPosition.BOTTOM,
+        );
+        return true;
+      } else {
+        Get.snackbar(
+          "Error",
+          response.body['message'] ?? "Something went wrong",
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
+          snackPosition: SnackPosition.BOTTOM,
+        );
+        return false;
+      }
+    } catch (e) {
+      Get.snackbar(
+        "Error",
+        "Connection failed",
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+        snackPosition: SnackPosition.BOTTOM,
+      );
+      return false;
+    } finally {
+      isLoading.value = false;
+    }
   }
 }

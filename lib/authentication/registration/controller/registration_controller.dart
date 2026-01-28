@@ -11,7 +11,9 @@ import 'package:image_picker/image_picker.dart';
 
 class RegistrationController extends GetxController {
   final OtpVerificationService _otpService = OtpVerificationService();
-  final RegistrationApiService _registrationService = RegistrationApiService();
+  final RegistrationApiService _registrationService = Get.put(
+    RegistrationApiService(),
+  );
   final ImagePicker _picker = ImagePicker();
 
   var isLoading = false.obs;

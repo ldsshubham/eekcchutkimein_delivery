@@ -1,3 +1,4 @@
+import 'package:eekcchutkimein_delivery/features/profile/controller/profile_controller.dart';
 import 'package:eekcchutkimein_delivery/features/towards_customer/util/textinput.dart';
 import 'package:eekcchutkimein_delivery/features/profile/profile_model.dart';
 import 'package:flutter/material.dart';
@@ -13,7 +14,9 @@ class UpdateProfileScreen extends StatefulWidget {
 
 class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
   // Read-only controllers
-  late final TextEditingController _nameController;
+  // Read-only controllers
+  late final TextEditingController _firstNameController;
+  late final TextEditingController _lastNameController;
   late final TextEditingController _phoneController;
 
   // Editable controllers
@@ -21,59 +24,28 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
   final TextEditingController _dobController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
 
-  final TextEditingController _address1Controller = TextEditingController();
-  final TextEditingController _address2Controller = TextEditingController();
-  final TextEditingController _cityController = TextEditingController();
-  final TextEditingController _stateController = TextEditingController();
-  final TextEditingController _pinController = TextEditingController();
-
-  final TextEditingController _vehicleNameController = TextEditingController();
-  final TextEditingController _vehicleNumberController =
-      TextEditingController();
-  final TextEditingController _licenseController = TextEditingController();
-  final TextEditingController _panController = TextEditingController();
-  final TextEditingController _aadharController = TextEditingController();
-
-  String? _selectedVehicleType;
-  final List<String> _vehicleTypes = [
-    'Bike',
-    'Cycle',
-    'Scooter',
-    'Electric Scooter',
-  ];
-
   @override
   void initState() {
     super.initState();
-    _nameController = TextEditingController(text: widget.profile.name);
+    _firstNameController = TextEditingController(
+      text: widget.profile.firstName,
+    );
+    _lastNameController = TextEditingController(text: widget.profile.lastName);
     _phoneController = TextEditingController(text: widget.profile.phone);
 
-    // Pre-fill existing data from profile if available
-    _vehicleNameController.text =
-        ""; // Should come from profile if added to model
-    _vehicleNumberController.text = widget.profile.vehicleNumber;
-    _selectedVehicleType = _vehicleTypes.contains(widget.profile.vehicleType)
-        ? widget.profile.vehicleType
-        : null;
+    _fatherNameController.text = widget.profile.fatherName;
+    _dobController.text = widget.profile.dob;
+    _emailController.text = widget.profile.email;
   }
 
   @override
   void dispose() {
-    _nameController.dispose();
+    _firstNameController.dispose();
+    _lastNameController.dispose();
     _phoneController.dispose();
     _fatherNameController.dispose();
     _dobController.dispose();
     _emailController.dispose();
-    _address1Controller.dispose();
-    _address2Controller.dispose();
-    _cityController.dispose();
-    _stateController.dispose();
-    _pinController.dispose();
-    _vehicleNameController.dispose();
-    _vehicleNumberController.dispose();
-    _licenseController.dispose();
-    _panController.dispose();
-    _aadharController.dispose();
     super.dispose();
   }
 
@@ -109,10 +81,15 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
                     const SizedBox(height: 10),
                     _buildSectionHeader("Personal Details"),
                     MinimalInput(
-                      label: "Full Name",
-                      controller: _nameController,
-                      readOnly: true,
-                      enabled: false,
+                      label: "First Name",
+                      controller: _firstNameController,
+                      textCapitalization: TextCapitalization.words,
+                    ),
+                    const SizedBox(height: 16),
+                    MinimalInput(
+                      label: "Last Name",
+                      controller: _lastNameController,
+                      textCapitalization: TextCapitalization.words,
                     ),
                     const SizedBox(height: 16),
                     MinimalInput(
@@ -140,87 +117,6 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
                       keyboardType: TextInputType.emailAddress,
                     ),
 
-                    const SizedBox(height: 32),
-
-                    // _buildSectionHeader("Address Details"),
-                    // MinimalInput(
-                    //   label: "Address Line 1",
-                    //   controller: _address1Controller,
-                    // ),
-                    // const SizedBox(height: 16),
-                    // MinimalInput(
-                    //   label: "Address Line 2",
-                    //   controller: _address2Controller,
-                    // ),
-                    // const SizedBox(height: 16),
-                    // Row(
-                    //   children: [
-                    //     Expanded(
-                    //       child: MinimalInput(
-                    //         label: "City",
-                    //         controller: _cityController,
-                    //       ),
-                    //     ),
-                    //     const SizedBox(width: 16),
-                    //     Expanded(
-                    //       child: MinimalInput(
-                    //         label: "State",
-                    //         controller: _stateController,
-                    //       ),
-                    //     ),
-                    //   ],
-                    // ),
-                    // const SizedBox(height: 16),
-                    // MinimalInput(
-                    //   label: "Pin Code",
-                    //   controller: _pinController,
-                    //   keyboardType: TextInputType.number,
-                    // ),
-                    const SizedBox(height: 32),
-                    _buildSectionHeader("Vehicle Details"),
-                    _buildDropdownLabel("Vehicle Type"),
-                    _buildVehicleDropdown(readOnly: true),
-                    const SizedBox(height: 16),
-                    MinimalInput(
-                      label: "Vehicle Name",
-                      controller: _vehicleNameController,
-                      readOnly: true,
-                      enabled: false,
-                    ),
-                    const SizedBox(height: 16),
-                    MinimalInput(
-                      label: "Vehicle Number",
-                      controller: _vehicleNumberController,
-                      textCapitalization: TextCapitalization.characters,
-                      readOnly: true,
-                      enabled: false,
-                    ),
-                    const SizedBox(height: 16),
-                    MinimalInput(
-                      label: "License Number",
-                      controller: _licenseController,
-                      textCapitalization: TextCapitalization.characters,
-                      readOnly: true,
-                      enabled: false,
-                    ),
-
-                    const SizedBox(height: 32),
-                    // _buildSectionHeader("Identity Documents"),
-                    // MinimalInput(
-                    //   label: "PAN Number",
-                    //   controller: _panController,
-                    //   textCapitalization: TextCapitalization.characters,
-                    //   readOnly: true,
-                    //   enabled: false,
-                    // ),
-                    // const SizedBox(height: 16),
-                    // MinimalInput(
-                    //   label: "Aadhar Number",
-                    //   controller: _aadharController,
-                    //   keyboardType: TextInputType.number,
-                    //   readOnly: true,
-                    //   enabled: false,
-                    // ),
                     const SizedBox(height: 40),
                   ],
                 ),
@@ -261,88 +157,48 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
     );
   }
 
-  Widget _buildDropdownLabel(String label) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
-      child: Text(
-        label,
-        style: const TextStyle(
-          fontSize: 14,
-          fontWeight: FontWeight.w600,
-          color: Colors.black87,
-        ),
-      ),
-    );
-  }
-
-  Widget _buildVehicleDropdown({bool readOnly = false}) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      decoration: BoxDecoration(
-        color: Colors.grey.shade50,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey.shade300),
-      ),
-      child: DropdownButtonHideUnderline(
-        child: DropdownButton<String>(
-          value: _selectedVehicleType,
-          hint: Text(
-            "Select Vehicle Type",
-            style: TextStyle(color: Colors.grey.shade400, fontSize: 13),
-          ),
-          isExpanded: true,
-          icon: const Icon(Icons.keyboard_arrow_down, color: Colors.black54),
-          items: _vehicleTypes.map((String type) {
-            return DropdownMenuItem<String>(
-              value: type,
-              child: Text(
-                type,
-                style: const TextStyle(fontSize: 14, color: Colors.black87),
-              ),
-            );
-          }).toList(),
-          onChanged: readOnly
-              ? null
-              : (String? newValue) {
-                  setState(() {
-                    _selectedVehicleType = newValue;
-                  });
-                },
-        ),
-      ),
-    );
-  }
-
   Widget _buildBottomAction() {
+    final ProfileController profileController = Get.find<ProfileController>();
     return Padding(
       padding: const EdgeInsets.all(24.0),
       child: SizedBox(
         width: double.infinity,
-        child: ElevatedButton(
-          onPressed: () {
-            // UI Only for now
-            Get.back();
-            Get.snackbar(
-              "Profile Updated",
-              "Your details have been updated successfully.",
-              snackPosition: SnackPosition.BOTTOM,
-              backgroundColor: Colors.green,
-              colorText: Colors.white,
-              margin: const EdgeInsets.all(16),
-            );
-          },
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.black,
-            foregroundColor: Colors.white,
-            padding: const EdgeInsets.symmetric(vertical: 16),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
+        child: Obx(
+          () => ElevatedButton(
+            onPressed: profileController.isLoading.value
+                ? null
+                : () async {
+                    await profileController.updateProfile(
+                      firstName: _firstNameController.text.trim(),
+                      lastName: _lastNameController.text.trim(),
+                      fatherName: _fatherNameController.text.trim(),
+                      dob: _dobController.text.trim(),
+                      email: _emailController.text.trim(),
+                    );
+                    Get.back();
+                  },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.black,
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(vertical: 16),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              elevation: 0,
             ),
-            elevation: 0,
-          ),
-          child: const Text(
-            "Save Changes",
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            child: profileController.isLoading.value
+                ? const SizedBox(
+                    height: 20,
+                    width: 20,
+                    child: CircularProgressIndicator(
+                      color: Colors.white,
+                      strokeWidth: 2,
+                    ),
+                  )
+                : const Text(
+                    "Save Changes",
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
           ),
         ),
       ),
