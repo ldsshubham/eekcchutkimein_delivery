@@ -37,19 +37,12 @@ class TowardsCustomerController extends GetxController {
     isPaymentVerified.value = false;
   }
 
-  Future<bool> endDelivery({
-    required int orderId,
-    required int otp,
-    required bool deliveryStatus,
-    required String message,
-  }) async {
+  Future<bool> endDelivery({required int orderId, required String otp}) async {
     try {
       isLoading.value = true;
       final response = await _apiService.endDelivery(
         orderId: orderId,
         otp: otp,
-        deliveryStatus: deliveryStatus,
-        message: message,
       );
 
       if (response.statusCode == 200) {

@@ -3,7 +3,7 @@ import 'package:iconsax/iconsax.dart';
 import 'package:toastification/toastification.dart';
 
 class ToastHelper {
-  static void showErrorToast({required String message}) {
+  static void showErrorToast(String s, {required String message}) {
     toastification.show(
       title: Text(message),
       type: ToastificationType.error,

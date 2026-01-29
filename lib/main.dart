@@ -6,18 +6,18 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   FlutterError.onError = (details) {
-    debugPrint('DIAGNOSTIC: Flutter Framework Error: ${details.exception}');
-    debugPrint('DIAGNOSTIC: Stack trace: ${details.stack}');
+    debugPrint('Flutter Framework Error: ${details.exception}');
+    debugPrint('Stack trace: ${details.stack}');
   };
 
   try {
-    debugPrint('DIAGNOSTIC: Starting GetStorage init');
+    debugPrint('Starting GetStorage init');
     await GetStorage.init();
-    debugPrint('DIAGNOSTIC: GetStorage init complete');
+    debugPrint('GetStorage init complete');
 
-    debugPrint('DIAGNOSTIC: Running MyApp');
+    debugPrint('Running MyApp');
     runApp(MyApp());
   } catch (e, stack) {
-    debugPrint('DIAGNOSTIC: Stack trace: $stack');
+    debugPrint('t: Stack trace: $stack');
   }
 }

@@ -11,6 +11,8 @@ class MinimalInput extends StatelessWidget {
   final Widget? prefixIcon;
   final bool readOnly;
   final bool? enabled;
+  final VoidCallback? onTap;
+  final int? maxLength;
   final String? hintText;
 
   const MinimalInput({
@@ -24,6 +26,8 @@ class MinimalInput extends StatelessWidget {
     this.prefixIcon,
     this.readOnly = false,
     this.enabled,
+    this.onTap,
+    this.maxLength,
     this.hintText,
   });
 
@@ -46,6 +50,8 @@ class MinimalInput extends StatelessWidget {
           obscureText: obscure,
           readOnly: readOnly,
           enabled: enabled,
+          onTap: onTap,
+          maxLength: maxLength,
           keyboardType: keyboardType,
           maxLines: maxLines,
           textCapitalization: textCapitalization,

@@ -47,10 +47,20 @@ class PickImageController extends GetxController {
     }
   }
 
+  Future<void> resetImage(String type) async {
+    if (type == 'selfie') {
+      selfieImage.value = null;
+      selfieImageId.value = null;
+    } else if (type == 'pan') {
+      panImage.value = null;
+      panImageId.value = null;
+    }
+  }
+
   Future<void> uploadCapturedImage(String type) async {
     final file = type == 'selfie' ? selfieImage.value : panImage.value;
     if (file == null) {
-      ToastHelper.showErrorToast(message: "No $type image selected");
+      ToastHelper.showErrorToast("No $type image selected", message: '');
       return;
     }
 
@@ -66,7 +76,8 @@ class PickImageController extends GetxController {
       debugPrint("UPLOAD RESPONSE ($type) STATUS: ${response.statusCode}");
       debugPrint("UPLOAD RESPONSE ($type) BODY: ${response.body}");
 
-      if (response.statusCode == 200 && response.body != null) {
+      if ((response.statusCode == 200 || response.statusCode == 201) &&
+          response.body != null) {
         final rawData = response.body['data'];
         debugPrint("PARSING UPLOAD ID ($type) FROM: $rawData");
         final rawId = rawData != null ? rawData['id'] : null;
@@ -92,7 +103,8 @@ class PickImageController extends GetxController {
         } else {
           debugPrint("FAILED TO PARSE ID ($type): rawId was $rawId");
           ToastHelper.showErrorToast(
-            message: "Failed to parse $type ID from response",
+            "Failed to parse $type ID from response",
+            message: '',
           );
         }
       } else {
@@ -102,13 +114,14 @@ class PickImageController extends GetxController {
             : "Server error (${response.statusCode})";
         debugPrint("UPLOAD FAILED ($type): $errorMsg");
         ToastHelper.showErrorToast(
-          message: "Failed to upload $type: $errorMsg",
+          "Failed to upload $type: $errorMsg",
+          message: '',
         );
       }
     } catch (e, stackTrace) {
       debugPrint("UPLOAD ERROR ($type) EXCEPTION: $e");
       debugPrint("UPLOAD ERROR ($type) STACKTRACE: $stackTrace");
-      ToastHelper.showErrorToast(message: "Error uploading $type: $e");
+      ToastHelper.showErrorToast("Error uploading $type: $e", message: '');
     } finally {
       if (type == 'selfie') {
         isSelfieUploading.value = false;

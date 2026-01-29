@@ -14,7 +14,7 @@ class RegistrationApiService extends GetConnect {
       });
 
       return post(
-        '${_baseUrl}/uploads/',
+        '${_baseUrl}/uploads',
         formData,
         headers: {if (token != null) 'Authorization': 'Bearer $token'},
       );

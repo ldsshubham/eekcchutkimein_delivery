@@ -32,58 +32,18 @@ class _OtpVerificationSheetState extends State<OtpVerificationSheet> {
     super.dispose();
   }
 
-  void _showCancelDialog() {
-    final TextEditingController reasonController = TextEditingController();
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text("Cancel Delivery"),
-        content: TextField(
-          controller: reasonController,
-          decoration: const InputDecoration(
-            hintText: "Enter reason for cancellation",
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text("Keep Order"),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              if (reasonController.text.trim().isEmpty) {
-                Get.snackbar("Error", "Please enter a reason");
-                return;
-              }
-              Navigator.pop(context);
-              _handleEndDelivery(false, reasonController.text.trim());
-            },
-            child: const Text("Confirm Cancel"),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Future<void> _handleEndDelivery(bool status, String message) async {
+  Future<void> _handleEndDelivery() async {
     final success = await controller.endDelivery(
-      orderId: int.parse(widget.orderId),
-      otp: int.parse(otp.isEmpty ? "0" : otp),
-      deliveryStatus: status,
-      message: message,
+      orderId: int.parse(widget.orderId.replaceAll('#', '')),
+      otp: otp,
     );
 
     if (success) {
-      if (status) {
-        Navigator.pop(context); // close bottom sheet
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (_) => OrderCompletedScreen()),
-        );
-      } else {
-        Navigator.pop(context); // close bottom sheet
-        Get.back(); // Go back from TowardsCustomerScreen
-      }
+      Navigator.pop(context); // close bottom sheet
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => OrderCompletedScreen()),
+      );
     }
   }
 
@@ -154,7 +114,7 @@ class _OtpVerificationSheetState extends State<OtpVerificationSheet> {
                   elevation: otp.length == 4 ? 4 : 0,
                 ),
                 onPressed: (otp.length == 4 && !controller.isLoading.value)
-                    ? () => _handleEndDelivery(true, "Delivered Successfully")
+                    ? () => _handleEndDelivery()
                     : null,
                 child: controller.isLoading.value
                     ? const CircularProgressIndicator(color: Colors.white)
@@ -168,19 +128,6 @@ class _OtpVerificationSheetState extends State<OtpVerificationSheet> {
                       ),
               );
             }),
-          ),
-
-          const SizedBox(height: 16),
-
-          /// CANCEL BUTTON
-          TextButton(
-            onPressed: controller.isLoading.value
-                ? null
-                : () => _showCancelDialog(),
-            child: const Text(
-              "Cancel Delivery",
-              style: TextStyle(color: Colors.red, fontWeight: FontWeight.w600),
-            ),
           ),
 
           const SizedBox(height: 10),

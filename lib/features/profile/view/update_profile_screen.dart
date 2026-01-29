@@ -108,6 +108,8 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
                     MinimalInput(
                       label: "Date of Birth",
                       controller: _dobController,
+                      readOnly: true,
+                      enabled: false,
                       hintText: "DD/MM/YYYY",
                     ),
                     const SizedBox(height: 16),

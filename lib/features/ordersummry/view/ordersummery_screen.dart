@@ -235,7 +235,7 @@ class OrderSummery extends StatelessWidget {
       if (response.statusCode == 200) {
         final message =
             response.body['mesaage'] ?? "Delivery Started Successfully!";
-        ToastHelper.showSuccessToast(message: message);
+        ToastHelper.showSuccessToast(message: "Delivery Started Successfully!");
         Navigator.push(
           context,
           MaterialPageRoute(
@@ -254,7 +254,8 @@ class OrderSummery extends StatelessWidget {
         );
       } else {
         ToastHelper.showErrorToast(
-          message: "Failed to start delivery: ${response.statusText}",
+          "Failed to start delivery: ${response.statusText}",
+          message: '',
         );
       }
     } else {

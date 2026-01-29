@@ -38,7 +38,7 @@ class ProfileApiService extends GetConnect {
   Future<Response> updateProfile(Map<String, dynamic> data) async {
     try {
       final token = await TokenService.getAccessToken();
-      return patch(
+      return post(
         '$_baseUrl/delivery/employee/rider/update/profile',
         data,
         headers: {

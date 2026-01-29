@@ -5,6 +5,7 @@ import 'package:eekcchutkimein_delivery/authentication/registration/controller/r
 import 'package:eekcchutkimein_delivery/features/towards_customer/util/textinput.dart';
 import 'package:eekcchutkimein_delivery/features/towards_customer/util/toastification_helper.dart';
 import 'package:eekcchutkimein_delivery/services/token_service.dart';
+import 'package:eekcchutkimein_delivery/constants/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
@@ -120,8 +121,14 @@ class _RegistrationPageState extends State<RegistrationPage> {
     }
 
     if (_emailController.text.trim().isEmpty ||
-        !emailRegex.hasMatch(_emailController.text.trim())) {
+        !emailRegex.hasMatch(_emailController.text.trim().toLowerCase())) {
       ToastHelper.showWarningToast(message: "Error: Please enter valid email");
+      return false;
+    }
+    if (_dateofbirthController.text.trim().isEmpty) {
+      ToastHelper.showWarningToast(
+        message: "Error: Please select date of birth",
+      );
       return false;
     }
     return true;
@@ -166,9 +173,23 @@ class _RegistrationPageState extends State<RegistrationPage> {
       );
       return false;
     }
+    if (_vehicleNumberController.text.trim().length < 8 ||
+        _vehicleNumberController.text.trim().length > 12) {
+      ToastHelper.showWarningToast(
+        message: "Error: Vehicle number must be between 8 and 12 characters",
+      );
+      return false;
+    }
     if (_licenseNumberController.text.trim().isEmpty) {
       ToastHelper.showWarningToast(
         message: "Error: Please enter license number",
+      );
+      return false;
+    }
+    if (_licenseNumberController.text.trim().length < 14 ||
+        _licenseNumberController.text.trim().length > 16) {
+      ToastHelper.showWarningToast(
+        message: "Error: License number must be between 14 and 16 characters",
       );
       return false;
     }
@@ -230,6 +251,36 @@ class _RegistrationPageState extends State<RegistrationPage> {
     }
   }
 
+  Future<void> _selectDate() async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now().subtract(const Duration(days: 365 * 18)),
+      firstDate: DateTime(1900),
+      lastDate: DateTime.now(),
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: ColorScheme.light(
+              primary: Colors.black,
+              onPrimary: Colors.white,
+              onSurface: Colors.black87,
+            ),
+            textButtonTheme: TextButtonThemeData(
+              style: TextButton.styleFrom(foregroundColor: Colors.black),
+            ),
+          ),
+          child: child!,
+        );
+      },
+    );
+    if (picked != null) {
+      setState(() {
+        _dateofbirthController.text =
+            "${picked.year}-${picked.month.toString().padLeft(2, '0')}-${picked.day.toString().padLeft(2, '0')}";
+      });
+    }
+  }
+
   void _previousPage() {
     if (_currentStep > 0) {
       _pageController.previousPage(
@@ -250,7 +301,10 @@ class _RegistrationPageState extends State<RegistrationPage> {
         'email': _emailController.text.trim(),
         'Addressline_1': _addressline1Controller.text.trim(),
         'Addressline_2': _addressline2Controller.text.trim(),
-        'user_image_id': _controller.selfieImageId.value?.toInt() ?? 23,
+        'user_image_id':
+            _pickImageController.selfieImageId.value?.toInt() ?? 23,
+        'pancard_number_id':
+            _pickImageController.panImageId.value?.toInt() ?? 0,
         'pancard_number': _panController.text.trim(),
         'aadharcard_number': _aadharController.text.trim(),
         'vehicleType': _selectedVehicleType ?? "Not Selected",
@@ -394,7 +448,9 @@ class _RegistrationPageState extends State<RegistrationPage> {
           MinimalInput(
             label: 'D.O.B',
             controller: _dateofbirthController,
-            keyboardType: TextInputType.datetime,
+            readOnly: true,
+            onTap: _selectDate,
+            hintText: "Select Date of Birth",
           ),
           const SizedBox(height: 20),
           MinimalInput(
@@ -530,12 +586,14 @@ class _RegistrationPageState extends State<RegistrationPage> {
             label: 'Vehicle Number',
             controller: _vehicleNumberController,
             textCapitalization: TextCapitalization.characters,
+            maxLength: 12,
           ),
           const SizedBox(height: 20),
           MinimalInput(
             label: 'License Number',
             controller: _licenseNumberController,
             textCapitalization: TextCapitalization.characters,
+            maxLength: 16,
           ),
           const SizedBox(height: 20),
         ],
@@ -567,13 +625,15 @@ class _RegistrationPageState extends State<RegistrationPage> {
             label: 'PAN Number',
             controller: _panController,
             textCapitalization: TextCapitalization.characters,
+            maxLength: 10,
             prefixIcon: const Icon(Icons.credit_card),
           ),
           const SizedBox(height: 20),
           MinimalInput(
             label: 'Aadhar Number',
             controller: _aadharController,
-            textCapitalization: TextCapitalization.characters,
+            maxLength: 12,
+            keyboardType: TextInputType.number,
             prefixIcon: const Icon(Icons.badge_outlined),
           ),
           const SizedBox(height: 30),
@@ -581,22 +641,24 @@ class _RegistrationPageState extends State<RegistrationPage> {
             () => _buildUploadCard(
               "Selfie",
               Icons.camera_alt_outlined,
-              _controller.selfieImage.value,
-              _controller.selfieImageId.value,
+              _pickImageController.selfieImage.value,
+              _pickImageController.selfieImageId.value,
               _pickImageController.isSelfieUploading.value,
               () => _showImageSourceDialog('selfie'),
               () => _pickImageController.uploadCapturedImage('selfie'),
+              () => _pickImageController.resetImage('selfie'),
             ),
           ),
           Obx(
             () => _buildUploadCard(
               "PAN Card Image",
               Icons.credit_card_outlined,
-              _controller.panImage.value,
-              _controller.panImageId.value,
+              _pickImageController.panImage.value,
+              _pickImageController.panImageId.value,
               _pickImageController.isPanUploading.value,
               () => _showImageSourceDialog('pan'),
               () => _pickImageController.uploadCapturedImage('pan'),
+              () => _pickImageController.resetImage('pan'),
             ),
           ),
           const SizedBox(height: 20),
@@ -644,6 +706,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
     bool isUploading,
     VoidCallback onPick,
     VoidCallback onUpload,
+    VoidCallback onReset,
   ) {
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
@@ -661,7 +724,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
           Row(
             children: [
               GestureDetector(
-                onTap: onPick,
+                onTap: id != null ? null : (image != null ? null : onPick),
                 child: Container(
                   width: 50,
                   height: 50,
@@ -712,47 +775,75 @@ class _RegistrationPageState extends State<RegistrationPage> {
                   ],
                 ),
               ),
-              if (id != null)
-                const Icon(Icons.check_circle, color: Colors.green)
-              else if (image != null && !isUploading)
+              if (id != null) ...[
+                const Icon(Icons.check_circle, color: Colors.green),
                 IconButton(
-                  onPressed: onPick,
-                  icon: const Icon(Icons.edit, color: Colors.black54, size: 20),
+                  onPressed: onReset,
+                  icon: const Icon(
+                    Icons.refresh,
+                    color: Colors.black54,
+                    size: 20,
+                  ),
+                  tooltip: "Retake",
+                ),
+              ] else if (image != null && !isUploading)
+                IconButton(
+                  onPressed: onReset,
+                  icon: const Icon(
+                    Icons.close,
+                    color: Colors.redAccent,
+                    size: 20,
+                  ),
+                  tooltip: "Remove",
                 ),
             ],
           ),
           if (image != null && id == null) ...[
             const SizedBox(height: 12),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: isUploading ? null : onUpload,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blue.shade700,
-                  foregroundColor: Colors.white,
-                  disabledBackgroundColor: Colors.grey.shade300,
-                  elevation: 0,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
+            Row(
+              children: [
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: isUploading ? null : onUpload,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blue.shade700,
+                      foregroundColor: Colors.white,
+                      disabledBackgroundColor: Colors.grey.shade300,
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    child: isUploading
+                        ? const SizedBox(
+                            height: 20,
+                            width: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: Colors.white,
+                            ),
+                          )
+                        : const Text(
+                            "Upload Now",
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                   ),
                 ),
-                child: isUploading
-                    ? const SizedBox(
-                        height: 20,
-                        width: 20,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          color: Colors.white,
-                        ),
-                      )
-                    : const Text(
-                        "Upload Now",
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-              ),
+                const SizedBox(width: 8),
+                OutlinedButton(
+                  onPressed: onPick,
+                  style: OutlinedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  child: const Text("Retake", style: TextStyle(fontSize: 12)),
+                ),
+              ],
             ),
           ],
         ],

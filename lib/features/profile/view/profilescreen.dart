@@ -137,12 +137,12 @@ class ProfileScreen extends StatelessWidget {
             label: "Completed Orders",
             value: profile.totalOrders.toString(),
           ),
-          _divider(),
-          _statRow(
-            icon: Icons.star_outline,
-            label: "Rating",
-            value: profile.rating.toString(),
-          ),
+          // _divider(),
+          // _statRow(
+          //   icon: Icons.star_outline,
+          //   label: "Rating",
+          //   value: profile.rating.toString(),
+          // ),
         ],
       ),
     );
@@ -245,14 +245,14 @@ class ProfileScreen extends StatelessWidget {
             "Edit Profile",
             onTap: () => Get.to(() => UpdateProfileScreen(profile: profile!)),
           ),
-          _divider(),
-          _actionTile(
-            Icons.account_balance_outlined,
-            "Bank Details",
-            onTap: () {},
-          ),
-          _divider(),
-          _actionTile(Icons.support_agent_outlined, "Support", onTap: () {}),
+          // _divider(),
+          // _actionTile(
+          //   Icons.account_balance_outlined,
+          //   "Bank Details",
+          //   onTap: () {},
+          // ),
+          // _divider(),
+          // _actionTile(Icons.support_agent_outlined, "Support", onTap: () {}),
           _divider(),
           _actionTile(
             Icons.logout,

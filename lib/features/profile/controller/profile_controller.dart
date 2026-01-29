@@ -53,25 +53,18 @@ class ProfileController extends GetxController {
       if (firstName != null) data['firstName'] = firstName;
       if (lastName != null) data['lastName'] = lastName;
       if (fatherName != null) data['fatherName'] = fatherName;
-      if (dob != null) data['dob'] = dob;
+      // if (dob != null) data['dob'] = dob;
       if (email != null) data['email'] = email;
 
       final response = await _profileApiService.updateProfile(data);
 
       if (response.statusCode == 200 && response.body['status'] == 'success') {
         ToastHelper.showSuccessToast(
-          response.body['message'] ?? "Profile Updated Successfully!",
-          message: '',
+          message: response.body['message'] ?? "Profile Updated Successfully!",
         );
-        // Get.snackbar(
-        //   "Success",
-        //   response.body['message'] ?? "Profile Updated Successfully!",
-        //   snackPosition: SnackPosition.BOTTOM,
-        //   backgroundColor: Colors.green,
-        //   colorText: Colors.white,
-        // );
         await fetchProfile(); // Refresh profile data
       } else {
+        print("UPDATE ${response.status} ${response.body}");
         ToastHelper.showErrorToast(
           response.body['message'] ?? "Failed to update profile",
           message: '',
