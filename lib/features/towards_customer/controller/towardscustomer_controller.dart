@@ -37,41 +37,22 @@ class TowardsCustomerController extends GetxController {
     isPaymentVerified.value = false;
   }
 
-  Future<bool> endDelivery({required int orderId, required String otp}) async {
+  Future<bool> endDelivery(int orderId, String otp) async {
     try {
       isLoading.value = true;
-      final response = await _apiService.endDelivery(
-        orderId: orderId,
-        otp: otp,
-      );
+      final response = await _apiService.endDelivery(orderId, otp);
 
       if (response.statusCode == 200) {
-        Get.snackbar(
-          "Success",
-          response.body['message'] ?? "Operation successful",
-          backgroundColor: Colors.green,
-          colorText: Colors.white,
-          snackPosition: SnackPosition.BOTTOM,
+        ToastHelper.showSuccessToast(
+          message: response.body['message'] ?? "Operation successful",
         );
         return true;
       } else {
-        Get.snackbar(
-          "Error",
-          response.body['message'] ?? "Something went wrong",
-          backgroundColor: Colors.red,
-          colorText: Colors.white,
-          snackPosition: SnackPosition.BOTTOM,
-        );
+        ToastHelper.showErrorToast("${response.body['message']}", message: '');
         return false;
       }
     } catch (e) {
-      Get.snackbar(
-        "Error",
-        "Connection failed",
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
-        snackPosition: SnackPosition.BOTTOM,
-      );
+      ToastHelper.showErrorToast("Connection failed", message: '');
       return false;
     } finally {
       isLoading.value = false;

@@ -3,7 +3,7 @@ import 'package:eekcchutkimein_delivery/features/profile/profile_model.dart';
 import 'package:eekcchutkimein_delivery/features/profile/api/profile_api_service.dart';
 import 'package:eekcchutkimein_delivery/features/towards_customer/util/toastification_helper.dart';
 import 'package:get/get.dart';
-import 'package:flutter/material.dart';
+import 'package:get_storage/get_storage.dart';
 
 class ProfileController extends GetxController {
   final RegistrationApiService _registrationApiService = Get.put(
@@ -13,11 +13,59 @@ class ProfileController extends GetxController {
 
   var isLoading = true.obs;
   var profile = Rxn<DeliveryPartnerProfile>();
+  var isOnline = true.obs;
+  final _box = GetStorage();
+  DateTime? _lastToggleTime;
 
   @override
   void onInit() {
     super.onInit();
+    isOnline.value = _box.read('isOnline') ?? true;
     fetchProfile();
+  }
+
+  Future<void> toggleAvailability(bool value) async {
+    try {
+      // Optimistic update
+      final previousValue = isOnline.value;
+      isOnline.value = value;
+      _box.write('isOnline', value);
+      _lastToggleTime = DateTime.now();
+
+      final response = await _profileApiService.updateAvailability(value);
+
+      // Relaxed success check: as long as it's 2xx and doesn't explicitly fail
+      final isSuccess =
+          response.isOk &&
+          (response.body == null ||
+              response.body['status'] == 'success' ||
+              response.body['status'] == 200 ||
+              response.body['message']?.toString().toLowerCase().contains(
+                    'success',
+                  ) ==
+                  true);
+
+      if (isSuccess) {
+        ToastHelper.showSuccessToast(
+          message:
+              response.body?['message'] ??
+              "Availability updated to ${value ? 'Online' : 'Offline'}",
+        );
+      } else {
+        // Revert on failure
+        isOnline.value = previousValue;
+        _box.write('isOnline', previousValue);
+        ToastHelper.showErrorToast(
+          "Failed to update availability",
+          message: response.body?['message'] ?? 'Response error',
+        );
+      }
+    } catch (e) {
+      // Revert on error
+      isOnline.value = !value;
+      _box.write('isOnline', !value);
+      ToastHelper.showErrorToast("Something went wrong", message: e.toString());
+    }
   }
 
   Future<void> fetchProfile() async {
@@ -28,7 +76,21 @@ class ProfileController extends GetxController {
       if (response.statusCode == 200 && response.body['status'] == 'success') {
         final List data = response.body['data'];
         if (data.isNotEmpty) {
-          profile.value = DeliveryPartnerProfile.fromJson(data[0]);
+          final profileData = DeliveryPartnerProfile.fromJson(data[0]);
+          profile.value = profileData;
+
+          // Sync online status with backend value, but ignore if a toggle just happened
+          // (Wait at least 5 seconds for backend to reflect changes)
+          final timeSinceToggle = _lastToggleTime == null
+              ? const Duration(seconds: 10)
+              : DateTime.now().difference(_lastToggleTime!);
+
+          if (timeSinceToggle.inSeconds > 5) {
+            if (isOnline.value != profileData.isOnline) {
+              isOnline.value = profileData.isOnline;
+              _box.write('isOnline', profileData.isOnline);
+            }
+          }
         }
       } else {
         Get.snackbar("Error", "Failed to fetch profile");
@@ -46,6 +108,15 @@ class ProfileController extends GetxController {
     String? fatherName,
     String? dob,
     String? email,
+    String? addressLine1,
+    String? addressLine2,
+    String? city,
+    String? state,
+    String? pinCode,
+    String? vehicleType,
+    String? vehicleNumber,
+    String? vehicleName,
+    String? licenseNumber,
   }) async {
     try {
       isLoading(true);
@@ -53,8 +124,17 @@ class ProfileController extends GetxController {
       if (firstName != null) data['firstName'] = firstName;
       if (lastName != null) data['lastName'] = lastName;
       if (fatherName != null) data['fatherName'] = fatherName;
-      // if (dob != null) data['dob'] = dob;
+      if (dob != null) data['dob'] = dob;
       if (email != null) data['email'] = email;
+      if (addressLine1 != null) data['Addressline_1'] = addressLine1;
+      if (addressLine2 != null) data['Addressline_2'] = addressLine2;
+      if (city != null) data['city'] = city;
+      if (state != null) data['state'] = state;
+      if (pinCode != null) data['pinCode'] = int.tryParse(pinCode) ?? 0;
+      if (vehicleType != null) data['vehicleType'] = vehicleType;
+      if (vehicleNumber != null) data['vehicleNumber'] = vehicleNumber;
+      if (vehicleName != null) data['vehicleName'] = vehicleName;
+      if (licenseNumber != null) data['license_number'] = licenseNumber;
 
       final response = await _profileApiService.updateProfile(data);
 
@@ -69,23 +149,9 @@ class ProfileController extends GetxController {
           response.body['message'] ?? "Failed to update profile",
           message: '',
         );
-        // Get.snackbar(
-        //   "Error",
-        //   response.body['message'] ?? "Failed to update profile",
-        //   snackPosition: SnackPosition.BOTTOM,
-        //   backgroundColor: Colors.red,
-        //   colorText: Colors.white,
-        // );
       }
     } catch (e) {
       ToastHelper.showErrorToast("Something went wrong: $e", message: '');
-      // Get.snackbar(
-      //   "Error",
-      //   "Something went wrong: $e",
-      //   snackPosition: SnackPosition.BOTTOM,
-      //   backgroundColor: Colors.red,
-      //   colorText: Colors.white,
-      // );
     } finally {
       isLoading(false);
     }

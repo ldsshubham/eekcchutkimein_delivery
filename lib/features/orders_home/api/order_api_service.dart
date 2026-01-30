@@ -36,10 +36,7 @@ class OrderApiService extends GetConnect {
     }
   }
 
-  Future<Response> endDelivery({
-    required int orderId,
-    required String otp,
-  }) async {
+  Future<Response> endDelivery(int orderId, String otp) async {
     try {
       final token = await TokenService.getAccessToken();
       return post(

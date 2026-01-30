@@ -130,7 +130,7 @@ class OrderCompletedScreen extends StatelessWidget {
                   Navigator.popUntil(context, (route) => route.isFirst);
                 },
                 child: const Text(
-                  "Go Online for Next Order",
+                  "Go for Next Order",
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,

@@ -2,8 +2,8 @@ import 'package:eekcchutkimein_delivery/constants/colors.dart';
 import 'package:eekcchutkimein_delivery/features/orders_home/model/order_model.dart';
 import 'package:eekcchutkimein_delivery/features/orders_home/util/slidetostart_btn.dart';
 import 'package:eekcchutkimein_delivery/features/ordersummry/view/ordersummery_screen.dart';
+import 'package:eekcchutkimein_delivery/features/profile/controller/profile_controller.dart';
 import 'package:flutter/material.dart';
-import 'package:get_storage/get_storage.dart';
 
 import 'package:eekcchutkimein_delivery/features/orders_home/controller/order_controller.dart';
 import 'package:get/get.dart';
@@ -13,7 +13,7 @@ class OrderDetails extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final status = GetStorage();
+    final ProfileController profileController = Get.put(ProfileController());
     final OrderController controller = Get.put(OrderController());
 
     return Obx(() {
@@ -34,7 +34,7 @@ class OrderDetails extends StatelessWidget {
           return OrderCard(
             order: order,
             onTap: () {
-              if (status.read('isOnline') ?? true) {
+              if (profileController.isOnline.value) {
                 showModalBottomSheet(
                   context: context,
                   isScrollControlled: true,

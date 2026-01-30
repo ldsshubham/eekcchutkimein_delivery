@@ -2,7 +2,6 @@ import 'package:eekcchutkimein_delivery/authentication/registration/api/registra
 import 'package:eekcchutkimein_delivery/features/towards_customer/util/toastification_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/get_state_manager/src/simple/get_controllers.dart';
 import 'package:image_picker/image_picker.dart';
 
 class PickImageController extends GetxController {

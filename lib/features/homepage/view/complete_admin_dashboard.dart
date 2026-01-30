@@ -8,6 +8,7 @@ import 'package:eekcchutkimein_delivery/services/token_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:eekcchutkimein_delivery/features/profile/controller/profile_controller.dart';
 import 'package:iconsax/iconsax.dart';
 
 class CompleteAdminPanel extends StatelessWidget {
@@ -15,15 +16,12 @@ class CompleteAdminPanel extends StatelessWidget {
 
   final controller = Get.put(MyDrawerController());
   final BottomNavController navController = Get.put(BottomNavController());
+  final ProfileController profileController = Get.put(ProfileController());
 
   final GetStorage box = GetStorage();
 
-  final RxBool isOnline = true.obs;
-
   @override
   Widget build(BuildContext context) {
-    isOnline.value = box.read('isOnline') ?? true;
-
     return Scaffold(
       key: controller.scaffoldKey,
       appBar: AppBar(
@@ -31,27 +29,28 @@ class CompleteAdminPanel extends StatelessWidget {
           onPressed: controller.openDrawer,
           icon: const Icon(Iconsax.menu),
         ),
-
         actions: [
           Obx(
             () => Row(
               children: [
                 Text(
-                  isOnline.value ? 'ONLINE' : 'OFFLINE',
+                  profileController.isOnline.value ? 'ONLINE' : 'OFFLINE',
                   style: TextStyle(
                     fontWeight: FontWeight.w600,
-                    color: isOnline.value ? AppColors.success : Colors.red,
+                    color: profileController.isOnline.value
+                        ? AppColors.success
+                        : Colors.red,
                   ),
                 ),
                 Switch(
-                  value: isOnline.value,
+                  value: profileController.isOnline.value,
                   activeThumbColor: AppColors.success,
                   onChanged: (value) {
-                    if (!value && isOnline.value) {
+                    if (value == profileController.isOnline.value) return;
+                    if (!value) {
                       _showOfflineAlert(context);
                     } else {
-                      isOnline.value = true;
-                      box.write('isOnline', true);
+                      profileController.toggleAvailability(true);
                     }
                   },
                 ),
@@ -163,8 +162,7 @@ class CompleteAdminPanel extends StatelessWidget {
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
             onPressed: () {
-              isOnline.value = false;
-              box.write('isOnline', false); // ✅ store offline
+              profileController.toggleAvailability(false);
               Get.back();
             },
             child: const Text('Go Offline'),
