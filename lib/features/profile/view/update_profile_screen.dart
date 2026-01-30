@@ -14,7 +14,6 @@ class UpdateProfileScreen extends StatefulWidget {
 
 class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
   // Read-only controllers
-  // Read-only controllers
   late final TextEditingController _firstNameController;
   late final TextEditingController _lastNameController;
   late final TextEditingController _phoneController;
@@ -23,6 +22,28 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
   final TextEditingController _fatherNameController = TextEditingController();
   final TextEditingController _dobController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
+
+  // Address controllers
+  final TextEditingController _addressLine1Controller = TextEditingController();
+  final TextEditingController _addressLine2Controller = TextEditingController();
+  final TextEditingController _cityController = TextEditingController();
+  final TextEditingController _stateController = TextEditingController();
+  final TextEditingController _pinCodeController = TextEditingController();
+
+  // Vehicle controllers
+  final TextEditingController _vehicleNameController = TextEditingController();
+  final TextEditingController _vehicleNumberController =
+      TextEditingController();
+  final TextEditingController _licenseNumberController =
+      TextEditingController();
+  String? _selectedVehicleType;
+
+  final List<String> _vehicleTypes = [
+    'Bike',
+    'Cycle',
+    'Scooter',
+    'Electric Scooter',
+  ];
 
   @override
   void initState() {
@@ -36,6 +57,19 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
     _fatherNameController.text = widget.profile.fatherName;
     _dobController.text = widget.profile.dob;
     _emailController.text = widget.profile.email;
+
+    _addressLine1Controller.text = widget.profile.addressLine1;
+    _addressLine2Controller.text = widget.profile.addressLine2;
+    _cityController.text = widget.profile.city;
+    _stateController.text = widget.profile.state;
+    _pinCodeController.text = widget.profile.pinCode;
+
+    _vehicleNameController.text = widget.profile.vehicleName;
+    _vehicleNumberController.text = widget.profile.vehicleNumber;
+    _licenseNumberController.text = widget.profile.licenseNumber;
+    if (_vehicleTypes.contains(widget.profile.vehicleType)) {
+      _selectedVehicleType = widget.profile.vehicleType;
+    }
   }
 
   @override
@@ -46,7 +80,44 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
     _fatherNameController.dispose();
     _dobController.dispose();
     _emailController.dispose();
+    _addressLine1Controller.dispose();
+    _addressLine2Controller.dispose();
+    _cityController.dispose();
+    _stateController.dispose();
+    _pinCodeController.dispose();
+    _vehicleNameController.dispose();
+    _vehicleNumberController.dispose();
+    _licenseNumberController.dispose();
     super.dispose();
+  }
+
+  Future<void> _selectDate() async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate:
+          DateTime.tryParse(_dobController.text) ??
+          DateTime.now().subtract(const Duration(days: 365 * 18)),
+      firstDate: DateTime(1900),
+      lastDate: DateTime.now(),
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: const ColorScheme.light(
+              primary: Colors.black,
+              onPrimary: Colors.white,
+              onSurface: Colors.black87,
+            ),
+          ),
+          child: child!,
+        );
+      },
+    );
+    if (picked != null) {
+      setState(() {
+        _dobController.text =
+            "${picked.year}-${picked.month.toString().padLeft(2, '0')}-${picked.day.toString().padLeft(2, '0')}";
+      });
+    }
   }
 
   @override
@@ -109,8 +180,8 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
                       label: "Date of Birth",
                       controller: _dobController,
                       readOnly: true,
-                      enabled: false,
-                      hintText: "DD/MM/YYYY",
+                      onTap: _selectDate,
+                      hintText: "YYYY-MM-DD",
                     ),
                     const SizedBox(height: 16),
                     MinimalInput(
@@ -118,7 +189,92 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
                       controller: _emailController,
                       keyboardType: TextInputType.emailAddress,
                     ),
-
+                    const SizedBox(height: 32),
+                    _buildSectionHeader("Address Details"),
+                    MinimalInput(
+                      label: "Address",
+                      controller: _addressLine1Controller,
+                    ),
+                    const SizedBox(height: 16),
+                    MinimalInput(label: "City", controller: _cityController),
+                    const SizedBox(height: 16),
+                    MinimalInput(label: "State", controller: _stateController),
+                    const SizedBox(height: 16),
+                    MinimalInput(
+                      label: "Pin Code",
+                      controller: _pinCodeController,
+                      keyboardType: TextInputType.number,
+                    ),
+                    const SizedBox(height: 32),
+                    _buildSectionHeader("Vehicle Details"),
+                    const Text(
+                      "Vehicle Type",
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.black87,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      decoration: BoxDecoration(
+                        color: Colors.grey.shade50,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: Colors.grey.shade300),
+                      ),
+                      child: DropdownButtonHideUnderline(
+                        child: DropdownButton<String>(
+                          value: _selectedVehicleType,
+                          hint: Text(
+                            "Select Vehicle Type",
+                            style: TextStyle(
+                              color: Colors.grey.shade400,
+                              fontSize: 12,
+                            ),
+                          ),
+                          isExpanded: true,
+                          icon: const Icon(Icons.keyboard_arrow_down),
+                          items: _vehicleTypes.map((String type) {
+                            return DropdownMenuItem<String>(
+                              value: type,
+                              child: Text(
+                                type,
+                                style: const TextStyle(
+                                  fontSize: 12,
+                                  color: Colors.black87,
+                                ),
+                              ),
+                            );
+                          }).toList(),
+                          onChanged: (String? newValue) {
+                            setState(() {
+                              _selectedVehicleType = newValue;
+                            });
+                          },
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    MinimalInput(
+                      label: "Vehicle Name",
+                      controller: _vehicleNameController,
+                      textCapitalization: TextCapitalization.words,
+                    ),
+                    const SizedBox(height: 16),
+                    MinimalInput(
+                      label: "Vehicle Number",
+                      controller: _vehicleNumberController,
+                      textCapitalization: TextCapitalization.characters,
+                      maxLength: 12,
+                    ),
+                    const SizedBox(height: 16),
+                    MinimalInput(
+                      label: "License Number",
+                      controller: _licenseNumberController,
+                      textCapitalization: TextCapitalization.characters,
+                      maxLength: 16,
+                    ),
                     const SizedBox(height: 40),
                   ],
                 ),
@@ -176,6 +332,15 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
                       fatherName: _fatherNameController.text.trim(),
                       dob: _dobController.text.trim(),
                       email: _emailController.text.trim(),
+                      addressLine1: _addressLine1Controller.text.trim(),
+                      addressLine2: _addressLine2Controller.text.trim(),
+                      city: _cityController.text.trim(),
+                      state: _stateController.text.trim(),
+                      pinCode: _pinCodeController.text.trim(),
+                      vehicleType: _selectedVehicleType,
+                      vehicleName: _vehicleNameController.text.trim(),
+                      vehicleNumber: _vehicleNumberController.text.trim(),
+                      licenseNumber: _licenseNumberController.text.trim(),
                     );
                     Get.back();
                   },

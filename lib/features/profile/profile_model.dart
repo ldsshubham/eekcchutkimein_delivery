@@ -12,6 +12,13 @@ class DeliveryPartnerProfile {
   final String email;
   final String vehicleNumber;
   final String vehicleType;
+  final String addressLine1;
+  final String addressLine2;
+  final String city;
+  final String state;
+  final String pinCode;
+  final String vehicleName;
+  final String licenseNumber;
   final bool isOnline;
 
   DeliveryPartnerProfile({
@@ -28,6 +35,13 @@ class DeliveryPartnerProfile {
     required this.email,
     required this.vehicleNumber,
     required this.vehicleType,
+    required this.addressLine1,
+    required this.addressLine2,
+    required this.city,
+    required this.state,
+    required this.pinCode,
+    required this.vehicleName,
+    required this.licenseNumber,
     required this.isOnline,
   });
   factory DeliveryPartnerProfile.fromJson(Map<String, dynamic> json) {
@@ -48,7 +62,23 @@ class DeliveryPartnerProfile {
       email: json['email']?.toString() ?? '',
       vehicleNumber: json['vehical_number']?.toString() ?? '',
       vehicleType: json['vehical_type']?.toString() ?? '',
-      isOnline: true,
+      addressLine1: json['address']?.toString() ?? '',
+      addressLine2: json['Addressline_2']?.toString() ?? '',
+      city: json['city']?.toString() ?? '',
+      state: json['state']?.toString() ?? '',
+      pinCode: json['pin_code']?.toString() ?? '',
+      vehicleName: json['vehical_name']?.toString() ?? '',
+      licenseNumber: json['license']?.toString() ?? '',
+      isOnline:
+          _parseBool(json['availability']) || _parseBool(json['is_online']),
     );
+  }
+
+  static bool _parseBool(dynamic value) {
+    if (value == null) return false;
+    if (value is bool) return value;
+    if (value is int) return value == 1;
+    final str = value.toString().toLowerCase();
+    return str == '1' || str == 'true' || str == 'online';
   }
 }

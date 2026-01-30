@@ -5,7 +5,6 @@ import 'package:eekcchutkimein_delivery/authentication/registration/controller/r
 import 'package:eekcchutkimein_delivery/features/towards_customer/util/textinput.dart';
 import 'package:eekcchutkimein_delivery/features/towards_customer/util/toastification_helper.dart';
 import 'package:eekcchutkimein_delivery/services/token_service.dart';
-import 'package:eekcchutkimein_delivery/constants/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';

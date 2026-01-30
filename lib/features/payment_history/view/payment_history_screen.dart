@@ -1,7 +1,9 @@
+import 'package:eekcchutkimein_delivery/constants/colors.dart';
+import 'package:eekcchutkimein_delivery/features/payment_history/model/wallet_history_model.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import '../controller/payment_history_controller.dart';
-import '../model/payment_history_model.dart';
 
 class PaymentHistoryScreen extends StatelessWidget {
   const PaymentHistoryScreen({super.key});
@@ -11,120 +13,140 @@ class PaymentHistoryScreen extends StatelessWidget {
     final controller = Get.put(PaymentHistoryController());
 
     return Scaffold(
+      backgroundColor: const Color(0xffF6F7F9),
       appBar: AppBar(
-        title: const Text("Payment History", style: TextStyle(fontSize: 18)),
+        backgroundColor: AppColors.primaryColor,
         elevation: 0,
+        leading: const BackButton(color: Colors.white),
+        title: const Text(
+          "Wallet History",
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+        ),
       ),
-      backgroundColor: Colors.grey.shade50,
       body: Obx(() {
         if (controller.isLoading.value) {
           return const Center(child: CircularProgressIndicator());
         }
 
         if (controller.historyList.isEmpty) {
-          return const Center(child: Text("No Payment History Found"));
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.history, size: 64, color: Colors.grey.shade400),
+                const SizedBox(height: 16),
+                Text(
+                  "No transactions yet",
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Colors.grey.shade600,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+            ),
+          );
         }
 
-        return ListView.separated(
-          padding: const EdgeInsets.all(16),
-          itemCount: controller.historyList.length,
-          separatorBuilder: (_, __) => const SizedBox(height: 12),
-          itemBuilder: (context, index) {
-            final item = controller.historyList[index];
-            return _HistoryCard(item: item);
-          },
+        return RefreshIndicator(
+          onRefresh: () => controller.fetchHistory(),
+          child: ListView.separated(
+            padding: const EdgeInsets.all(16),
+            itemCount: controller.historyList.length,
+            separatorBuilder: (_, __) => const SizedBox(height: 12),
+            itemBuilder: (context, index) {
+              final item = controller.historyList[index];
+              return _TransactionCard(item: item);
+            },
+          ),
         );
       }),
     );
   }
 }
 
-class _HistoryCard extends StatelessWidget {
-  final PaymentHistoryItem item;
-  const _HistoryCard({required this.item});
+class _TransactionCard extends StatelessWidget {
+  final WalletHistoryItem item;
+  const _TransactionCard({required this.item});
 
   @override
   Widget build(BuildContext context) {
+    final dateStr = DateFormat('MMM dd, yyyy • hh:mm a').format(item.createdAt);
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            offset: const Offset(0, 2),
-            blurRadius: 8,
+            color: Colors.black.withOpacity(0.03),
+            offset: const Offset(0, 4),
+            blurRadius: 12,
           ),
         ],
       ),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Icon Container
+          // Icon
           Container(
-            padding: const EdgeInsets.all(10),
+            padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: item.isCredit ? Colors.green.shade50 : Colors.red.shade50,
-              borderRadius: BorderRadius.circular(10),
+              color: Colors.green.shade50,
+              shape: BoxShape.circle,
             ),
-            child: Icon(
-              item.isCredit ? Icons.arrow_downward : Icons.arrow_upward,
-              color: item.isCredit ? Colors.green : Colors.red,
-              size: 20,
+            child: const Icon(
+              Icons.account_balance_wallet_rounded,
+              color: Colors.green,
+              size: 24,
             ),
           ),
-          const SizedBox(width: 14),
+          const SizedBox(width: 16),
 
-          // Data
+          // Details
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      item.description,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.black87,
-                      ),
-                    ),
-                    Text(
-                      "${item.isCredit ? '+' : '-'}₹${item.amount.toStringAsFixed(0)}",
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: item.isCredit ? Colors.green : Colors.red,
-                      ),
-                    ),
-                  ],
+                Text(
+                  "Order #${item.orderId}",
+                  style: const TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black87,
+                  ),
                 ),
                 const SizedBox(height: 4),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      item.orderId,
-                      style: TextStyle(
-                        fontSize: 13,
-                        color: Colors.grey.shade600,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                    Text(
-                      item.date,
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.grey.shade500,
-                      ),
-                    ),
-                  ],
+                Text(
+                  dateStr,
+                  style: TextStyle(fontSize: 12, color: Colors.grey.shade500),
                 ),
               ],
             ),
+          ),
+
+          // Amount
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Text(
+                "+₹${item.amount}",
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.green,
+                ),
+              ),
+              const SizedBox(height: 4),
+              const Text(
+                "Completed",
+                style: TextStyle(
+                  fontSize: 11,
+                  color: Colors.grey,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
           ),
         ],
       ),

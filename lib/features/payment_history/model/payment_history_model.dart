@@ -1,9 +1,9 @@
 class PaymentHistoryItem {
   final String orderId;
   final double amount;
-  final String date;  // e.g., "30 Dec, 4:15 PM" - simplified for UI
-  final bool isCredit; // true for earnings, false for deductions
-  final String description; // e.g. "Order delivered", "Weekly Incentive"
+  final String date;
+  final bool isCredit;
+  final String description;
 
   PaymentHistoryItem({
     required this.orderId,

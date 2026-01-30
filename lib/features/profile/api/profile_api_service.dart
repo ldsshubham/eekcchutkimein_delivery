@@ -50,4 +50,20 @@ class ProfileApiService extends GetConnect {
       return Response(statusCode: 500, statusText: e.toString());
     }
   }
+
+  Future<Response> updateAvailability(bool availability) async {
+    try {
+      final token = await TokenService.getAccessToken();
+      return post(
+        '$_baseUrl/delivery/employee/rider/availability',
+        {'availability': availability},
+        headers: {
+          if (token != null) 'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+      );
+    } catch (e) {
+      return Response(statusCode: 500, statusText: e.toString());
+    }
+  }
 }

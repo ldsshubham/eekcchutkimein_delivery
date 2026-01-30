@@ -1,3 +1,4 @@
+// Towards Customer Screen
 import 'package:eekcchutkimein_delivery/constants/colors.dart';
 import 'package:eekcchutkimein_delivery/features/orders_home/util/slidetostart_btn.dart';
 import 'package:eekcchutkimein_delivery/features/towards_customer/controller/towardscustomer_controller.dart';
@@ -14,13 +15,8 @@ class TowardsCustomerScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // var paymentReceivedLocal = false; // Simulated payment status
-    //     if (order.paymentMode == "online") {
-    //       paymentReceivedLocal=true;
-    //     }
     return Scaffold(
       backgroundColor: const Color(0xffF6F7F9),
-
       appBar: AppBar(
         backgroundColor: AppColors.primaryColor,
         elevation: 0,
@@ -46,7 +42,6 @@ class TowardsCustomerScreen extends StatelessWidget {
                   const SizedBox(height: 16),
                   if (order.paymentMode != "Online") _codPaymentOption(context),
                   const SizedBox(height: 16),
-                  // _mapPreview(),
                 ],
               ),
             ),
