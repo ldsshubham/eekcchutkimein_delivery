@@ -2,10 +2,11 @@ class DeliveryOrder {
   final String customerName;
   final String phone;
   final String address;
-  final String orderId;
+  final int orderId;
   final String paymentMode;
   final double amount;
   final int items;
+  final String? otp;
 
   DeliveryOrder({
     required this.customerName,
@@ -15,5 +16,6 @@ class DeliveryOrder {
     required this.paymentMode,
     required this.amount,
     required this.items,
+    this.otp,
   });
 }

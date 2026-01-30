@@ -5,8 +5,13 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 
 class OtpVerificationSheet extends StatefulWidget {
-  final String orderId;
-  const OtpVerificationSheet({super.key, required this.orderId});
+  final int orderId;
+  final String otp;
+  const OtpVerificationSheet({
+    super.key,
+    required this.orderId,
+    required this.otp,
+  });
 
   @override
   State<OtpVerificationSheet> createState() => _OtpVerificationSheetState();
@@ -33,10 +38,7 @@ class _OtpVerificationSheetState extends State<OtpVerificationSheet> {
   }
 
   Future<void> _handleEndDelivery() async {
-    final success = await controller.endDelivery(
-      orderId: int.parse(widget.orderId.replaceAll('#', '')),
-      otp: otp,
-    );
+    final success = await controller.endDelivery(widget.orderId, otp);
 
     if (success) {
       Navigator.pop(context); // close bottom sheet

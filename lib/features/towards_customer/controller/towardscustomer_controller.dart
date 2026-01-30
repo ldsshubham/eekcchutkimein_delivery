@@ -37,13 +37,10 @@ class TowardsCustomerController extends GetxController {
     isPaymentVerified.value = false;
   }
 
-  Future<bool> endDelivery({required int orderId, required String otp}) async {
+  Future<bool> endDelivery(int orderId, String otp) async {
     try {
       isLoading.value = true;
-      final response = await _apiService.endDelivery(
-        orderId: orderId,
-        otp: otp,
-      );
+      final response = await _apiService.endDelivery(orderId, otp);
 
       if (response.statusCode == 200) {
         Get.snackbar(

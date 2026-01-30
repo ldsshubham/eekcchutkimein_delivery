@@ -3,6 +3,7 @@ import 'package:eekcchutkimein_delivery/features/orders_home/util/slidetostart_b
 import 'package:eekcchutkimein_delivery/features/towards_customer/controller/towardscustomer_controller.dart';
 import 'package:eekcchutkimein_delivery/features/towards_customer/model/deliveryorder_model.dart';
 import 'package:eekcchutkimein_delivery/features/towards_customer/util/otpverification.dart';
+import 'package:eekcchutkimein_delivery/features/towards_customer/util/toastification_helper.dart';
 import 'package:eekcchutkimein_delivery/features/towards_customer/view/paymentpage_cod.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -45,7 +46,7 @@ class TowardsCustomerScreen extends StatelessWidget {
                   const SizedBox(height: 16),
                   if (order.paymentMode != "Online") _codPaymentOption(context),
                   const SizedBox(height: 16),
-                  _mapPreview(),
+                  // _mapPreview(),
                 ],
               ),
             ),
@@ -56,9 +57,9 @@ class TowardsCustomerScreen extends StatelessWidget {
             child: SlideToStartButton(
               textTitle: "Order Delivered",
               onSlideComplete: () {
-                showOtpSheet(context);
-                final otp = generateOtp();
-                debugPrint("DELIVERY OTP: $otp");
+                showOtpSheet(context, order.orderId, order.otp ?? "");
+                // final otp = generateOtp();
+                // debugPrint("DELIVERY OTP: $otp");
               },
             ),
           ),
@@ -144,7 +145,7 @@ class TowardsCustomerScreen extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 12),
-          _detailRow("Order ID", order.orderId),
+          _detailRow("Order ID", "#${order.orderId}"),
           _detailRow("Payment", order.paymentMode),
           _detailRow("Amount", "₹${order.amount}"),
         ],
@@ -203,14 +204,17 @@ class TowardsCustomerScreen extends StatelessWidget {
                   onTap: () {
                     // Pass 'true' to indicate payment success
                     // Get.back(result: true);
-                    Get.snackbar(
-                      "Success",
-                      "Payment marked as collected",
-                      backgroundColor: Colors.green,
-                      colorText: Colors.white,
-                      snackPosition: SnackPosition.BOTTOM,
-                      margin: const EdgeInsets.all(20),
+                    ToastHelper.showSuccessToast(
+                      message: "Payment marked as collected",
                     );
+                    // Get.snackbar(
+                    //   "Success",
+                    //   "Payment marked as collected",
+                    //   backgroundColor: Colors.green,
+                    //   colorText: Colors.white,
+                    //   snackPosition: SnackPosition.BOTTOM,
+                    //   margin: const EdgeInsets.all(20),
+                    // );
                     paymentController.toggleCashCollection();
                   },
                   child: Container(
@@ -308,22 +312,14 @@ class TowardsCustomerScreen extends StatelessWidget {
     );
   }
 
-  String generateOtp() {
-    return (1000 +
-            (9999 - 1000) *
-                (DateTime.now().millisecondsSinceEpoch % 1000) ~/
-                1000)
-        .toString();
-  }
-
-  void showOtpSheet(BuildContext context) {
+  void showOtpSheet(BuildContext context, int orderId, String otp) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      builder: (_) => OtpVerificationSheet(orderId: order.orderId),
+      builder: (_) => OtpVerificationSheet(orderId: orderId, otp: otp),
     );
   }
 }
