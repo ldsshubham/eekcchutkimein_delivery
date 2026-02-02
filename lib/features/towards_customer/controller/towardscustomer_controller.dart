@@ -1,3 +1,4 @@
+import 'package:eekcchutkimein_delivery/features/ordercompleted/view/ordercomplete_screen.dart';
 import 'package:eekcchutkimein_delivery/features/orders_home/api/order_api_service.dart';
 import 'package:eekcchutkimein_delivery/features/towards_customer/util/toastification_helper.dart';
 import 'package:flutter/material.dart';
@@ -48,11 +49,39 @@ class TowardsCustomerController extends GetxController {
         );
         return true;
       } else {
-        ToastHelper.showErrorToast("${response.body['message']}", message: '');
+        ToastHelper.showErrorToast(
+          response.body['message'] ?? 'Operation failed',
+        );
         return false;
       }
     } catch (e) {
-      ToastHelper.showErrorToast("Connection failed", message: '');
+      ToastHelper.showErrorToast("Connection failed");
+      return false;
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  Future<bool> cancelOrder(int orderId, String reason) async {
+    try {
+      isLoading.value = true;
+      final response = await _apiService.cancelOrder(orderId, reason);
+      print("CANCEL RESPOSNE ${response.body}");
+
+      if (response.statusCode == 200) {
+        ToastHelper.showSuccessToast(
+          message: response.body['message'] ?? "Order cancelled successfully",
+        );
+        return true;
+      } else {
+        print("CANCEL RESPOSNE:ERROR ${response.body}");
+        ToastHelper.showErrorToast(
+          response.body['message'] ?? 'Cancellation failed',
+        );
+        return false;
+      }
+    } catch (e) {
+      ToastHelper.showErrorToast("Connection failed");
       return false;
     } finally {
       isLoading.value = false;

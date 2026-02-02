@@ -51,4 +51,21 @@ class OrderApiService extends GetConnect {
       return Response(statusCode: 500, statusText: e.toString());
     }
   }
+
+  Future<Response> cancelOrder(int orderId, String reason) async {
+    try {
+      final token = await TokenService.getAccessToken();
+      return post(
+        '$_baseUrl/delivery/employee/cancel/delivery',
+        {"order_id": "$orderId", "message": reason},
+        headers: {
+          if (token != null) 'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+      );
+    } catch (e) {
+      print("CANCEL ORDER ERROR: API $e");
+      return Response(statusCode: 500, statusText: e.toString());
+    }
+  }
 }

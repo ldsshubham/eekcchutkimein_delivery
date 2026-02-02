@@ -1,6 +1,7 @@
 // Towards Customer Screen
 import 'package:eekcchutkimein_delivery/constants/colors.dart';
 import 'package:eekcchutkimein_delivery/features/orders_home/util/slidetostart_btn.dart';
+import 'package:eekcchutkimein_delivery/features/ordercompleted/view/ordercomplete_screen.dart';
 import 'package:eekcchutkimein_delivery/features/towards_customer/controller/towardscustomer_controller.dart';
 import 'package:eekcchutkimein_delivery/features/towards_customer/model/deliveryorder_model.dart';
 import 'package:eekcchutkimein_delivery/features/towards_customer/util/otpverification.dart';
@@ -15,6 +16,7 @@ class TowardsCustomerScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    print("ORDER ID: ${order} ${order.orderId}");
     return Scaffold(
       backgroundColor: const Color(0xffF6F7F9),
       appBar: AppBar(
@@ -34,6 +36,8 @@ class TowardsCustomerScreen extends StatelessWidget {
               padding: const EdgeInsets.all(16),
               child: Column(
                 children: [
+                  _cancelOrderCard(context, order.orderId),
+                  const SizedBox(height: 16),
                   _customerCard(),
                   const SizedBox(height: 16),
                   _addressCard(),
@@ -315,6 +319,188 @@ class TowardsCustomerScreen extends StatelessWidget {
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (_) => OtpVerificationSheet(orderId: orderId, otp: otp),
+    );
+  }
+
+  Widget _cancelOrderCard(BuildContext context, int orderId) {
+    return InkWell(
+      onTap: () => _showCancellationBottomSheet(context, orderId),
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+        decoration: BoxDecoration(
+          color: Colors.black,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: Colors.red.shade100, width: 1),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.red.withOpacity(0.05),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: Colors.red.shade50,
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.cancel_outlined,
+                color: Colors.red.shade700,
+                size: 20,
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "Unable to deliver?",
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                      color: Colors.red.shade900,
+                    ),
+                  ),
+                  const Text(
+                    "Tap here to cancel this order",
+                    style: TextStyle(color: Colors.grey, fontSize: 12),
+                  ),
+                ],
+              ),
+            ),
+            Icon(Icons.chevron_right, color: Colors.red.shade200),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showCancellationBottomSheet(BuildContext context, int orderId) {
+    final List<String> reasons = [
+      "Customer not reachable",
+      "Address incorrect / unable to find",
+      "Customer refused to accept",
+      "Vehicle issue / breakdown",
+      "Other",
+    ];
+
+    String? selectedReason;
+    final TowardsCustomerController controller =
+        Get.find<TowardsCustomerController>();
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setModalState) {
+            return Container(
+              padding: const EdgeInsets.all(20),
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Center(
+                    child: Container(
+                      width: 40,
+                      height: 4,
+                      decoration: BoxDecoration(
+                        color: Colors.grey.shade300,
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  const Text(
+                    "Cancel Order",
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 8),
+                  const Text(
+                    "Please select a reason for cancellation",
+                    style: TextStyle(color: Colors.grey),
+                  ),
+                  const SizedBox(height: 20),
+                  ...reasons.map(
+                    (reason) => RadioListTile<String>(
+                      title: Text(reason, style: const TextStyle(fontSize: 14)),
+                      value: reason,
+                      groupValue: selectedReason,
+                      activeColor: Colors.red,
+                      contentPadding: EdgeInsets.zero,
+                      onChanged: (value) {
+                        setModalState(() {
+                          selectedReason = value;
+                        });
+                      },
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  SizedBox(
+                    width: double.infinity,
+                    height: 50,
+                    child: Obx(
+                      () => ElevatedButton(
+                        onPressed:
+                            controller.isLoading.value || selectedReason == null
+                            ? null
+                            : () async {
+                                print(
+                                  "CANCEL ORDER: ${selectedReason} ${orderId}",
+                                );
+                                final success = await controller.cancelOrder(
+                                  orderId,
+                                  selectedReason!,
+                                );
+                                if (success) {
+                                  print("Order cancelled successfully");
+                                  Get.offAll(
+                                    () => const OrderCompletedScreen(
+                                      isCancelled: true,
+                                    ),
+                                  );
+                                }
+                              },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.red,
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        child: controller.isLoading.value
+                            ? const SizedBox(
+                                height: 20,
+                                width: 20,
+                                child: CircularProgressIndicator(
+                                  color: Colors.white,
+                                  strokeWidth: 2,
+                                ),
+                              )
+                            : const Text(
+                                "Confirm Cancellation",
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                ],
+              ),
+            );
+          },
+        );
+      },
     );
   }
 }

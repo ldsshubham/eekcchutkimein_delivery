@@ -14,6 +14,7 @@ class MinimalInput extends StatelessWidget {
   final VoidCallback? onTap;
   final int? maxLength;
   final String? hintText;
+  final ValueChanged<String>? onChanged;
 
   const MinimalInput({
     super.key,
@@ -29,6 +30,7 @@ class MinimalInput extends StatelessWidget {
     this.onTap,
     this.maxLength,
     this.hintText,
+    this.onChanged,
   });
 
   @override
@@ -51,6 +53,7 @@ class MinimalInput extends StatelessWidget {
           readOnly: readOnly,
           enabled: enabled,
           onTap: onTap,
+          onChanged: onChanged,
           maxLength: maxLength,
           keyboardType: keyboardType,
           maxLines: maxLines,

@@ -254,8 +254,8 @@ class OrderSummery extends StatelessWidget {
         );
       } else {
         ToastHelper.showErrorToast(
-          "Failed to start delivery: ${response.statusText}",
-          message: '',
+          "Failed to start delivery",
+          subMessage: response.statusText,
         );
       }
     } else {

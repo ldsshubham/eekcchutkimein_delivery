@@ -1,31 +1,36 @@
 class DashboardModel {
-  final int totalOrders;
-  final int deliveredOrders;
-  final int pendingOrders;
-  final int totalSales;
-  final int totalLeads;
-  final int totalProducts;
-  final int totalServices;
+  final int deliveryBoyId;
+  final String totalOrders;
+  final String pendingOrders;
+  final String deliveredOrders;
+  final String assignedToday;
+  final String totalEarnings;
 
+  //  {
+  //         "delivery_boy_id": 1,
+  //         "total_orders": "300",
+  //         "pending_orders": "297",
+  //         "delivered_orders": "3",
+  //         "assigned_today": "0",
+  //         "total_earnings": "200.00"
+  //     }
   DashboardModel({
+    required this.deliveryBoyId,
     required this.totalOrders,
-    required this.deliveredOrders,
     required this.pendingOrders,
-    required this.totalSales,
-    required this.totalLeads,
-    required this.totalProducts,
-    required this.totalServices,
+    required this.deliveredOrders,
+    required this.assignedToday,
+    required this.totalEarnings,
   });
 
-  factory DashboardModel.fromJson(Map<String, dynamic> json) {
+  factory DashboardModel.fromjson(Map<String, dynamic> json) {
     return DashboardModel(
-      totalOrders: json['total_orders'] ?? 0,
-      deliveredOrders: json['delivered_order'] ?? 0,
-      pendingOrders: json['pending_order'] ?? 0,
-      totalSales: json['total_sales'] ?? 0,
-      totalLeads: json['total_leads'] ?? 0,
-      totalProducts: json['total_products'] ?? 0,
-      totalServices: json['total_services'] ?? 0,
+      deliveryBoyId: json['delivery_boy_id'] ?? 0,
+      totalOrders: json['total_orders'] ?? "0",
+      pendingOrders: json['pending_orders'] ?? "0",
+      deliveredOrders: json['delivered_orders'] ?? 0,
+      assignedToday: json['assigned_today'] ?? 0,
+      totalEarnings: json['total_earnings'] ?? 0,
     );
   }
 }

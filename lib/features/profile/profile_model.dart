@@ -70,7 +70,9 @@ class DeliveryPartnerProfile {
       vehicleName: json['vehical_name']?.toString() ?? '',
       licenseNumber: json['license']?.toString() ?? '',
       isOnline:
-          _parseBool(json['availability']) || _parseBool(json['is_online']),
+          _parseBool(json['availability']) ||
+          _parseBool(json['is_online']) ||
+          _parseBool(json['online_status']),
     );
   }
 
@@ -79,6 +81,10 @@ class DeliveryPartnerProfile {
     if (value is bool) return value;
     if (value is int) return value == 1;
     final str = value.toString().toLowerCase();
-    return str == '1' || str == 'true' || str == 'online';
+    return str == '1' ||
+        str == 'true' ||
+        str == 'online' ||
+        str == 'yes' ||
+        str == 'active';
   }
 }

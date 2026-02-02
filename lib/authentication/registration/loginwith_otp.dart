@@ -119,8 +119,9 @@ class _PhoneVerifyScreenState extends State<PhoneVerifyScreen> {
                           onPressed: () {
                             if (_phoneController.text.length != 10) {
                               ToastHelper.showErrorToast(
-                                "Invalid Number \nPlease enter a valid 10-digit mobile number",
-                                message: '',
+                                "Invalid Number",
+                                subMessage:
+                                    "Please enter a valid 10-digit mobile number",
                               );
                             } else {
                               controller.sendOtp(_phoneController.text);

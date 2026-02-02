@@ -1,8 +1,11 @@
 import 'package:eekcchutkimein_delivery/constants/colors.dart';
+import 'package:eekcchutkimein_delivery/routes/routes.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class OrderCompletedScreen extends StatelessWidget {
-  const OrderCompletedScreen({super.key});
+  final bool isCancelled;
+  const OrderCompletedScreen({super.key, this.isCancelled = false});
 
   @override
   Widget build(BuildContext context) {
@@ -10,13 +13,15 @@ class OrderCompletedScreen extends StatelessWidget {
       backgroundColor: const Color(0xffF6F7F9),
       body: Column(
         children: [
-          /// GREEN SUCCESS HEADER (NO GAP, CURVED)
+          /// HEADER (NO GAP, CURVED)
           Container(
             width: double.infinity,
             height: 260,
-            decoration: const BoxDecoration(
-              color: Colors.green,
-              borderRadius: BorderRadius.vertical(bottom: Radius.circular(0)),
+            decoration: BoxDecoration(
+              color: isCancelled ? Colors.red : Colors.green,
+              borderRadius: const BorderRadius.vertical(
+                bottom: Radius.circular(0),
+              ),
             ),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -47,9 +52,11 @@ class OrderCompletedScreen extends StatelessWidget {
                         color: Colors.white,
                         shape: BoxShape.circle,
                       ),
-                      child: const Icon(
-                        Icons.check_rounded,
-                        color: Color(0xFF16A34A), // better green
+                      child: Icon(
+                        isCancelled ? Icons.close_rounded : Icons.check_rounded,
+                        color: isCancelled
+                            ? Colors.red
+                            : const Color(0xFF16A34A),
                         size: 38,
                       ),
                     ),
@@ -58,9 +65,9 @@ class OrderCompletedScreen extends StatelessWidget {
 
                 const SizedBox(height: 18),
 
-                const Text(
-                  "Order Delivered!",
-                  style: TextStyle(
+                Text(
+                  isCancelled ? "Order Cancelled!" : "Order Delivered!",
+                  style: const TextStyle(
                     color: Colors.white,
                     fontSize: 22,
                     fontWeight: FontWeight.w600,
@@ -69,9 +76,11 @@ class OrderCompletedScreen extends StatelessWidget {
 
                 const SizedBox(height: 6),
 
-                const Text(
-                  "Delivery completed successfully",
-                  style: TextStyle(color: Colors.white70, fontSize: 14),
+                Text(
+                  isCancelled
+                      ? "The order has been cancelled."
+                      : "Delivery completed successfully",
+                  style: const TextStyle(color: Colors.white70, fontSize: 14),
                 ),
               ],
             ),
@@ -79,36 +88,40 @@ class OrderCompletedScreen extends StatelessWidget {
 
           const SizedBox(height: 28),
 
-          /// EARNINGS CARD
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Container(
-              padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 16),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(18),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.06),
-                    blurRadius: 14,
-                    offset: const Offset(0, 6),
-                  ),
-                ],
-              ),
-              child: Column(
-                children: [
-                  _earningRow("Delivery Fee", "₹45"),
-                  const SizedBox(height: 14),
-                  _earningRow("Bonus", "₹10"),
-                  const Padding(
-                    padding: EdgeInsets.symmetric(vertical: 14),
-                    child: Divider(height: 1),
-                  ),
-                  _earningRow("Total Earnings", "₹55", isTotal: true),
-                ],
+          /// EARNINGS CARD (Only if not cancelled, or show zero)
+          if (!isCancelled)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  vertical: 18,
+                  horizontal: 16,
+                ),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(18),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.06),
+                      blurRadius: 14,
+                      offset: const Offset(0, 6),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  children: [
+                    _earningRow("Delivery Fee", "₹45"),
+                    const SizedBox(height: 14),
+                    _earningRow("Bonus", "₹10"),
+                    const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 14),
+                      child: Divider(height: 1),
+                    ),
+                    _earningRow("Total Earnings", "₹55", isTotal: true),
+                  ],
+                ),
               ),
             ),
-          ),
 
           const Spacer(),
 
@@ -127,7 +140,7 @@ class OrderCompletedScreen extends StatelessWidget {
                   elevation: 4,
                 ),
                 onPressed: () {
-                  Navigator.popUntil(context, (route) => route.isFirst);
+                  Get.offAllNamed(AppRoutes.homepage);
                 },
                 child: const Text(
                   "Go for Next Order",

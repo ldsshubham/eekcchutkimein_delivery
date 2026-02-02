@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 
 import 'package:eekcchutkimein_delivery/features/orders_home/controller/order_controller.dart';
 import 'package:get/get.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 class OrderDetails extends StatelessWidget {
   const OrderDetails({super.key});
@@ -18,40 +19,49 @@ class OrderDetails extends StatelessWidget {
 
     return Obx(() {
       if (controller.isLoading.value) {
-        return const Center(child: CircularProgressIndicator());
+        return Center(
+          child: LoadingAnimationWidget.fourRotatingDots(
+            color: AppColors.primaryColor,
+            size: 50,
+          ),
+        );
       }
       print('ORDER LIST ${controller.orders}');
       if (controller.orders.isEmpty) {
         return const Center(child: Text("No orders found"));
       }
 
-      return ListView.separated(
-        padding: const EdgeInsets.all(16),
-        itemCount: controller.orders.length,
-        separatorBuilder: (context, index) => const SizedBox(height: 16),
-        itemBuilder: (context, index) {
-          final order = controller.orders[index];
-          return OrderCard(
-            order: order,
-            onTap: () {
-              if (profileController.isOnline.value) {
-                showModalBottomSheet(
-                  context: context,
-                  isScrollControlled: true,
-                  backgroundColor: Colors.white,
-                  shape: const RoundedRectangleBorder(
-                    borderRadius: BorderRadius.vertical(
-                      top: Radius.circular(20),
+      return RefreshIndicator(
+        color: AppColors.primaryColor,
+        onRefresh: () => controller.fetchOrders(),
+        child: ListView.separated(
+          padding: const EdgeInsets.all(16),
+          itemCount: controller.orders.length,
+          separatorBuilder: (context, index) => const SizedBox(height: 16),
+          itemBuilder: (context, index) {
+            final order = controller.orders[index];
+            return OrderCard(
+              order: order,
+              onTap: () {
+                if (profileController.isOnline.value) {
+                  showModalBottomSheet(
+                    context: context,
+                    isScrollControlled: true,
+                    backgroundColor: Colors.white,
+                    shape: const RoundedRectangleBorder(
+                      borderRadius: BorderRadius.vertical(
+                        top: Radius.circular(20),
+                      ),
                     ),
-                  ),
-                  builder: (_) => OrderBottomSheet(order: order),
-                );
-              } else {
-                _showOfflineSnackBar(context);
-              }
-            },
-          );
-        },
+                    builder: (_) => OrderBottomSheet(order: order),
+                  );
+                } else {
+                  _showOfflineSnackBar(context);
+                }
+              },
+            );
+          },
+        ),
       );
     });
   }
@@ -96,17 +106,21 @@ class OrderCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bool isAssigned = order.orderStatus == "Assigned";
+    // Current status logic
+    final bool isAssigned = order.orderStatus.toLowerCase() == "assigned";
+    final Color statusColor = isAssigned
+        ? const Color(0xFF16A34A)
+        : const Color(0xFFEA580C);
 
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 16,
+            offset: const Offset(0, 8),
           ),
         ],
       ),
@@ -119,23 +133,41 @@ class OrderCard extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                Row(
                   children: [
-                    Text(
-                      "Order #${order.orderId}",
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: AppColors.primaryColor.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: const Icon(
+                        Icons.receipt_long,
+                        color: AppColors.primaryColor,
+                        size: 20,
                       ),
                     ),
-                    const SizedBox(height: 4),
-                    Text(
-                      "${order.orderDate} • ${order.orderTime}",
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.grey.shade600,
-                      ),
+                    const SizedBox(width: 12),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "Order #${order.orderId}",
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: -0.5,
+                          ),
+                        ),
+                        Text(
+                          "${order.orderDate} • ${order.orderTime}",
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Colors.grey.shade500,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
@@ -145,25 +177,38 @@ class OrderCard extends StatelessWidget {
                     vertical: 6,
                   ),
                   decoration: BoxDecoration(
-                    color: isAssigned
-                        ? Colors.green.shade50
-                        : Colors.orange.shade50,
-                    borderRadius: BorderRadius.circular(20),
+                    color: statusColor.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(12),
                   ),
-                  child: Text(
-                    order.orderStatus,
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                      color: isAssigned ? Colors.green : Colors.orange,
-                    ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        isAssigned
+                            ? Icons.check_circle_outline_rounded
+                            : Icons.history_rounded,
+                        size: 14,
+                        color: statusColor,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        order.orderStatus.toUpperCase(),
+                        style: TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.w800,
+                          color: statusColor,
+                          letterSpacing: 0.5,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ],
             ),
           ),
 
-          const Divider(height: 1),
+          const Divider(height: 1, indent: 16, endIndent: 16),
+
+          // Vendor Section
           Padding(
             padding: const EdgeInsets.all(16),
             child: Column(
@@ -171,75 +216,102 @@ class OrderCard extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    Icon(Icons.store, color: Colors.blue.shade400, size: 20),
+                    const Icon(Icons.location_on, color: Colors.blue, size: 16),
                     const SizedBox(width: 8),
-                    Text(
-                      order.vendorName,
-                      style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
+                    Expanded(
+                      child: Text(
+                        order.vendorName,
+                        style: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black87,
+                        ),
                       ),
                     ),
                   ],
                 ),
                 const SizedBox(height: 4),
                 Padding(
-                  padding: const EdgeInsets.only(left: 28),
+                  padding: const EdgeInsets.only(left: 24),
                   child: Text(
                     order.vendorAddress,
                     style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
-                  ),
-                ),
-                const SizedBox(height: 12),
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: Colors.grey.shade50,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Column(
-                    children: order.productList.map((product) {
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 2),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              product.productName,
-                              style: const TextStyle(fontSize: 13),
-                            ),
-                            Text(
-                              "x${product.productQuantity}",
-                              style: const TextStyle(
-                                fontSize: 13,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ],
-                        ),
-                      );
-                    }).toList(),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
               ],
             ),
           ),
 
+          // Items Preview (Compact)
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: const Color(0xFFF8FAFC),
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Column(
+                children: order.productList.map((product) {
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 2),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          product.productName,
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: Colors.grey.shade800,
+                          ),
+                        ),
+                        Text(
+                          "x${product.productQuantity}",
+                          style: const TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                }).toList(),
+              ),
+            ),
+          ),
+
+          const SizedBox(height: 16),
           const Divider(height: 1),
 
-          // Footer Action Section
+          // Action Footer
           Padding(
             padding: const EdgeInsets.all(16),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  "₹${order.orderAmount}",
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
-                  ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "Amount",
+                      style: TextStyle(
+                        color: Colors.grey.shade500,
+                        fontSize: 11,
+                      ),
+                    ),
+                    Text(
+                      "₹${order.orderAmount}",
+                      style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w900,
+                        color: Colors.black,
+                        letterSpacing: -1,
+                      ),
+                    ),
+                  ],
                 ),
                 ElevatedButton(
                   onPressed: onTap,
@@ -247,17 +319,28 @@ class OrderCard extends StatelessWidget {
                     backgroundColor: AppColors.primaryColor,
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 20,
-                      vertical: 10,
+                      horizontal: 18,
+                      vertical: 12,
                     ),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
+                      borderRadius: BorderRadius.circular(12),
                     ),
-                    elevation: 0,
+                    elevation: 2,
+                    shadowColor: AppColors.primaryColor.withOpacity(0.4),
                   ),
-                  child: const Text(
-                    "Start Delivery",
-                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                  child: const Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        "Start Delivery",
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      // SizedBox(width: 8),
+                      // Icon(Icons.arrow_forward_rounded, size: 18),
+                    ],
                   ),
                 ),
               ],
@@ -277,14 +360,14 @@ class OrderBottomSheet extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: EdgeInsets.only(
-        left: 16,
-        right: 16,
+        left: 20,
+        right: 20,
         top: 12,
-        bottom: MediaQuery.of(context).viewInsets.bottom + 16,
+        bottom: MediaQuery.of(context).viewInsets.bottom + 24,
       ),
       decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        color: Color(0xFFF8FAFC),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -293,9 +376,9 @@ class OrderBottomSheet extends StatelessWidget {
           /// Drag handle
           Center(
             child: Container(
-              width: 40,
+              width: 48,
               height: 5,
-              margin: const EdgeInsets.only(bottom: 16),
+              margin: const EdgeInsets.only(bottom: 24),
               decoration: BoxDecoration(
                 color: Colors.grey.shade300,
                 borderRadius: BorderRadius.circular(10),
@@ -303,30 +386,27 @@ class OrderBottomSheet extends StatelessWidget {
             ),
           ),
 
-          /// PICKUP FROM
-          const Text(
-            "Pickup From",
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+          const Row(
+            children: [
+              Icon(Icons.route, color: AppColors.primaryColor),
+              SizedBox(width: 10),
+              Text(
+                "Delivery Route",
+                style: TextStyle(
+                  fontWeight: FontWeight.w900,
+                  fontSize: 18,
+                  letterSpacing: -0.5,
+                ),
+              ),
+            ],
           ),
-          const SizedBox(height: 8),
-
-          _pickupCard(order),
-
-          const SizedBox(height: 16),
-
-          /// DROP TO
-          const Text(
-            "Drop To",
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
-          ),
-          const SizedBox(height: 8),
-
-          _dropCard(order),
 
           const SizedBox(height: 24),
 
-          /// SLIDE TO START
-          /// SLIDE TO START
+          _buildRouteTimeline(order),
+
+          const SizedBox(height: 32),
+
           SlideToStartButton(
             textTitle: 'Slide to Start Delivery',
             onSlideComplete: () {
@@ -342,69 +422,99 @@ class OrderBottomSheet extends StatelessWidget {
     );
   }
 
-  /// PICKUP CARD
-  Widget _pickupCard(OrderModel order) {
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: Colors.grey.shade100,
-        borderRadius: BorderRadius.circular(14),
-      ),
-      child: Row(
-        children: [
-          CircleAvatar(
-            backgroundColor: Colors.green.shade100,
-            child: const Icon(Icons.store, color: Colors.green),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  order.vendorName,
-                  style: const TextStyle(fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  order.vendorAddress,
-                  style: const TextStyle(color: Colors.grey),
-                ),
-              ],
+  Widget _buildRouteTimeline(OrderModel order) {
+    return Column(
+      children: [
+        _timelineItem(
+          title: "Pickup From",
+          name: order.vendorName,
+          address: order.vendorAddress,
+          isFirst: true,
+          icon: Icons.store_rounded,
+          color: Colors.blue,
+        ),
+        Container(
+          height: 30,
+          margin: const EdgeInsets.only(left: 19),
+          decoration: BoxDecoration(
+            border: Border(
+              left: BorderSide(
+                color: Colors.grey.shade300,
+                width: 2,
+                style: BorderStyle.solid,
+              ),
             ),
           ),
-          const Text(
-            "PICKUP",
-            style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold),
-          ),
-        ],
-      ),
+        ),
+        _timelineItem(
+          title: "Drop To",
+          name: order.customerName,
+          address: order.customerAddress,
+          isLast: true,
+          icon: Icons.person_pin_circle_rounded,
+          color: Colors.green,
+        ),
+      ],
     );
   }
 
-  Widget _dropCard(OrderModel order) {
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: Colors.grey.shade100,
-        borderRadius: BorderRadius.circular(14),
-      ),
-      child: Row(
-        children: [
-          CircleAvatar(
-            backgroundColor: Colors.blue.shade100,
-            child: const Icon(Icons.person, color: Colors.blue),
+  Widget _timelineItem({
+    required String title,
+    required String name,
+    required String address,
+    required IconData icon,
+    required Color color,
+    bool isFirst = false,
+    bool isLast = false,
+  }) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          width: 40,
+          height: 40,
+          decoration: BoxDecoration(
+            color: color.withOpacity(0.1),
+            shape: BoxShape.circle,
           ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Text(
-              "${order.customerName}\n${order.customerAddress}",
-              style: const TextStyle(height: 1.4),
-            ),
+          child: Icon(icon, color: color, size: 22),
+        ),
+        const SizedBox(width: 14),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                style: TextStyle(
+                  color: Colors.grey.shade500,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 11,
+                  letterSpacing: 0.5,
+                ),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                name,
+                style: const TextStyle(
+                  fontWeight: FontWeight.w800,
+                  fontSize: 15,
+                  color: Colors.black87,
+                ),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                address,
+                style: TextStyle(
+                  color: Colors.grey.shade600,
+                  fontSize: 13,
+                  height: 1.3,
+                ),
+              ),
+            ],
           ),
-          const Icon(Icons.keyboard_arrow_down),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }

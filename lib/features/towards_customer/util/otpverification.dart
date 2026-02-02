@@ -1,5 +1,6 @@
 import 'package:eekcchutkimein_delivery/features/ordercompleted/view/ordercomplete_screen.dart';
 import 'package:eekcchutkimein_delivery/features/towards_customer/controller/towardscustomer_controller.dart';
+import 'package:eekcchutkimein_delivery/features/towards_customer/util/textinput.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -28,10 +29,13 @@ class _OtpVerificationSheetState extends State<OtpVerificationSheet> {
   final TowardsCustomerController controller =
       Get.find<TowardsCustomerController>();
 
-  String get otp => controllers.map((c) => c.text).join();
+  final TextEditingController otpController = TextEditingController();
+
+  String get otp => otpController.text;
 
   @override
   void dispose() {
+    otpController.dispose();
     for (var c in controllers) c.dispose();
     for (var f in focusNodes) f.dispose();
     super.dispose();
@@ -92,10 +96,12 @@ class _OtpVerificationSheetState extends State<OtpVerificationSheet> {
 
           const SizedBox(height: 26),
 
-          /// OTP INPUT ROW
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: List.generate(4, (index) => _otpBox(index)),
+          MinimalInput(
+            label: 'Enter 4-digit OTP',
+            controller: otpController,
+            onChanged: (val) {
+              setState(() {});
+            },
           ),
 
           const SizedBox(height: 30),
@@ -105,17 +111,18 @@ class _OtpVerificationSheetState extends State<OtpVerificationSheet> {
             width: double.infinity,
             height: 52,
             child: Obx(() {
+              final isOtpValid = otp.length == 4;
               return ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: otp.length == 4
+                  backgroundColor: isOtpValid
                       ? Colors.green
                       : Colors.grey.shade400,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16),
                   ),
-                  elevation: otp.length == 4 ? 4 : 0,
+                  elevation: isOtpValid ? 4 : 0,
                 ),
-                onPressed: (otp.length == 4 && !controller.isLoading.value)
+                onPressed: (isOtpValid && !controller.isLoading.value)
                     ? () => _handleEndDelivery()
                     : null,
                 child: controller.isLoading.value

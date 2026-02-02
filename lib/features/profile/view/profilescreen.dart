@@ -1,3 +1,4 @@
+import 'package:eekcchutkimein_delivery/constants/colors.dart';
 import 'package:eekcchutkimein_delivery/features/profile/api/profile_api_service.dart';
 import 'package:eekcchutkimein_delivery/features/profile/controller/profile_controller.dart';
 import 'package:eekcchutkimein_delivery/features/profile/profile_model.dart';
@@ -7,6 +8,7 @@ import 'package:eekcchutkimein_delivery/services/token_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -19,7 +21,10 @@ class ProfileScreen extends StatelessWidget {
       color: const Color(0xffF6F7F9),
       child: Obx(() {
         if (controller.isLoading.value) {
-          return const Center(child: CircularProgressIndicator());
+          return LoadingAnimationWidget.fourRotatingDots(
+            color: AppColors.primaryColor,
+            size: 48,
+          );
         }
 
         final profile = controller.profile.value;

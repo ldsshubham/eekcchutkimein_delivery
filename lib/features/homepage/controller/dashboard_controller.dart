@@ -16,10 +16,10 @@ class DashboardController extends GetxController {
   Future<void> fetchDashboardDetails() async {
     try {
       isLoadining.value = true;
-      // final response = await dashboardApi.fetchDashboardDetails();
-      // dashboardData.value = response;
+      await Future.delayed(const Duration(milliseconds: 800));
+      final response = await dashboardApi.fetchDashboardDetails();
+      dashboardData.value = response;
     } catch (e) {
-      // Handle any errors here
       errorMessage.value = "Failed to fetch dashboard details: $e";
     } finally {
       isLoadining.value = false;

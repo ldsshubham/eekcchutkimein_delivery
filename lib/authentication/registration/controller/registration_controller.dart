@@ -144,13 +144,13 @@ class RegistrationController extends GetxController {
         final errorMsg =
             response.body?['message']?.toString() ?? "Registration failed";
 
-        ToastHelper.showErrorToast("Registration failed", message: errorMsg);
+        ToastHelper.showErrorToast("Registration failed", subMessage: errorMsg);
       }
     } catch (e) {
       debugPrint("REGISTER ERROR: $e");
       ToastHelper.showErrorToast(
-        "An unexpected error occurred: $e",
-        message: '',
+        "An unexpected error occurred",
+        subMessage: e.toString(),
       );
     } finally {
       isLoading.value = false;
@@ -241,10 +241,13 @@ class RegistrationController extends GetxController {
         }
       } else {
         String errorMsg = response.body?['message'] ?? "Invalid OTP";
-        ToastHelper.showErrorToast(errorMsg, message: '');
+        ToastHelper.showErrorToast(errorMsg);
       }
     } catch (e) {
-      ToastHelper.showErrorToast("Verification failed: $e", message: '');
+      ToastHelper.showErrorToast(
+        "Verification failed",
+        subMessage: e.toString(),
+      );
     } finally {
       isLoading.value = false;
     }
