@@ -30,7 +30,7 @@ class OrderDetails extends StatelessWidget {
       }
       print('ORDER LIST ${controller.orders}');
       if (controller.orders.isEmpty) {
-        return const Center(child: Text("No orders found"));
+        return Scaffold(body: const Center(child: Text("No orders found")));
       }
 
       return RefreshIndicator(

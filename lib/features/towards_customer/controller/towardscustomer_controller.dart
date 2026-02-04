@@ -1,15 +1,12 @@
 import 'dart:convert';
-import 'package:eekcchutkimein_delivery/features/ordercompleted/view/ordercomplete_screen.dart';
 import 'package:eekcchutkimein_delivery/features/orders_home/api/order_api_service.dart';
 import 'package:eekcchutkimein_delivery/features/towards_customer/model/order_detail_model.dart';
 import 'package:eekcchutkimein_delivery/features/towards_customer/util/toastification_helper.dart';
-import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class TowardsCustomerController extends GetxController {
   final OrderApiService _apiService = OrderApiService();
 
-  // Observable variables for payment state
   RxBool isPaymentCollected = false.obs;
   RxBool isPaymentVerified = false.obs;
   RxBool isLoading = false.obs;
@@ -24,7 +21,6 @@ class TowardsCustomerController extends GetxController {
 
       if (response.statusCode == 200) {
         var body = response.body;
-        print("FETCH ORDER DETAILS BODY TYPE: ${body.runtimeType}");
         if (body is String) {
           try {
             body = jsonDecode(body);

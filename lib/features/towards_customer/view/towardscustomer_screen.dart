@@ -8,6 +8,7 @@ import 'package:eekcchutkimein_delivery/features/towards_customer/util/otpverifi
 import 'package:eekcchutkimein_delivery/features/towards_customer/view/paymentpage_cod.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:maps_launcher/maps_launcher.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class TowardsCustomerScreen extends StatefulWidget {
@@ -53,11 +54,13 @@ class _TowardsCustomerScreenState extends State<TowardsCustomerScreen> {
         print("RESPONSE AT TOWARDS${controller.orderDetails.value}");
         final response = controller.orderDetails.value;
         if (response == null || response.data.orderDetails.isEmpty) {
-          return const Center(child: Text("No order details found"));
+          return Scaffold(
+            body: const Center(child: Text("No order details found")),
+          );
         }
 
         final order = response.data.orderDetails.first;
-        print("ORDER AT TOWARDS${order}");
+        print("ORDER AT TOWARDS ${order}");
 
         return Column(
           children: [
@@ -97,6 +100,12 @@ class _TowardsCustomerScreenState extends State<TowardsCustomerScreen> {
   }
 
   Widget _customerCard(OrderDetail order) {
+    final name = order.customerName.isNotEmpty
+        ? order.customerName
+        : order.deliveryName;
+    print(
+      "NAME AT TOWARDS${name}. ${order.customerName} ${order.deliveryName}",
+    );
     return _card(
       child: Row(
         children: [
@@ -107,20 +116,23 @@ class _TowardsCustomerScreenState extends State<TowardsCustomerScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  "HH ${order.customerName}",
+                  name,
                   style: const TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 14,
                   ),
                 ),
                 const SizedBox(height: 4),
-                const Text("Customer", style: TextStyle(color: Colors.grey)),
+                Text("Customer", style: TextStyle(color: Colors.grey)),
               ],
             ),
           ),
           IconButton(
             icon: const Icon(Icons.call, color: Colors.green),
             onPressed: () {
+              print(
+                "PHONE NUMBER ${order.customerPhone} ${order.deliveryAddress}",
+              );
               _makePhoneCall(order.customerPhone);
             },
           ),
@@ -150,11 +162,16 @@ class _TowardsCustomerScreenState extends State<TowardsCustomerScreen> {
             style: TextStyle(color: Colors.grey.shade700),
           ),
           const SizedBox(height: 8),
-          Text(
-            "Navigate",
-            style: TextStyle(
-              color: Colors.green.shade700,
-              fontWeight: FontWeight.bold,
+          InkWell(
+            onTap: () {
+              MapsLauncher.launchQuery(order.deliveryAddress);
+            },
+            child: Text(
+              "Navigate",
+              style: TextStyle(
+                color: Colors.green.shade700,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
         ],

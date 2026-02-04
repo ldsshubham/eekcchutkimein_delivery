@@ -15,6 +15,8 @@ class OrderModel {
   final List<OrderItem> productList;
   final String paymentStatus;
   final String paymentGateway;
+  final String? vendorLatitude;
+  final String? vendorLongitude;
 
   OrderModel({
     required this.orderId,
@@ -31,6 +33,8 @@ class OrderModel {
     required this.productList,
     required this.paymentStatus,
     required this.paymentGateway,
+    this.vendorLatitude,
+    this.vendorLongitude,
   });
 
   factory OrderModel.fromJson(Map<String, dynamic> json) {
@@ -134,6 +138,12 @@ class OrderModel {
       paymentStatus:
           (json['PaymentStatus'] ?? json['payment_status'] ?? 'Pending')
               .toString(),
+      vendorLatitude:
+          (vendor['latitude'] ?? vendor['vendor_latitude'] ?? vendor['lat'])
+              ?.toString(),
+      vendorLongitude:
+          (vendor['longitude'] ?? vendor['vendor_longitude'] ?? vendor['long'])
+              ?.toString(),
     );
   }
 }

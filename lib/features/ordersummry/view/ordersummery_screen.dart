@@ -3,20 +3,34 @@ import 'package:eekcchutkimein_delivery/features/orders_home/model/order_model.d
 import 'package:eekcchutkimein_delivery/features/orders_home/controller/order_controller.dart';
 import 'package:eekcchutkimein_delivery/features/orders_home/util/slidetostart_btn.dart';
 import 'package:eekcchutkimein_delivery/features/ordersummry/util/uploadimage.dart';
+import 'package:eekcchutkimein_delivery/features/towards_customer/controller/towardscustomer_controller.dart';
+import 'package:eekcchutkimein_delivery/features/towards_customer/model/order_detail_model.dart';
 import 'package:eekcchutkimein_delivery/features/towards_customer/util/toastification_helper.dart';
 import 'package:eekcchutkimein_delivery/features/towards_customer/view/towardscustomer_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:map_launcher/map_launcher.dart';
 import 'package:maps_launcher/maps_launcher.dart';
 
 class OrderSummery extends StatelessWidget {
   final OrderModel? order;
-  const OrderSummery({super.key, this.order});
+  OrderSummery({super.key, this.order});
+
+  final TowardsCustomerController controller =
+      Get.find<TowardsCustomerController>();
 
   @override
   Widget build(BuildContext context) {
     final currentOrder = order ?? Get.arguments as OrderModel;
+    controller.fetchOrderDetails(currentOrder.orderId);
+
+    final response = controller.orderDetails.value;
+    if (response == null || response.data.orderDetails.isEmpty) {
+      return const Center(child: Text("No order details found"));
+    }
+
+    final orderDetail = response.data.orderDetails.first;
+    print("ORDER AT TOWARDS${orderDetail}");
+
     return Scaffold(
       backgroundColor: Colors.white,
 
@@ -55,8 +69,6 @@ class OrderSummery extends StatelessWidget {
                   ),
 
                   const SizedBox(height: 20),
-
-                  /// VENDOR DETAILS
                   const Text(
                     "Vendor Details",
                     style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
@@ -66,6 +78,8 @@ class OrderSummery extends StatelessWidget {
                   _infoTile(
                     title: currentOrder.vendorName,
                     subtitle: currentOrder.vendorAddress,
+                    latitude: orderDetail.vendorLatitude,
+                    longitude: orderDetail.vendorLongitude,
                     trailing: Icons.navigation,
                     trailingColor: Colors.green,
                   ),
@@ -112,39 +126,6 @@ class OrderSummery extends StatelessWidget {
               textTitle: "Slide to confirm order picked up!",
               onSlideComplete: () async {
                 _showUploadSheet(context, currentOrder);
-                // final OrderController controller = Get.find<OrderController>();
-
-                // // Show loading
-                // Get.dialog(
-                //   const Center(child: CircularProgressIndicator()),
-                //   barrierDismissible: false,
-                // );
-
-                // final response = await controller.startDelivery(
-                //   currentOrder.orderId,
-                // );
-
-                // // Close loading
-                // Get.back();
-
-                // if (response.statusCode == 200) {
-                //   final message =
-                //       response.body['mesaage'] ??
-                //       "Delivery Started Successfully!";
-                //   ToastHelper.showSuccessToast(message: message);
-                //   _showUploadSheet(context, currentOrder);
-                // } else {
-                //   ToastHelper.showErrorToast(
-                //     message: "Failed to start delivery: ${response.statusText}",
-                //   );
-                //   // Get.snackbar(
-                //   //   "Error",
-                //   //   "Failed to start delivery: ${response.statusText}",
-                //   //   backgroundColor: Colors.red,
-                //   //   colorText: Colors.white,
-                //   //   snackPosition: SnackPosition.BOTTOM,
-                //   // );
-                // }
               },
             ),
           ),
@@ -153,12 +134,11 @@ class OrderSummery extends StatelessWidget {
     );
   }
 
-  /// INFO TILE (Vendor / Customer)
   Widget _infoTile({
     required String title,
     required String subtitle,
-    String? latitude,
-    String? longitude,
+    double? latitude,
+    double? longitude,
     IconData? trailing,
     Color? trailingColor,
   }) {
@@ -191,10 +171,7 @@ class OrderSummery extends StatelessWidget {
               onTap: () {
                 if (latitude != null && longitude != null) {
                   try {
-                    MapsLauncher.launchCoordinates(
-                      double.parse(latitude),
-                      double.parse(longitude),
-                    );
+                    MapsLauncher.launchCoordinates(latitude, longitude);
                   } catch (e) {
                     print("Error launching maps: $e");
                   }
