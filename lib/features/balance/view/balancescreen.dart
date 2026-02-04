@@ -1,167 +1,236 @@
+import 'package:eekcchutkimein_delivery/features/homepage/controller/dashboard_controller.dart';
+import 'package:eekcchutkimein_delivery/features/payment_history/controller/payment_history_controller.dart';
+import 'package:eekcchutkimein_delivery/features/payment_history/model/wallet_history_model.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../../payment_history/view/payment_history_screen.dart';
+import 'package:intl/intl.dart';
+import '../../../constants/colors.dart';
 
 class BalanceScreen extends StatelessWidget {
   const BalanceScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final List<PaymentHistory> history = [
-      PaymentHistory(
-        orderId: "#ORD-78452",
-        amount: 85,
-        date: "30 Dec, 4:15 PM",
-        isCredit: true,
-      ),
-      PaymentHistory(
-        orderId: "#ORD-78421",
-        amount: 120,
-        date: "30 Dec, 2:10 PM",
-        isCredit: true,
-      ),
-      PaymentHistory(
-        orderId: "#ORD-78311",
-        amount: 60,
-        date: "29 Dec, 9:30 PM",
-        isCredit: false,
-      ),
-    ];
+    final DashboardController dashboardController = Get.put(
+      DashboardController(),
+    );
+    final PaymentHistoryController historyController = Get.put(
+      PaymentHistoryController(),
+    );
 
-    return Padding(
-      padding: const EdgeInsets.all(14),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          /// BALANCE CARD
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [Color(0xff00A884), Color(0xff00906F)],
-              ),
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: const [
-                Text(
-                  "AVAILABLE BALANCE",
-                  style: TextStyle(color: Colors.white70, fontSize: 12),
-                ),
-                SizedBox(height: 6),
-                Text(
-                  "₹1,245.00",
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold,
+    return RefreshIndicator(
+      color: AppColors.primaryColor,
+      onRefresh: () async {
+        await dashboardController.fetchDashboardDetails();
+        await historyController.fetchHistory();
+      },
+      child: SingleChildScrollView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        padding: const EdgeInsets.all(16),
+        child: Obx(() {
+          final dashboard = dashboardController.dashboardData.value;
+          final balance = dashboard?.totalEarnings ?? "0.00";
+          final isLoading =
+              dashboardController.isLoadining.value ||
+              historyController.isLoading.value;
+
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              /// BALANCE CARD
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(24),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      AppColors.primaryColor,
+                      AppColors.primaryColor.withOpacity(0.8),
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
                   ),
+                  borderRadius: BorderRadius.circular(24),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.primaryColor.withOpacity(0.3),
+                      blurRadius: 6,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
                 ),
-                SizedBox(height: 6),
-                Text(
-                  "Updated just now",
-                  style: TextStyle(color: Colors.white70, fontSize: 12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      "TOTAL EARNINGS",
+                      style: TextStyle(
+                        color: Colors.white70,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        letterSpacing: 1.2,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    Text(
+                      "₹$balance",
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 36,
+                        fontWeight: FontWeight.w900,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    Row(
+                      children: [
+                        const Icon(
+                          Icons.update,
+                          color: Colors.white70,
+                          size: 14,
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          "Last updated: ${DateFormat('hh:mm a').format(DateTime.now())}",
+                          style: const TextStyle(
+                            color: Colors.white70,
+                            fontSize: 11,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
-              ],
-            ),
-          ),
-
-          const SizedBox(height: 20),
-
-          /// QUICK STATS
-          Row(
-            children: [
-              _StatTile(title: "Orders", value: "12"),
-              _StatTile(title: "Tips", value: "₹140"),
-              _StatTile(title: "Incentives", value: "₹220"),
-            ],
-          ),
-
-          const SizedBox(height: 24),
-
-          /// RECENT TRANSACTIONS TITLE
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Text(
-                "Recent Transactions",
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
               ),
-              TextButton(
-                onPressed: () {
-                  Get.to(() => const PaymentHistoryScreen());
-                },
-                child: const Text("View All"),
+
+              const SizedBox(height: 24),
+
+              /// QUICK STATS
+              if (dashboard != null)
+                Row(
+                  children: [
+                    _StatTile(title: "Orders", value: dashboard.totalOrders),
+                    _StatTile(title: "Today", value: dashboard.assignedToday),
+                    _StatTile(title: "Pending", value: dashboard.pendingOrders),
+                  ],
+                ),
+
+              const SizedBox(height: 32),
+
+              /// TRANSACTIONS TITLE
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    "Payment History",
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w800,
+                      color: Colors.black87,
+                    ),
+                  ),
+                  if (isLoading)
+                    const SizedBox(
+                      width: 16,
+                      height: 16,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    ),
+                ],
               ),
+
+              const SizedBox(height: 16),
+
+              /// TRANSACTIONS LIST
+              if (historyController.historyList.isEmpty && !isLoading)
+                const Center(
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(vertical: 40),
+                    child: Text(
+                      "No transactions found",
+                      style: TextStyle(color: Colors.grey),
+                    ),
+                  ),
+                )
+              else
+                ListView.separated(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: historyController.historyList.length,
+                  separatorBuilder: (_, __) => const SizedBox(height: 12),
+                  itemBuilder: (context, index) {
+                    final item = historyController.historyList[index];
+                    return _PaymentTile(item: item);
+                  },
+                ),
             ],
-          ),
-
-          const SizedBox(height: 8),
-
-          /// TRANSACTIONS LIST
-          ListView.separated(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: history.length,
-            separatorBuilder: (_, __) => const Divider(height: 1),
-            itemBuilder: (context, index) {
-              final item = history[index];
-              return _PaymentTile(item: item);
-            },
-          ),
-        ],
+          );
+        }),
       ),
     );
   }
 }
 
 class _PaymentTile extends StatelessWidget {
-  final PaymentHistory item;
+  final WalletHistoryItem item;
   const _PaymentTile({required this.item});
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      contentPadding: const EdgeInsets.symmetric(vertical: 6),
-      leading: CircleAvatar(
-        backgroundColor: item.isCredit
-            ? Colors.green.shade100
-            : Colors.orange.shade100,
-        child: Icon(
-          item.isCredit ? Icons.arrow_downward : Icons.schedule,
-          color: item.isCredit ? Colors.green : Colors.orange,
-        ),
+    final dateStr = DateFormat('MMM dd, hh:mm a').format(item.createdAt);
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.grey.shade100),
       ),
-      title: Text(
-        item.orderId,
-        style: const TextStyle(fontWeight: FontWeight.w500),
-      ),
-      subtitle: Text(item.date),
-      trailing: Text(
-        "${item.isCredit ? '+' : ''}₹${item.amount}",
-        style: TextStyle(
-          fontWeight: FontWeight.bold,
-          color: item.isCredit ? Colors.green : Colors.orange,
-        ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: Colors.green.shade50,
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(
+              Icons.account_balance_wallet_rounded,
+              color: Colors.green,
+              size: 20,
+            ),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "Order #${item.orderId}",
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black87,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  dateStr,
+                  style: TextStyle(fontSize: 12, color: Colors.grey.shade500),
+                ),
+              ],
+            ),
+          ),
+          Text(
+            "+₹${item.amount}",
+            style: const TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w900,
+              color: Colors.green,
+            ),
+          ),
+        ],
       ),
     );
   }
-}
-
-class PaymentHistory {
-  final String orderId;
-  final int amount;
-  final String date;
-  final bool isCredit;
-
-  PaymentHistory({
-    required this.orderId,
-    required this.amount,
-    required this.date,
-    required this.isCredit,
-  });
 }
 
 class _StatTile extends StatelessWidget {
@@ -175,14 +244,14 @@ class _StatTile extends StatelessWidget {
     return Expanded(
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 4),
-        padding: const EdgeInsets.symmetric(vertical: 14),
+        padding: const EdgeInsets.symmetric(vertical: 16),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              blurRadius: 8,
+              color: Colors.black.withOpacity(0.04),
+              blurRadius: 10,
               offset: const Offset(0, 4),
             ),
           ],
@@ -191,12 +260,20 @@ class _StatTile extends StatelessWidget {
           children: [
             Text(
               value,
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              style: const TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.w900,
+                color: Colors.black87,
+              ),
             ),
             const SizedBox(height: 4),
             Text(
               title,
-              style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+              style: TextStyle(
+                fontSize: 11,
+                color: Colors.grey.shade500,
+                fontWeight: FontWeight.w600,
+              ),
             ),
           ],
         ),

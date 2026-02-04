@@ -9,8 +9,8 @@ import 'package:get/get.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 class DashboardScreen extends StatelessWidget {
-  final DashboardController controller = Get.put(DashboardController());
-  final ProfileController profileController = Get.put(ProfileController());
+  final DashboardController controller = Get.find<DashboardController>();
+  final ProfileController profileController = Get.find<ProfileController>();
   DashboardScreen({super.key});
 
   @override

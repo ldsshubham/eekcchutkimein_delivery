@@ -1,11 +1,18 @@
 import 'package:eekcchutkimein_delivery/constants/colors.dart';
+import 'package:eekcchutkimein_delivery/features/homepage/controller/dashboard_controller.dart';
+import 'package:eekcchutkimein_delivery/features/orders_home/controller/order_controller.dart';
 import 'package:eekcchutkimein_delivery/routes/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class OrderCompletedScreen extends StatelessWidget {
   final bool isCancelled;
-  const OrderCompletedScreen({super.key, this.isCancelled = false});
+  final String? earnings;
+  const OrderCompletedScreen({
+    super.key,
+    this.isCancelled = false,
+    this.earnings,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -110,14 +117,16 @@ class OrderCompletedScreen extends StatelessWidget {
                 ),
                 child: Column(
                   children: [
-                    _earningRow("Delivery Fee", "₹45"),
-                    const SizedBox(height: 14),
-                    _earningRow("Bonus", "₹10"),
+                    _earningRow("Earnings", "₹${earnings ?? '0'}"),
                     const Padding(
                       padding: EdgeInsets.symmetric(vertical: 14),
                       child: Divider(height: 1),
                     ),
-                    _earningRow("Total Earnings", "₹55", isTotal: true),
+                    _earningRow(
+                      "Total Earnings",
+                      "₹${earnings ?? '0'}",
+                      isTotal: true,
+                    ),
                   ],
                 ),
               ),
@@ -140,6 +149,12 @@ class OrderCompletedScreen extends StatelessWidget {
                   elevation: 4,
                 ),
                 onPressed: () {
+                  try {
+                    Get.find<OrderController>().fetchOrders();
+                    Get.find<DashboardController>().fetchDashboardDetails();
+                  } catch (e) {
+                    // Controllers might not be initialized yet, that's fine
+                  }
                   Get.offAllNamed(AppRoutes.homepage);
                 },
                 child: const Text(

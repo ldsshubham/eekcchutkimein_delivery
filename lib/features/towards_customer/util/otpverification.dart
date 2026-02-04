@@ -42,13 +42,15 @@ class _OtpVerificationSheetState extends State<OtpVerificationSheet> {
   }
 
   Future<void> _handleEndDelivery() async {
-    final success = await controller.endDelivery(widget.orderId, otp);
+    final result = await controller.endDelivery(widget.orderId, otp);
 
-    if (success) {
+    if (result != null) {
       Navigator.pop(context); // close bottom sheet
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (_) => OrderCompletedScreen()),
+        MaterialPageRoute(
+          builder: (_) => OrderCompletedScreen(earnings: result.toString()),
+        ),
       );
     }
   }
@@ -102,6 +104,8 @@ class _OtpVerificationSheetState extends State<OtpVerificationSheet> {
             onChanged: (val) {
               setState(() {});
             },
+            keyboardType: TextInputType.number,
+            maxLength: 4,
           ),
 
           const SizedBox(height: 30),

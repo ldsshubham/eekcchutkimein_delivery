@@ -3,11 +3,12 @@ import 'package:eekcchutkimein_delivery/features/orders_home/model/order_model.d
 import 'package:eekcchutkimein_delivery/features/orders_home/controller/order_controller.dart';
 import 'package:eekcchutkimein_delivery/features/orders_home/util/slidetostart_btn.dart';
 import 'package:eekcchutkimein_delivery/features/ordersummry/util/uploadimage.dart';
-import 'package:eekcchutkimein_delivery/features/towards_customer/model/deliveryorder_model.dart';
 import 'package:eekcchutkimein_delivery/features/towards_customer/util/toastification_helper.dart';
 import 'package:eekcchutkimein_delivery/features/towards_customer/view/towardscustomer_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:map_launcher/map_launcher.dart';
+import 'package:maps_launcher/maps_launcher.dart';
 
 class OrderSummery extends StatelessWidget {
   final OrderModel? order;
@@ -156,6 +157,8 @@ class OrderSummery extends StatelessWidget {
   Widget _infoTile({
     required String title,
     required String subtitle,
+    String? latitude,
+    String? longitude,
     IconData? trailing,
     Color? trailingColor,
   }) {
@@ -183,7 +186,24 @@ class OrderSummery extends StatelessWidget {
               ],
             ),
           ),
-          if (trailing != null) Icon(trailing, color: trailingColor),
+          if (trailing != null)
+            InkWell(
+              onTap: () {
+                if (latitude != null && longitude != null) {
+                  try {
+                    MapsLauncher.launchCoordinates(
+                      double.parse(latitude),
+                      double.parse(longitude),
+                    );
+                  } catch (e) {
+                    print("Error launching maps: $e");
+                  }
+                } else {
+                  print("Latitude or longitude is null");
+                }
+              },
+              child: Icon(trailing, color: trailingColor),
+            ),
         ],
       ),
     );
@@ -233,23 +253,12 @@ class OrderSummery extends StatelessWidget {
       Get.back();
 
       if (response.statusCode == 200) {
-        final message =
-            response.body['mesaage'] ?? "Delivery Started Successfully!";
         ToastHelper.showSuccessToast(message: "Delivery Started Successfully!");
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (_) => TowardsCustomerScreen(
-              order: DeliveryOrder(
-                customerName: currentOrder.customerName,
-                phone: currentOrder.customerPhone,
-                address: currentOrder.customerAddress,
-                orderId: currentOrder.orderId,
-                paymentMode: currentOrder.paymentGateway,
-                amount: currentOrder.orderAmount,
-                items: currentOrder.productList.length,
-              ),
-            ),
+            builder: (_) =>
+                TowardsCustomerScreen(orderId: currentOrder.orderId),
           ),
         );
       } else {

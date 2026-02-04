@@ -3,20 +3,36 @@ import 'package:eekcchutkimein_delivery/constants/colors.dart';
 import 'package:eekcchutkimein_delivery/features/orders_home/util/slidetostart_btn.dart';
 import 'package:eekcchutkimein_delivery/features/ordercompleted/view/ordercomplete_screen.dart';
 import 'package:eekcchutkimein_delivery/features/towards_customer/controller/towardscustomer_controller.dart';
-import 'package:eekcchutkimein_delivery/features/towards_customer/model/deliveryorder_model.dart';
+import 'package:eekcchutkimein_delivery/features/towards_customer/model/order_detail_model.dart';
 import 'package:eekcchutkimein_delivery/features/towards_customer/util/otpverification.dart';
-import 'package:eekcchutkimein_delivery/features/towards_customer/util/toastification_helper.dart';
 import 'package:eekcchutkimein_delivery/features/towards_customer/view/paymentpage_cod.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:url_launcher/url_launcher.dart';
 
-class TowardsCustomerScreen extends StatelessWidget {
-  final DeliveryOrder order;
-  const TowardsCustomerScreen({super.key, required this.order});
+class TowardsCustomerScreen extends StatefulWidget {
+  final int orderId;
+  const TowardsCustomerScreen({super.key, required this.orderId});
+
+  @override
+  State<TowardsCustomerScreen> createState() => _TowardsCustomerScreenState();
+}
+
+class _TowardsCustomerScreenState extends State<TowardsCustomerScreen> {
+  final TowardsCustomerController controller =
+      Get.find<TowardsCustomerController>();
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      controller.resetPaymentState();
+      controller.fetchOrderDetails(widget.orderId);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    print("ORDER ID: ${order} ${order.orderId}");
     return Scaffold(
       backgroundColor: const Color(0xffF6F7F9),
       appBar: AppBar(
@@ -28,46 +44,59 @@ class TowardsCustomerScreen extends StatelessWidget {
           style: TextStyle(color: Colors.white),
         ),
       ),
+      body: Obx(() {
+        if (controller.isLoading.value &&
+            controller.orderDetails.value == null) {
+          return const Center(child: CircularProgressIndicator());
+        }
 
-      body: Column(
-        children: [
-          Expanded(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                children: [
-                  _cancelOrderCard(context, order.orderId),
-                  const SizedBox(height: 16),
-                  _customerCard(),
-                  const SizedBox(height: 16),
-                  _addressCard(),
-                  const SizedBox(height: 16),
-                  _orderDetailsCard(),
-                  const SizedBox(height: 16),
-                  if (order.paymentMode != "Online") _codPaymentOption(context),
-                  const SizedBox(height: 16),
-                ],
+        print("RESPONSE AT TOWARDS${controller.orderDetails.value}");
+        final response = controller.orderDetails.value;
+        if (response == null || response.data.orderDetails.isEmpty) {
+          return const Center(child: Text("No order details found"));
+        }
+
+        final order = response.data.orderDetails.first;
+        print("ORDER AT TOWARDS${order}");
+
+        return Column(
+          children: [
+            Expanded(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  children: [
+                    _cancelOrderCard(context, order.orderId),
+                    const SizedBox(height: 16),
+                    _customerCard(order),
+                    const SizedBox(height: 16),
+                    _addressCard(order),
+                    const SizedBox(height: 16),
+                    _orderDetailsCard(order),
+                    const SizedBox(height: 16),
+                    if (order.paymentStatus != "success")
+                      _codPaymentOption(context, order),
+                    const SizedBox(height: 16),
+                  ],
+                ),
               ),
             ),
-          ),
-
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: SlideToStartButton(
-              textTitle: "Order Delivered",
-              onSlideComplete: () {
-                showOtpSheet(context, order.orderId, order.otp ?? "");
-                // final otp = generateOtp();
-                // debugPrint("DELIVERY OTP: $otp");
-              },
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: SlideToStartButton(
+                textTitle: "Order Delivered",
+                onSlideComplete: () {
+                  showOtpSheet(context, order.orderId, "");
+                },
+              ),
             ),
-          ),
-        ],
-      ),
+          ],
+        );
+      }),
     );
   }
 
-  Widget _customerCard() {
+  Widget _customerCard(OrderDetail order) {
     return _card(
       child: Row(
         children: [
@@ -78,7 +107,7 @@ class TowardsCustomerScreen extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  order.customerName,
+                  "HH ${order.customerName}",
                   style: const TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 14,
@@ -91,14 +120,16 @@ class TowardsCustomerScreen extends StatelessWidget {
           ),
           IconButton(
             icon: const Icon(Icons.call, color: Colors.green),
-            onPressed: () {},
+            onPressed: () {
+              _makePhoneCall(order.customerPhone);
+            },
           ),
         ],
       ),
     );
   }
 
-  Widget _addressCard() {
+  Widget _addressCard(OrderDetail order) {
     return _card(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -114,7 +145,10 @@ class TowardsCustomerScreen extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 8),
-          Text(order.address, style: TextStyle(color: Colors.grey.shade700)),
+          Text(
+            order.deliveryAddress,
+            style: TextStyle(color: Colors.grey.shade700),
+          ),
           const SizedBox(height: 8),
           Text(
             "Navigate",
@@ -128,7 +162,7 @@ class TowardsCustomerScreen extends StatelessWidget {
     );
   }
 
-  Widget _orderDetailsCard() {
+  Widget _orderDetailsCard(OrderDetail order) {
     return _card(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -137,118 +171,216 @@ class TowardsCustomerScreen extends StatelessWidget {
             children: [
               _iconCircle(Icons.receipt),
               const SizedBox(width: 12),
-              Text(
+              const Text(
                 "Order Details",
-                style: const TextStyle(fontWeight: FontWeight.bold),
+                style: TextStyle(fontWeight: FontWeight.bold),
               ),
             ],
           ),
           const SizedBox(height: 12),
           _detailRow("Order ID", "#${order.orderId}"),
-          _detailRow("Payment", order.paymentMode),
-          _detailRow("Amount", "₹${order.amount}"),
+          _detailRow("Payment", order.gateway),
+          _detailRow("Amount", "₹${order.orderTotalAmount}"),
         ],
       ),
     );
   }
 
-  Widget _codPaymentOption(context) {
-    // Inject controller
-    final TowardsCustomerController paymentController = Get.put(
-      TowardsCustomerController(),
-    );
+  Widget _codPaymentOption(BuildContext context, OrderDetail order) {
+    final TowardsCustomerController paymentController =
+        Get.find<TowardsCustomerController>();
 
-    return _card(
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(24),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 20,
+            offset: const Offset(0, 10),
+          ),
+        ],
+      ),
       child: Obx(() {
-        final isPaymentDone =
-            paymentController.isPaymentCollected.value ||
-            paymentController.isPaymentVerified.value;
+        final isCollected = paymentController.isPaymentCollected.value;
+        final isVerified = paymentController.isPaymentVerified.value;
+        final isLoading = paymentController.isLoading.value;
 
         return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _detailRow("Cash on Delivery", "₹${(order.amount)}"),
-            const SizedBox(height: 18),
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                // SHOW QR BUTTON
-                InkWell(
-                  onTap: () async {
-                    // Navigate to PaymentPage and wait for result
-                    final result = await Get.to(
-                      () => PaymentpageCod(order.amount),
-                    );
-                    if (result == true) {
-                      paymentController.confirmQrPayment();
-                    }
-                  },
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      vertical: 8,
-                      horizontal: 44,
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "Payment Method",
+                      style: TextStyle(
+                        color: Colors.grey.shade500,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
-                    decoration: BoxDecoration(
-                      color: Colors.amber.shade300,
-                      borderRadius: BorderRadius.circular(8),
+                    const Text(
+                      "Cash On Delivery",
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
                     ),
-                    child: const Text(
-                      "Show QR",
-                      style: TextStyle(color: Colors.black54),
-                    ),
-                  ),
+                  ],
                 ),
-
-                // COLLECT CASH BUTTON (Toggle)
-                InkWell(
-                  onTap: () {
-                    // Pass 'true' to indicate payment success
-                    // Get.back(result: true);
-                    ToastHelper.showSuccessToast(
-                      message: "Payment marked as collected",
-                    );
-                    // Get.snackbar(
-                    //   "Success",
-                    //   "Payment marked as collected",
-                    //   backgroundColor: Colors.green,
-                    //   colorText: Colors.white,
-                    //   snackPosition: SnackPosition.BOTTOM,
-                    //   margin: const EdgeInsets.all(20),
-                    // );
-                    paymentController.toggleCashCollection();
-                  },
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      vertical: 8,
-                      horizontal: 28,
-                    ),
-                    decoration: BoxDecoration(
-                      color: paymentController.isPaymentCollected.value
-                          ? Colors
-                                .green
-                                .shade600 // Green if collected
-                          : Colors.blue.shade300, // Blue if pending
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Text(
-                      paymentController.isPaymentCollected.value
-                          ? "Collected"
-                          : "Collect Cash",
-                      style: const TextStyle(color: Colors.white),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 6,
+                  ),
+                  decoration: BoxDecoration(
+                    color: (isCollected || isVerified)
+                        ? Colors.green.withOpacity(0.1)
+                        : Colors.orange.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(100),
+                  ),
+                  child: Text(
+                    (isCollected || isVerified) ? "PAID" : "PENDING",
+                    style: TextStyle(
+                      color: (isCollected || isVerified)
+                          ? Colors.green
+                          : Colors.orange,
+                      fontWeight: FontWeight.w800,
+                      fontSize: 10,
+                      letterSpacing: 1,
                     ),
                   ),
                 ),
               ],
             ),
             const SizedBox(height: 20),
-
-            // PAYMENT RECEIVED INDICATOR
-            if (isPaymentDone)
-              Text(
-                'Payment Received!',
-                style: TextStyle(
-                  color: AppColors.green,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: const Color(0xFFF8FAFC),
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    "Amount to Collect",
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.black87,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  Text(
+                    "₹${order.orderTotalAmount}",
+                    style: const TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w900,
+                      color: AppColors.primaryColor,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 24),
+            if (!(isCollected || isVerified))
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      onPressed: isLoading
+                          ? null
+                          : () async {
+                              final result = await Get.to(
+                                () => PaymentpageCod(
+                                  double.tryParse(order.orderTotalAmount) ??
+                                      0.0,
+                                ),
+                              );
+                              if (result == true) {
+                                paymentController.collectPayment(
+                                  order.orderId,
+                                  'cash',
+                                );
+                              }
+                            },
+                      icon: const Icon(Icons.qr_code_scanner, size: 18),
+                      label: const Text("Show QR"),
+                      style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        side: BorderSide(color: Colors.grey.shade300),
+                        foregroundColor: Colors.black87,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: ElevatedButton.icon(
+                      onPressed: isLoading
+                          ? null
+                          : () => paymentController.collectPayment(
+                              order.orderId,
+                              'cash',
+                            ),
+                      icon: isLoading
+                          ? const SizedBox(
+                              width: 18,
+                              height: 18,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: Colors.white,
+                              ),
+                            )
+                          : const Icon(Icons.payments_outlined, size: 18),
+                      label: Text(isLoading ? "Processing..." : "Collect Cash"),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.primaryColor,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        elevation: 0,
+                      ),
+                    ),
+                  ),
+                ],
+              )
+            else
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                decoration: BoxDecoration(
+                  color: Colors.green.shade50,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Colors.green.shade100),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.check_circle,
+                      color: Colors.green.shade700,
+                      size: 20,
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      isCollected ? "Cash Collected" : "Payment Verified",
+                      style: TextStyle(
+                        color: Colors.green.shade700,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
                 ),
               ),
           ],
@@ -299,6 +431,7 @@ class TowardsCustomerScreen extends StatelessWidget {
 
   /// 🔹 DETAIL ROW
   Widget _detailRow(String title, String value) {
+    if (value == "razorpay") value = "Paid";
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6),
       child: Row(
@@ -502,5 +635,10 @@ class TowardsCustomerScreen extends StatelessWidget {
         );
       },
     );
+  }
+
+  Future<void> _makePhoneCall(String phoneNumber) async {
+    final Uri launchUri = Uri(scheme: 'tel', path: phoneNumber);
+    await launchUrl(launchUri);
   }
 }

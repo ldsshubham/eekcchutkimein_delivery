@@ -9,13 +9,15 @@ import 'package:eekcchutkimein_delivery/features/orders_home/controller/order_co
 import 'package:get/get.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 
+import 'package:eekcchutkimein_delivery/features/towards_customer/util/toastification_helper.dart';
+
 class OrderDetails extends StatelessWidget {
   const OrderDetails({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final ProfileController profileController = Get.put(ProfileController());
-    final OrderController controller = Get.put(OrderController());
+    final ProfileController profileController = Get.find<ProfileController>();
+    final OrderController controller = Get.find<OrderController>();
 
     return Obx(() {
       if (controller.isLoading.value) {
@@ -43,6 +45,16 @@ class OrderDetails extends StatelessWidget {
             return OrderCard(
               order: order,
               onTap: () {
+                print("order.vendorName ${order.vendorName}");
+                if (order.vendorName == "Multiple Vendors") {
+                  ToastHelper.showErrorToast(
+                    "Human Error",
+                    subMessage:
+                        "Multiple vendor orders cannot be processed by riders.",
+                  );
+                  return;
+                }
+
                 if (profileController.isOnline.value) {
                   showModalBottomSheet(
                     context: context,
@@ -107,7 +119,13 @@ class OrderCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Current status logic
-    final bool isAssigned = order.orderStatus.toLowerCase() == "assigned";
+    final bool isAssigned = order.orderStatus;
+    final String statusText;
+    if (!isAssigned) {
+      statusText = "Assigned";
+    } else {
+      statusText = "Delivered";
+    }
     final Color statusColor = isAssigned
         ? const Color(0xFF16A34A)
         : const Color(0xFFEA580C);
@@ -191,7 +209,7 @@ class OrderCard extends StatelessWidget {
                       ),
                       const SizedBox(width: 4),
                       Text(
-                        order.orderStatus.toUpperCase(),
+                        statusText,
                         style: TextStyle(
                           fontSize: 10,
                           fontWeight: FontWeight.w800,

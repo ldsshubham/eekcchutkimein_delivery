@@ -23,6 +23,9 @@ dependencies:
   country_code_picker: ^3.4.1
   country_state_city: ^0.1.6
   intl: ^0.18.1
+  url_launcher: ^6.3.2
+  map_launcher: ^4.4.3
+  maps_launcher: ^3.0.0+1
 
 dev_dependencies:
   flutter_test:

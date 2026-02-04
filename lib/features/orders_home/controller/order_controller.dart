@@ -18,20 +18,40 @@ class OrderController extends GetxController {
     try {
       isLoading.value = true;
       final response = await _apiService.fetchOrders();
-      debugPrint("ORDER LIST RESPONSE: ${response.statusCode}");
+      debugPrint("ORDER LIST STATUS: ${response.statusCode}");
+      debugPrint("ORDER LIST BODY: ${response.body}");
 
       if (response.statusCode == 200 && response.body != null) {
-        final data = response.body;
-        print('Order -------------- $data');
-        if (data['data'] != null && data['data'] is List) {
-          final List<dynamic> orderList = data['data'];
+        final dynamic responseData = response.body;
+        List<dynamic>? orderList;
+
+        if (responseData is List) {
+          orderList = responseData;
+        } else if (responseData is Map) {
+          if (responseData['data'] != null && responseData['data'] is List) {
+            orderList = responseData['data'];
+          } else if (responseData['orders'] != null &&
+              responseData['orders'] is List) {
+            orderList = responseData['orders'];
+          }
+        }
+
+        if (orderList != null) {
           orders.value = orderList
+              .whereType<Map<String, dynamic>>()
               .map((json) => OrderModel.fromJson(json))
               .toList();
           debugPrint("PARSED ${orders.length} ORDERS");
+        } else {
+          debugPrint("NO ORDER LIST FOUND IN RESPONSE DATA");
+          orders.clear();
         }
       } else {
-        debugPrint("FAILED TO FETCH ORDERS: ${response.body}");
+        debugPrint(
+          "FAILED TO FETCH ORDERS: Status ${response.statusCode}, Body: ${response.body}",
+        );
+        // Optional: clear orders or keep old ones?
+        // orders.clear();
       }
     } catch (e) {
       debugPrint("ERROR FETCHING ORDERS-catch: $e");

@@ -68,4 +68,38 @@ class OrderApiService extends GetConnect {
       return Response(statusCode: 500, statusText: e.toString());
     }
   }
+
+  Future<Response> collectPayment(int orderId, String mode) async {
+    try {
+      final token = await TokenService.getAccessToken();
+      return post(
+        '$_baseUrl/delivery/employee/rider/order/payment/collection',
+        {"mode": mode, "order_id": orderId},
+        headers: {
+          if (token != null) 'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+      );
+    } catch (e) {
+      print("COLLECT PAYMENT ERROR: API $e");
+      return Response(statusCode: 500, statusText: e.toString());
+    }
+  }
+
+  Future<Response> fetchOrderDetails(int orderId) async {
+    try {
+      final token = await TokenService.getAccessToken();
+      return post(
+        '$_baseUrl/delivery/employee/rider/order/details',
+        {"order_id": orderId},
+        headers: {
+          if (token != null) 'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+      );
+    } catch (e) {
+      print("FETCH ORDER DETAILS ERROR: API $e");
+      return Response(statusCode: 500, statusText: e.toString());
+    }
+  }
 }

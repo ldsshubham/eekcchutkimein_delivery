@@ -8,7 +8,10 @@ import 'package:eekcchutkimein_delivery/services/token_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:eekcchutkimein_delivery/features/homepage/controller/dashboard_controller.dart';
+import 'package:eekcchutkimein_delivery/features/orders_home/controller/order_controller.dart';
 import 'package:eekcchutkimein_delivery/features/profile/controller/profile_controller.dart';
+import 'package:eekcchutkimein_delivery/features/towards_customer/controller/towardscustomer_controller.dart';
 import 'package:iconsax/iconsax.dart';
 
 class CompleteAdminPanel extends StatelessWidget {
@@ -17,6 +20,13 @@ class CompleteAdminPanel extends StatelessWidget {
   final controller = Get.put(MyDrawerController());
   final BottomNavController navController = Get.put(BottomNavController());
   final ProfileController profileController = Get.put(ProfileController());
+  final OrderController orderController = Get.put(OrderController());
+  final DashboardController dashboardController = Get.put(
+    DashboardController(),
+  );
+  final TowardsCustomerController towardsCustomerController = Get.put(
+    TowardsCustomerController(),
+  );
 
   final GetStorage box = GetStorage();
 
@@ -75,15 +85,15 @@ class CompleteAdminPanel extends StatelessWidget {
 
             ListTile(
               leading: const Icon(Iconsax.activity),
-              title: const Text('Order'),
+              title: const Text('Dashboard'),
               onTap: () {
                 navController.changePage(0);
                 controller.closeDrawer();
               },
             ),
             ListTile(
-              leading: const Icon(Iconsax.location),
-              title: const Text('Map'),
+              leading: const Icon(Iconsax.shopping_bag),
+              title: const Text('Orders'),
               onTap: () {
                 navController.changePage(1);
                 controller.closeDrawer();
@@ -127,9 +137,12 @@ class CompleteAdminPanel extends StatelessWidget {
           items: const [
             BottomNavigationBarItem(
               icon: Icon(Iconsax.activity),
+              label: 'Dashboard',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Iconsax.shopping_bag),
               label: 'Orders',
             ),
-            BottomNavigationBarItem(icon: Icon(Iconsax.map), label: 'Map'),
             BottomNavigationBarItem(
               icon: Icon(Iconsax.wallet),
               label: 'Balance',
