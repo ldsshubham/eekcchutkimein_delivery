@@ -4,16 +4,6 @@ import 'package:firebase_core/firebase_core.dart' show FirebaseOptions;
 import 'package:flutter/foundation.dart'
     show defaultTargetPlatform, kIsWeb, TargetPlatform;
 
-/// Default [FirebaseOptions] for use with your Firebase apps.
-///
-/// Example:
-/// ```dart
-/// import 'firebase_options.dart';
-/// // ...
-/// await Firebase.initializeApp(
-///   options: DefaultFirebaseOptions.currentPlatform,
-/// );
-/// ```
 class DefaultFirebaseOptions {
   static FirebaseOptions get currentPlatform {
     if (kIsWeb) {
@@ -52,7 +42,7 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyDLmH9jRrEVZpGhqBOmEMJg-pxnrXZPkes',
-    appId: '1:1015878662447:android:aca166aea725a7182d09da',
+    appId: '1:1015878662447:android:e075966c503dddff2d09da',
     messagingSenderId: '1015878662447',
     projectId: 'ecm-delivery',
     storageBucket: 'ecm-delivery.firebasestorage.app',
@@ -60,20 +50,20 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyDjhnGfDmZhK1IJ4z1iW89S6trlwJXE6Jk',
-    appId: '1:1015878662447:ios:b1c28aa485541be12d09da',
+    appId: '1:1015878662447:ios:e7f6127ddea8c56b2d09da',
     messagingSenderId: '1015878662447',
     projectId: 'ecm-delivery',
     storageBucket: 'ecm-delivery.firebasestorage.app',
-    iosBundleId: 'com.example.eekcchutkimeinDelivery',
+    iosBundleId: 'com.eekcchutimein.delivery',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
     apiKey: 'AIzaSyDjhnGfDmZhK1IJ4z1iW89S6trlwJXE6Jk',
-    appId: '1:1015878662447:ios:b1c28aa485541be12d09da',
+    appId: '1:1015878662447:ios:e7f6127ddea8c56b2d09da',
     messagingSenderId: '1015878662447',
     projectId: 'ecm-delivery',
     storageBucket: 'ecm-delivery.firebasestorage.app',
-    iosBundleId: 'com.example.eekcchutkimeinDelivery',
+    iosBundleId: 'com.eekcchutimein.delivery',
   );
 
   static const FirebaseOptions windows = FirebaseOptions(
@@ -85,4 +75,5 @@ class DefaultFirebaseOptions {
     storageBucket: 'ecm-delivery.firebasestorage.app',
     measurementId: 'G-V0MX3KX12E',
   );
+
 }
