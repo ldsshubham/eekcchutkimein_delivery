@@ -5,7 +5,16 @@ import 'package:get/get.dart';
 class DashboardController extends GetxController {
   var isLoadining = false.obs;
   final DashboardApi dashboardApi = DashboardApi();
-  var dashboardData = Rxn<DashboardModel>();
+  var dashboardData = Rx<DashboardModel>(
+    DashboardModel(
+      deliveryBoyId: 0,
+      totalOrders: "0",
+      pendingOrders: "0",
+      deliveredOrders: "0",
+      assignedToday: "0",
+      totalEarnings: "0",
+    ),
+  );
   final errorMessage = ''.obs;
   @override
   void onInit() {
@@ -20,7 +29,15 @@ class DashboardController extends GetxController {
       final response = await dashboardApi.fetchDashboardDetails();
       dashboardData.value = response;
     } catch (e) {
-      errorMessage.value = "Failed to fetch dashboard details: $e";
+      // On error, show 0 values instead of error message
+      dashboardData.value = DashboardModel(
+        deliveryBoyId: 0,
+        totalOrders: "0",
+        pendingOrders: "0",
+        deliveredOrders: "0",
+        assignedToday: "0",
+        totalEarnings: "0",
+      );
     } finally {
       isLoadining.value = false;
     }

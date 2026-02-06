@@ -1,5 +1,3 @@
-import 'package:eekcchutkimein_delivery/constants/app_sizes.dart';
-import 'package:eekcchutkimein_delivery/constants/app_text_styles.dart';
 import 'package:eekcchutkimein_delivery/constants/colors.dart';
 import 'package:eekcchutkimein_delivery/features/homepage/controller/dashboard_controller.dart';
 import 'package:eekcchutkimein_delivery/features/homepage/model/dashboard_model.dart';
@@ -24,26 +22,6 @@ class DashboardScreen extends StatelessWidget {
             child: LoadingAnimationWidget.fourRotatingDots(
               color: AppColors.primaryColor,
               size: 48,
-            ),
-          );
-        } else if (controller.errorMessage.isNotEmpty &&
-            controller.dashboardData.value == null) {
-          return Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  controller.errorMessage.value,
-                  style: AppTextStyles.bodyText.copyWith(
-                    fontSize: AppSizes.fontL,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                TextButton(
-                  onPressed: controller.fetchDashboardDetails,
-                  child: const Text("Retry"),
-                ),
-              ],
             ),
           );
         } else {
@@ -190,7 +168,7 @@ class DashboardScreen extends StatelessWidget {
       crossAxisCount: 2,
       crossAxisSpacing: 16,
       mainAxisSpacing: 16,
-      childAspectRatio: 1.2,
+      childAspectRatio: 1.1,
       children: [
         _buildStatCard(
           "Delivered",

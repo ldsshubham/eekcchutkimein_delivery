@@ -21,116 +21,136 @@ class OrderSummery extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final currentOrder = order ?? Get.arguments as OrderModel;
-    controller.fetchOrderDetails(currentOrder.orderId);
 
-    final response = controller.orderDetails.value;
-    if (response == null || response.data.orderDetails.isEmpty) {
-      return const Center(child: Text("No order details found"));
+    // Fetch order details when screen loads
+    if (controller.orderDetails.value == null) {
+      controller.fetchOrderDetails(currentOrder.orderId);
     }
-
-    final orderDetail = response.data.orderDetails.first;
-    print("ORDER AT TOWARDS${orderDetail}");
 
     return Scaffold(
       backgroundColor: Colors.white,
-
       appBar: AppBar(
         backgroundColor: AppColors.primaryColor,
         elevation: 0,
         leading: const BackButton(color: Colors.white),
       ),
+      body: Obx(() {
+        // Show loading indicator while fetching data
+        if (controller.isLoading.value) {
+          return const Center(
+            child: CircularProgressIndicator(color: AppColors.primaryColor),
+          );
+        }
 
-      body: Column(
-        children: [
-          /// CONTENT
-          Expanded(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  /// STATUS BANNER
-                  Container(
-                    padding: const EdgeInsets.all(14),
-                    decoration: BoxDecoration(
-                      color: Colors.orange.shade50,
-                      borderRadius: BorderRadius.circular(14),
+        final response = controller.orderDetails.value;
+        if (response == null || response.data.orderDetails.isEmpty) {
+          return const Center(child: Text("No order details found"));
+        }
+
+        final orderDetail = response.data.orderDetails.first;
+        print("ORDER AT TOWARDS${orderDetail}");
+
+        return Column(
+          children: [
+            /// CONTENT
+            Expanded(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    /// STATUS BANNER
+                    Container(
+                      padding: const EdgeInsets.all(14),
+                      decoration: BoxDecoration(
+                        color: Colors.orange.shade50,
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                      child: Row(
+                        children: const [
+                          Icon(Icons.pedal_bike, color: Colors.orange),
+                          SizedBox(width: 8),
+                          Text(
+                            "Heading to pickup location",
+                            style: TextStyle(fontWeight: FontWeight.w600),
+                          ),
+                        ],
+                      ),
                     ),
-                    child: Row(
-                      children: const [
-                        Icon(Icons.pedal_bike, color: Colors.orange),
-                        SizedBox(width: 8),
-                        Text(
-                          "Heading to pickup location",
-                          style: TextStyle(fontWeight: FontWeight.w600),
-                        ),
-                      ],
+
+                    const SizedBox(height: 20),
+                    const Text(
+                      "Vendor Details",
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
                     ),
-                  ),
+                    const SizedBox(height: 8),
 
-                  const SizedBox(height: 20),
-                  const Text(
-                    "Vendor Details",
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                  ),
-                  const SizedBox(height: 8),
+                    _infoTile(
+                      title: currentOrder.vendorName,
+                      subtitle: currentOrder.vendorAddress,
+                      latitude: orderDetail.vendorLatitude,
+                      longitude: orderDetail.vendorLongitude,
+                      trailing: Icons.navigation,
+                      trailingColor: Colors.green,
+                    ),
 
-                  _infoTile(
-                    title: currentOrder.vendorName,
-                    subtitle: currentOrder.vendorAddress,
-                    latitude: orderDetail.vendorLatitude,
-                    longitude: orderDetail.vendorLongitude,
-                    trailing: Icons.navigation,
-                    trailingColor: Colors.green,
-                  ),
+                    const SizedBox(height: 20),
 
-                  const SizedBox(height: 20),
+                    /// CUSTOMER DETAILS
+                    const Text(
+                      "Customer Details",
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
 
-                  /// CUSTOMER DETAILS
-                  const Text(
-                    "Customer Details",
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                  ),
-                  const SizedBox(height: 8),
+                    _infoTile(
+                      title: currentOrder.customerName,
+                      subtitle: currentOrder.customerAddress,
+                    ),
 
-                  _infoTile(
-                    title: currentOrder.customerName,
-                    subtitle: currentOrder.customerAddress,
-                  ),
+                    const SizedBox(height: 20),
 
-                  const SizedBox(height: 20),
+                    /// ITEMS
+                    const Text(
+                      "Items",
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
 
-                  /// ITEMS
-                  const Text(
-                    "Items",
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                  ),
-                  const SizedBox(height: 8),
-
-                  ...currentOrder.productList
-                      .map(
-                        (item) => _itemRow(
-                          item.productName,
-                          "x${item.productQuantity}",
-                        ),
-                      )
-                      .toList(),
-                ],
+                    ...currentOrder.productList
+                        .map(
+                          (item) => _itemRow(
+                            item.productName,
+                            "x${item.productQuantity}",
+                          ),
+                        )
+                        .toList(),
+                  ],
+                ),
               ),
             ),
-          ),
 
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: SlideToStartButton(
-              textTitle: "Slide to confirm order picked up!",
-              onSlideComplete: () async {
-                _showUploadSheet(context, currentOrder);
-              },
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: SlideToStartButton(
+                textTitle: "Slide to confirm order picked up!",
+                onSlideComplete: () async {
+                  _showUploadSheet(context, currentOrder);
+                },
+              ),
             ),
-          ),
-        ],
-      ),
+          ],
+        );
+      }),
     );
   }
 

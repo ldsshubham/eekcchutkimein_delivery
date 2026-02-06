@@ -12,7 +12,6 @@ class DashboardApi {
     final String url = '${AppString.baseUrl}/delivery/employee/rider/dashboard';
 
     try {
-      print('Dashboard APi is beingh called');
       final response = await http.get(
         Uri.parse(url),
         headers: {

@@ -8,6 +8,24 @@ class OrderController extends GetxController {
   var orders = <OrderModel>[].obs;
   var isLoading = false.obs;
 
+  // TEMPORARY: Add specific order IDs you want to show here
+  final List<int> selectiveOrderIds = [
+    2240,
+    2241,
+    2242,
+    2243,
+    2244,
+    2263,
+    2264,
+    2265,
+    2266,
+    2267,
+    2268,
+    2269,
+    2270,
+    2271,
+  ];
+
   @override
   void onInit() {
     super.onInit();
@@ -37,11 +55,24 @@ class OrderController extends GetxController {
         }
 
         if (orderList != null) {
-          orders.value = orderList
+          var allOrders = orderList
               .whereType<Map<String, dynamic>>()
               .map((json) => OrderModel.fromJson(json))
               .toList();
-          debugPrint("PARSED ${orders.length} ORDERS");
+
+          // TEMPORARY: Filter by selective order IDs if list is not empty
+          if (selectiveOrderIds.isNotEmpty) {
+            orders.value = allOrders
+                .where((order) => selectiveOrderIds.contains(order.orderId))
+                .toList();
+            debugPrint(
+              "FILTERED ${orders.length} ORDERS from selective IDs: $selectiveOrderIds",
+            );
+          } else {
+            // If no selective IDs, show all orders (old behavior without .take(5))
+            orders.value = allOrders;
+            debugPrint("PARSED ${orders.length} ORDERS (no filter applied)");
+          }
         } else {
           debugPrint("NO ORDER LIST FOUND IN RESPONSE DATA");
           orders.clear();

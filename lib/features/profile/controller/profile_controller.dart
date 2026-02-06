@@ -22,7 +22,7 @@ class ProfileController extends GetxController {
     super.onInit();
     // Default to true if never set, otherwise use persisted value
     isOnline.value = _box.read('isOnline') ?? true;
-    _lastToggleTime = DateTime.now(); // Prevents immediate sync on app start
+    _lastToggleTime = DateTime.now();
     fetchProfile();
   }
 
@@ -104,6 +104,52 @@ class ProfileController extends GetxController {
       Get.snackbar("Error", "Something went wrong: $e");
     } finally {
       isLoading(false);
+    }
+  }
+
+  Future<void> deleteProfile() async {
+    isLoading(true);
+    try {
+      print("=== DELETE PROFILE START ===");
+      print("Partner ID: ${profile.value!.partnerId}");
+
+      final response = await _registrationApiService.deleteProfile(
+        profile.value!.partnerId,
+      );
+
+      print("DELETE RESPONSE Status Code: ${response.statusCode}");
+      print("DELETE RESPONSE Body: ${response.body}");
+      print("DELETE RESPONSE Body Type: ${response.body.runtimeType}");
+
+      if (response.body != null && response.body is Map) {
+        print("DELETE RESPONSE Status Field: ${response.body['status']}");
+        print("DELETE RESPONSE Message Field: ${response.body['message']}");
+      }
+
+      if (response.statusCode == 200 && response.body['status'] == 'success') {
+        print("✅ DELETE SUCCESS - Navigating to login");
+        ToastHelper.showSuccessToast(
+          message: response.body['message'] ?? "Profile deleted successfully!",
+        );
+        _box.write('isOnline', false);
+        Get.offAllNamed('/login');
+      } else {
+        print(
+          "❌ DELETE FAILED - Status: ${response.statusCode}, Body Status: ${response.body?['status']}",
+        );
+        ToastHelper.showErrorToast(
+          response.body['message'] ?? "Failed to delete profile",
+        );
+      }
+    } catch (e) {
+      print("❌ DELETE ERROR - Exception: $e");
+      ToastHelper.showErrorToast(
+        "Something went wrong",
+        subMessage: e.toString(),
+      );
+    } finally {
+      isLoading(false);
+      print("=== DELETE PROFILE END ===");
     }
   }
 

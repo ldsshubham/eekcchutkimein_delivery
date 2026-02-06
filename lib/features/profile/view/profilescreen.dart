@@ -29,7 +29,7 @@ class ProfileScreen extends StatelessWidget {
 
         final profile = controller.profile.value;
         if (profile == null) {
-          return const Center(child: Text("Failed to load profile"));
+          return Scaffold(body: Center(child: Text("Failed to load profile")));
         }
 
         return ListView(
@@ -37,7 +37,7 @@ class ProfileScreen extends StatelessWidget {
           children: [
             _profileHeader(profile),
             const SizedBox(height: 12),
-            _statsCard(profile),
+            // _statsCard(profile),
             const SizedBox(height: 12),
             _infoCard("Personal Details", [
               _infoTile(
@@ -270,7 +270,7 @@ class ProfileScreen extends StatelessWidget {
             Icons.delete_outline,
             "Delete Account",
             isLogout: true, // Reuse red styling
-            onTap: () => _showDeleteAccountAlert(context),
+            onTap: () => _showDeleteAccountAlert(context, profile!.partnerId),
           ),
         ],
       ),
@@ -359,7 +359,7 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
-  void _showDeleteAccountAlert(BuildContext context) {
+  void _showDeleteAccountAlert(BuildContext context, String partnerId) {
     Get.dialog(
       AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -380,30 +380,44 @@ class ProfileScreen extends StatelessWidget {
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
             onPressed: () async {
-              // 1. Close dialog
-              Get.back();
-
-              // 2. Call API
+              print("Delete button pressed");
               try {
                 final apiService = ProfileApiService();
-                final response = await apiService.deleteProfile();
+                print("API service created");
+
+                // Extract numeric ID from partnerId (e.g., "DP123" -> 123)
+                print("partnerId: $partnerId");
+                final id = int.parse(partnerId.replaceFirst('DP', ''));
+                print("Parsed ID: $id");
+
+                final response = await apiService.deleteProfile(id);
+                print("API response received");
+                print("Response body: ${response.body}");
+                print("Response status: ${response.statusCode}");
 
                 if (response.statusCode == 200) {
-                  // 3. Clear data and navigate to Splash
                   await TokenService.clearTokens();
+                  print("Token cleared");
                   await GetStorage().erase();
                   Get.offAllNamed(AppRoutes.notReg);
                 } else {
                   Get.snackbar(
                     "Error",
-                    "Failed to delete account. Please try again.",
+                    "Failed to delete account: ${response.statusCode}",
                     snackPosition: SnackPosition.BOTTOM,
                     backgroundColor: Colors.red,
                     colorText: Colors.white,
                   );
                 }
               } catch (e) {
-                Get.snackbar("Error", "Something went wrong.");
+                print("Error in delete profile: $e");
+                Get.snackbar(
+                  "Error",
+                  "Something went wrong: $e",
+                  snackPosition: SnackPosition.BOTTOM,
+                  backgroundColor: Colors.red,
+                  colorText: Colors.white,
+                );
               }
             },
             child: const Text('Delete', style: TextStyle(color: Colors.white)),
