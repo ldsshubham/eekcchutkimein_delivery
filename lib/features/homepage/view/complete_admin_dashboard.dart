@@ -84,24 +84,24 @@ class CompleteAdminPanel extends StatelessWidget {
             ),
 
             ListTile(
-              leading: const Icon(Iconsax.activity),
-              title: const Text('Dashboard'),
+              leading: const Icon(Iconsax.shopping_bag),
+              title: const Text('Orders'),
               onTap: () {
                 navController.changePage(0);
                 controller.closeDrawer();
               },
             ),
             ListTile(
-              leading: const Icon(Iconsax.shopping_bag),
-              title: const Text('Orders'),
+              leading: const Icon(Iconsax.activity),
+              title: const Text('Performance'),
               onTap: () {
                 navController.changePage(1);
                 controller.closeDrawer();
               },
             ),
             ListTile(
-              leading: const Icon(Iconsax.wallet),
-              title: const Text('Balance'),
+              leading: const Icon(Icons.attach_money_outlined),
+              title: const Text('Earnings'),
               onTap: () {
                 navController.changePage(2);
                 controller.closeDrawer();
@@ -136,16 +136,16 @@ class CompleteAdminPanel extends StatelessWidget {
           type: BottomNavigationBarType.fixed,
           items: const [
             BottomNavigationBarItem(
-              icon: Icon(Iconsax.activity),
-              label: 'Dashboard',
-            ),
-            BottomNavigationBarItem(
               icon: Icon(Iconsax.shopping_bag),
               label: 'Orders',
             ),
             BottomNavigationBarItem(
-              icon: Icon(Iconsax.wallet),
-              label: 'Balance',
+              icon: Icon(Iconsax.activity),
+              label: 'Performance',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.attach_money_outlined),
+              label: 'Earnings',
             ),
             BottomNavigationBarItem(icon: Icon(Iconsax.user), label: 'Profile'),
           ],

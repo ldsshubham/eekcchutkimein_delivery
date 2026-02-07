@@ -76,9 +76,9 @@ class TowardsCustomerController extends GetxController {
       final response = await _apiService.endDelivery(orderId, otp);
 
       if (response.statusCode == 200) {
-        ToastHelper.showSuccessToast(
-          message: response.body['message'] ?? "Operation successful",
-        );
+        // ToastHelper.showSuccessToast(
+        //   message: response.body['message'] ?? "Operation successful",
+        // );
         return response.body['data']; // Return earnings amount
       } else {
         ToastHelper.showErrorToast(

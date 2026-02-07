@@ -6,8 +6,8 @@ import 'package:eekcchutkimein_delivery/features/profile/view/profilescreen.dart
 import 'package:flutter/material.dart';
 
 final List<Widget> pages = [
-  DashboardScreen(),
   OrderDetails(),
+  DashboardScreen(),
   // MapScreen(),
   BalanceScreen(),
   ProfileScreen(),

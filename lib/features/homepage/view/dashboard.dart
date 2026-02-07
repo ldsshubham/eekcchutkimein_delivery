@@ -1,6 +1,7 @@
 import 'package:eekcchutkimein_delivery/constants/colors.dart';
 import 'package:eekcchutkimein_delivery/features/homepage/controller/dashboard_controller.dart';
 import 'package:eekcchutkimein_delivery/features/homepage/model/dashboard_model.dart';
+import 'package:eekcchutkimein_delivery/features/homepage/controller/bottomnavcontroller.dart';
 import 'package:eekcchutkimein_delivery/features/profile/controller/profile_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -9,6 +10,7 @@ import 'package:loading_animation_widget/loading_animation_widget.dart';
 class DashboardScreen extends StatelessWidget {
   final DashboardController controller = Get.find<DashboardController>();
   final ProfileController profileController = Get.find<ProfileController>();
+  final BottomNavController navController = Get.find<BottomNavController>();
   DashboardScreen({super.key});
 
   @override
@@ -25,7 +27,7 @@ class DashboardScreen extends StatelessWidget {
             ),
           );
         } else {
-          final data = controller.dashboardData.value!;
+          final data = controller.dashboardData.value;
           return RefreshIndicator(
             onRefresh: controller.fetchDashboardDetails,
             child: SingleChildScrollView(
@@ -33,45 +35,48 @@ class DashboardScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // --- ENHANCED HEADER ---
-                  _buildHeader(data),
-                  const SizedBox(height: 33),
-
-                  // // --- XP & LEVEL PROGRESS SECTION ---
-                  // _buildXPSection(data),
-                  // const SizedBox(height: 24),
-
-                  // // --- DAILY GOAL SECTION ---
-                  // _buildDailyQuest(data),
-                  // const SizedBox(height: 32),
-
-                  // --- STATS GRID ---
+                  // --- PERFORMANCE OVERVIEW SECTION ---
+                  const SizedBox(height: 12),
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text(
-                        "Your Performance",
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black54,
+                      Container(
+                        width: 4,
+                        height: 24,
+                        decoration: BoxDecoration(
+                          color: AppColors.primaryColor,
+                          borderRadius: BorderRadius.circular(2),
                         ),
                       ),
-                      // Text(
-                      //   "Last 24h",
-                      //   style: TextStyle(
-                      //     color: Colors.grey.shade500,
-                      //     fontSize: 13,
-                      //   ),
-                      // ),
+                      const SizedBox(width: 12),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            "Performance Overview",
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.w800,
+                              color: Colors.black87,
+                              letterSpacing: -0.5,
+                            ),
+                          ),
+                          Text(
+                            "Your activity summary",
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500,
+                              color: Colors.grey.shade500,
+                            ),
+                          ),
+                        ],
+                      ),
                     ],
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 24),
                   _buildStatsGrid(data),
 
                   const SizedBox(height: 32),
 
-                  // Refresh button at bottom
                   Center(
                     child: IntrinsicWidth(
                       child: TextButton(
@@ -181,6 +186,7 @@ class DashboardScreen extends StatelessWidget {
           data.pendingOrders,
           Icons.timer,
           Colors.orange,
+          onTap: () => navController.changePage(0),
         ),
         _buildStatCard(
           "Assigned Today",
@@ -189,10 +195,10 @@ class DashboardScreen extends StatelessWidget {
           Colors.blue,
         ),
         _buildStatCard(
-          "Total Earnings",
-          "₹${data.totalEarnings}",
-          Icons.account_balance_wallet,
-          Colors.purple,
+          "Cancelled orders",
+          data.cancelledOrders,
+          Icons.cancel,
+          Colors.red,
         ),
       ],
     );
@@ -202,59 +208,63 @@ class DashboardScreen extends StatelessWidget {
     String title,
     String value,
     IconData icon,
-    Color color,
-  ) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: Colors.grey.shade50),
-        boxShadow: [
-          BoxShadow(
-            color: color.withOpacity(0.05),
-            blurRadius: 15,
-            offset: const Offset(0, 8),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: color.withOpacity(0.08),
-              borderRadius: BorderRadius.circular(14),
+    Color color, {
+    VoidCallback? onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(24),
+          border: Border.all(color: Colors.grey.shade50),
+          boxShadow: [
+            BoxShadow(
+              color: color.withOpacity(0.05),
+              blurRadius: 15,
+              offset: const Offset(0, 8),
             ),
-            child: Icon(icon, color: color, size: 22),
-          ),
-          const SizedBox(height: 12),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                value,
-                style: TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.w800,
-                  color: Colors.black.withOpacity(0.8),
-                  letterSpacing: -0.5,
-                ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: color.withOpacity(0.08),
+                borderRadius: BorderRadius.circular(14),
               ),
-              const SizedBox(height: 2),
-              Text(
-                title,
-                style: TextStyle(
-                  color: Colors.grey.shade500,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w500,
+              child: Icon(icon, color: color, size: 22),
+            ),
+            const SizedBox(height: 12),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  value,
+                  style: TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.w800,
+                    color: Colors.black.withOpacity(0.8),
+                    letterSpacing: -0.5,
+                  ),
                 ),
-              ),
-            ],
-          ),
-        ],
+                const SizedBox(height: 2),
+                Text(
+                  title,
+                  style: TextStyle(
+                    color: Colors.grey.shade500,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }

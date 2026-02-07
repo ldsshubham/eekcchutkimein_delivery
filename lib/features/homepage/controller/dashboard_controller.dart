@@ -13,6 +13,7 @@ class DashboardController extends GetxController {
       deliveredOrders: "0",
       assignedToday: "0",
       totalEarnings: "0",
+      cancelledOrders: "0",
     ),
   );
   final errorMessage = ''.obs;
@@ -37,6 +38,7 @@ class DashboardController extends GetxController {
         deliveredOrders: "0",
         assignedToday: "0",
         totalEarnings: "0",
+        cancelledOrders: "0",
       );
     } finally {
       isLoadining.value = false;

@@ -68,33 +68,16 @@ class ProfileScreen extends StatelessWidget {
       decoration: _cardDecoration(),
       child: Row(
         children: [
-          Stack(
-            children: [
-              const CircleAvatar(
-                radius: 28,
-                backgroundColor: Color(0xffEDEDED),
-                child: Icon(
-                  Icons.person_outline,
-                  size: 30,
-                  color: Colors.black54,
-                ),
-              ),
-              Positioned(
-                bottom: 2,
-                right: 2,
-                child: Container(
-                  width: 10,
-                  height: 10,
-                  decoration: BoxDecoration(
-                    color: profile.isOnline ? Colors.green : Colors.grey,
-                    shape: BoxShape.circle,
-                    border: Border.all(color: Colors.white, width: 1.5),
-                  ),
-                ),
-              ),
-            ],
+          // Accent Bar
+          Container(
+            width: 4,
+            height: 48,
+            decoration: BoxDecoration(
+              color: AppColors.primaryColor,
+              borderRadius: BorderRadius.circular(2),
+            ),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: 14),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -102,22 +85,63 @@ class ProfileScreen extends StatelessWidget {
                 Text(
                   profile.name,
                   style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
+                    fontSize: 20,
+                    fontWeight: FontWeight.w900,
+                    color: Colors.black,
+                    letterSpacing: -0.5,
                   ),
                 ),
                 const SizedBox(height: 2),
                 Text(
                   profile.phone,
-                  style: const TextStyle(fontSize: 14, color: Colors.black54),
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.grey.shade600,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
                 const SizedBox(height: 2),
                 Text(
                   "Partner ID: ${profile.partnerId}",
-                  style: const TextStyle(fontSize: 13, color: Colors.black45),
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.grey.shade400,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
               ],
             ),
+          ),
+          Stack(
+            children: [
+              CircleAvatar(
+                radius: 28,
+                backgroundColor: const Color(0xffEDEDED),
+                backgroundImage: profile.imageUrl != null
+                    ? NetworkImage(profile.imageUrl!)
+                    : null,
+                child: profile.imageUrl == null
+                    ? const Icon(
+                        Icons.person_outline,
+                        size: 30,
+                        color: Colors.black54,
+                      )
+                    : null,
+              ),
+              Positioned(
+                bottom: 2,
+                right: 2,
+                child: Container(
+                  width: 12,
+                  height: 12,
+                  decoration: BoxDecoration(
+                    color: profile.isOnline ? Colors.green : Colors.grey,
+                    shape: BoxShape.circle,
+                    border: Border.all(color: Colors.white, width: 2),
+                  ),
+                ),
+              ),
+            ],
           ),
         ],
       ),
@@ -194,13 +218,27 @@ class ProfileScreen extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
-            padding: const EdgeInsets.fromLTRB(14, 12, 14, 8),
-            child: Text(
-              title,
-              style: const TextStyle(
-                fontSize: 15, // +2
-                fontWeight: FontWeight.w500,
-              ),
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+            child: Row(
+              children: [
+                Container(
+                  width: 3,
+                  height: 16,
+                  decoration: BoxDecoration(
+                    color: AppColors.primaryColor,
+                    borderRadius: BorderRadius.circular(1.5),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  title,
+                  style: const TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w800,
+                    color: Colors.black87,
+                  ),
+                ),
+              ],
             ),
           ),
           _divider(),

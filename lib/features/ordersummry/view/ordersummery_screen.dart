@@ -32,6 +32,10 @@ class OrderSummery extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: AppColors.primaryColor,
         elevation: 0,
+        title: Text(
+          "Order ID: ${currentOrder.orderId}",
+          style: TextStyle(color: Colors.white, fontSize: 18),
+        ),
         leading: const BackButton(color: Colors.white),
       ),
       body: Obx(() {
@@ -213,7 +217,7 @@ class OrderSummery extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(name),
+          SizedBox(width: Get.width * 0.6, child: Text(name, maxLines: 2)),
           Text(qty, style: const TextStyle(fontWeight: FontWeight.bold)),
         ],
       ),

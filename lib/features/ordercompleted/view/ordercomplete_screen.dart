@@ -17,7 +17,9 @@ class OrderCompletedScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xffF6F7F9),
+      backgroundColor: isCancelled
+          ? Colors.red.shade100
+          : const Color(0xffF6F7F9),
       body: Column(
         children: [
           /// HEADER (NO GAP, CURVED)
@@ -96,42 +98,41 @@ class OrderCompletedScreen extends StatelessWidget {
           const SizedBox(height: 28),
 
           /// EARNINGS CARD (Only if not cancelled, or show zero)
-          if (!isCancelled)
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Container(
-                padding: const EdgeInsets.symmetric(
-                  vertical: 18,
-                  horizontal: 16,
-                ),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(18),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.06),
-                      blurRadius: 14,
-                      offset: const Offset(0, 6),
-                    ),
-                  ],
-                ),
-                child: Column(
-                  children: [
-                    _earningRow("Earnings", "₹${earnings ?? '0'}"),
-                    const Padding(
-                      padding: EdgeInsets.symmetric(vertical: 14),
-                      child: Divider(height: 1),
-                    ),
-                    _earningRow(
-                      "Total Earnings",
-                      "₹${earnings ?? '0'}",
-                      isTotal: true,
-                    ),
-                  ],
-                ),
-              ),
-            ),
-
+          // if (!isCancelled)
+          //   Padding(
+          //     padding: const EdgeInsets.symmetric(horizontal: 16),
+          //     child: Container(
+          //       padding: const EdgeInsets.symmetric(
+          //         vertical: 18,
+          //         horizontal: 16,
+          //       ),
+          //       decoration: BoxDecoration(
+          //         color: Colors.white,
+          //         borderRadius: BorderRadius.circular(18),
+          //         boxShadow: [
+          //           BoxShadow(
+          //             color: Colors.black.withOpacity(0.06),
+          //             blurRadius: 14,
+          //             offset: const Offset(0, 6),
+          //           ),
+          //         ],
+          //       ),
+          //       child: Column(
+          //         children: [
+          //           _earningRow("Earnings", "₹${earnings ?? '0'}"),
+          //           const Padding(
+          //             padding: EdgeInsets.symmetric(vertical: 14),
+          //             child: Divider(height: 1),
+          //           ),
+          //           _earningRow(
+          //             "Total Earnings",
+          //             "₹${earnings ?? '0'}",
+          //             isTotal: true,
+          //           ),
+          //         ],
+          //       ),
+          //     ),
+          //   ),
           const Spacer(),
 
           /// CTA BUTTON

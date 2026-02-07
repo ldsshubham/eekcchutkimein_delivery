@@ -8,9 +8,9 @@ class BottomNavController extends GetxController {
     currentPage.value = index;
     // Trigger refreshes when switching tabs
     if (index == 0) {
-      Get.find<DashboardController>().fetchDashboardDetails();
-    } else if (index == 1) {
       Get.find<OrderController>().fetchOrders();
+    } else if (index == 1) {
+      Get.find<DashboardController>().fetchDashboardDetails();
     }
   }
 }

@@ -5,15 +5,8 @@ class DashboardModel {
   final String deliveredOrders;
   final String assignedToday;
   final String totalEarnings;
+  final String cancelledOrders;
 
-  //  {
-  //         "delivery_boy_id": 1,
-  //         "total_orders": "300",
-  //         "pending_orders": "297",
-  //         "delivered_orders": "3",
-  //         "assigned_today": "0",
-  //         "total_earnings": "200.00"
-  //     }
   DashboardModel({
     required this.deliveryBoyId,
     required this.totalOrders,
@@ -21,6 +14,7 @@ class DashboardModel {
     required this.deliveredOrders,
     required this.assignedToday,
     required this.totalEarnings,
+    required this.cancelledOrders,
   });
 
   factory DashboardModel.fromjson(Map<String, dynamic> json) {
@@ -33,6 +27,7 @@ class DashboardModel {
       deliveredOrders: (json['delivered_orders'] ?? "0").toString(),
       assignedToday: (json['assigned_today'] ?? "0").toString(),
       totalEarnings: (json['total_earnings'] ?? "0").toString(),
+      cancelledOrders: (json['cancelled_orders'] ?? "0").toString(),
     );
   }
 }

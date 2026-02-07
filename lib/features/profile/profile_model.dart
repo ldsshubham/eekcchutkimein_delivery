@@ -20,6 +20,7 @@ class DeliveryPartnerProfile {
   final String vehicleName;
   final String licenseNumber;
   final bool isOnline;
+  final String? imageUrl;
 
   DeliveryPartnerProfile({
     required this.firstName,
@@ -43,6 +44,7 @@ class DeliveryPartnerProfile {
     required this.vehicleName,
     required this.licenseNumber,
     required this.isOnline,
+    required this.imageUrl,
   });
   factory DeliveryPartnerProfile.fromJson(Map<String, dynamic> json) {
     final firstName = json['firstname']?.toString() ?? '';
@@ -73,6 +75,7 @@ class DeliveryPartnerProfile {
           _parseBool(json['availability']) ||
           _parseBool(json['is_online']) ||
           _parseBool(json['online_status']),
+      imageUrl: json['image_url']?.toString() ?? '',
     );
   }
 

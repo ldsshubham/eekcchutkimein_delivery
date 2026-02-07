@@ -1,4 +1,5 @@
 import 'package:eekcchutkimein_delivery/constants/colors.dart';
+
 import 'package:eekcchutkimein_delivery/features/orders_home/model/order_model.dart';
 import 'package:eekcchutkimein_delivery/features/orders_home/util/slidetostart_btn.dart';
 import 'package:eekcchutkimein_delivery/features/ordersummry/view/ordersummery_screen.dart';
@@ -7,16 +8,18 @@ import 'package:flutter/material.dart';
 
 import 'package:eekcchutkimein_delivery/features/orders_home/controller/order_controller.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 import 'package:eekcchutkimein_delivery/features/towards_customer/util/toastification_helper.dart';
 
 class OrderDetails extends StatelessWidget {
-  const OrderDetails({super.key});
+  final ProfileController profileController = Get.find<ProfileController>();
+  OrderDetails({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final ProfileController profileController = Get.find<ProfileController>();
+    // final ProfileController profileController = Get.find<ProfileController>();
     final OrderController controller = Get.find<OrderController>();
 
     return Obx(() {
@@ -36,46 +39,124 @@ class OrderDetails extends StatelessWidget {
       return RefreshIndicator(
         color: AppColors.primaryColor,
         onRefresh: () => controller.fetchOrders(),
-        child: ListView.separated(
-          padding: const EdgeInsets.all(16),
-          itemCount: controller.orders.length,
-          separatorBuilder: (context, index) => const SizedBox(height: 16),
-          itemBuilder: (context, index) {
-            final order = controller.orders[index];
-            return OrderCard(
-              order: order,
-              onTap: () {
-                print("order.vendorName ${order.vendorName}");
-                if (order.vendorName == "Multiple Vendors") {
-                  ToastHelper.showErrorToast(
-                    "Human Error",
-                    subMessage:
-                        "Multiple vendor orders cannot be processed by riders.",
-                  );
-                  return;
-                }
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 20, 16, 0),
+              child: _buildHeader(),
+            ),
+            const SizedBox(height: 20),
+            Expanded(
+              child: ListView.separated(
+                padding: const EdgeInsets.all(16),
+                itemCount: controller.orders.length,
+                separatorBuilder: (context, index) =>
+                    const SizedBox(height: 16),
+                itemBuilder: (context, index) {
+                  final order = controller.orders[index];
+                  return OrderCard(
+                    order: order,
+                    onTap: () {
+                      print("order.vendorName ${order.vendorName}");
+                      if (order.vendorName == "Multiple Vendors") {
+                        ToastHelper.showErrorToast(
+                          "Human Error",
+                          subMessage:
+                              "Multiple vendor orders cannot be processed by riders.",
+                        );
+                        return;
+                      }
 
-                if (profileController.isOnline.value) {
-                  showModalBottomSheet(
-                    context: context,
-                    isScrollControlled: true,
-                    backgroundColor: Colors.white,
-                    shape: const RoundedRectangleBorder(
-                      borderRadius: BorderRadius.vertical(
-                        top: Radius.circular(20),
-                      ),
-                    ),
-                    builder: (_) => OrderBottomSheet(order: order),
+                      if (profileController.isOnline.value) {
+                        showModalBottomSheet(
+                          context: context,
+                          isScrollControlled: true,
+                          backgroundColor: Colors.white,
+                          shape: const RoundedRectangleBorder(
+                            borderRadius: BorderRadius.vertical(
+                              top: Radius.circular(20),
+                            ),
+                          ),
+                          builder: (_) => OrderBottomSheet(order: order),
+                        );
+                      } else {
+                        _showOfflineSnackBar(context);
+                      }
+                    },
                   );
-                } else {
-                  _showOfflineSnackBar(context);
-                }
-              },
-            );
-          },
+                },
+              ),
+            ),
+          ],
         ),
       );
     });
+  }
+
+  Widget _buildHeader() {
+    // Current time based greeting
+    final hour = DateTime.now().hour;
+    String greeting = "Good Morning";
+    if (hour >= 12 && hour < 17) greeting = "Good Afternoon";
+    if (hour >= 17) greeting = "Good Evening";
+
+    return Row(
+      children: [
+        // Accent Bar
+        Container(
+          width: 4,
+          height: 40,
+          decoration: BoxDecoration(
+            color: AppColors.primaryColor,
+            borderRadius: BorderRadius.circular(2),
+          ),
+        ),
+        const SizedBox(width: 14),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                greeting,
+                style: TextStyle(
+                  color: Colors.grey.shade500,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w500,
+                  letterSpacing: 0.5,
+                ),
+              ),
+              Text(
+                profileController.profile.value?.name ?? "Delivery Hero",
+                style: const TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.w900,
+                  color: Colors.black,
+                  letterSpacing: -0.8,
+                ),
+              ),
+            ],
+          ),
+        ),
+        // Avatar with border
+        Container(
+          padding: const EdgeInsets.all(3),
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            border: Border.all(
+              color: AppColors.primaryColor.withOpacity(0.1),
+              width: 2,
+            ),
+          ),
+          child: CircleAvatar(
+            radius: 20,
+            backgroundImage: NetworkImage(
+              profileController.profile.value?.imageUrl ??
+                  'https://ui-avatars.com/api/?name=${profileController.profile.value?.name}&background=0D8ABC&color=fff',
+            ),
+          ),
+        ),
+      ],
+    );
   }
 
   void _showOfflineSnackBar(BuildContext context) {
@@ -279,7 +360,7 @@ class OrderCard extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         SizedBox(
-                          width: Get.width * 0.7,
+                          width: Get.width * 0.6,
                           child: Text(
                             product.productName,
                             maxLines: 3,
@@ -290,12 +371,14 @@ class OrderCard extends StatelessWidget {
                           ),
                         ),
                         SizedBox(width: 10),
-                        Text(
-                          "x${product.productQuantity}",
-                          style: const TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black,
+                        SizedBox(
+                          child: Text(
+                            "x${product.productQuantity}",
+                            style: const TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
+                            ),
                           ),
                         ),
                       ],
@@ -409,17 +492,38 @@ class OrderBottomSheet extends StatelessWidget {
             ),
           ),
 
-          const Row(
+          Row(
             children: [
-              Icon(Icons.route, color: AppColors.primaryColor),
-              SizedBox(width: 10),
-              Text(
-                "Delivery Route",
-                style: TextStyle(
-                  fontWeight: FontWeight.w900,
-                  fontSize: 18,
-                  letterSpacing: -0.5,
+              Container(
+                width: 4,
+                height: 24,
+                decoration: BoxDecoration(
+                  color: AppColors.primaryColor,
+                  borderRadius: BorderRadius.circular(2),
                 ),
+              ),
+              const SizedBox(width: 12),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    "Delivery Route",
+                    style: TextStyle(
+                      fontWeight: FontWeight.w900,
+                      fontSize: 18,
+                      letterSpacing: -0.5,
+                      color: Colors.black87,
+                    ),
+                  ),
+                  Text(
+                    "Order track summary",
+                    style: TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w500,
+                      color: Colors.grey.shade500,
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
