@@ -61,4 +61,33 @@ class RegistrationApiService extends GetConnect {
       return Response(statusCode: 500, statusText: e.toString());
     }
   }
+
+  Future<Response> deleteProfile(String id) async {
+    try {
+      final token = await TokenService.getAccessToken();
+      print(
+        'DELETE PROFILE API - Token: ${token != null ? "Present" : "Missing"}',
+      );
+      print('DELETE PROFILE API - Partner ID: $id');
+
+      final body = {'id': int.parse(id)};
+      print('DELETE PROFILE API - Request Body: $body');
+
+      return post(
+        "$_baseUrl/delivery/employee/rider/delete/profile",
+        body,
+        headers: {
+          if (token != null) 'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+      ).then((value) {
+        print('DELETE PROFILE API - Status Code: ${value.statusCode}');
+        print('DELETE PROFILE API - Response Body: ${value.body}');
+        return value;
+      });
+    } catch (e) {
+      print('DELETE PROFILE API - Error: $e');
+      return Response(statusCode: 500, statusText: e.toString());
+    }
+  }
 }

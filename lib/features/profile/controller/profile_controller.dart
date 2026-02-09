@@ -20,7 +20,9 @@ class ProfileController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    // Default to true if never set, otherwise use persisted value
     isOnline.value = _box.read('isOnline') ?? true;
+    _lastToggleTime = DateTime.now();
     fetchProfile();
   }
 
@@ -36,7 +38,7 @@ class ProfileController extends GetxController {
 
       // Relaxed success check: as long as it's 2xx and doesn't explicitly fail
       final isSuccess =
-          response.isOk &&
+          response.status.isOk &&
           (response.body == null ||
               response.body['status'] == 'success' ||
               response.body['status'] == 200 ||
@@ -57,14 +59,17 @@ class ProfileController extends GetxController {
         _box.write('isOnline', previousValue);
         ToastHelper.showErrorToast(
           "Failed to update availability",
-          message: response.body?['message'] ?? 'Response error',
+          subMessage: response.body?['message'] ?? 'Response error',
         );
       }
     } catch (e) {
       // Revert on error
       isOnline.value = !value;
       _box.write('isOnline', !value);
-      ToastHelper.showErrorToast("Something went wrong", message: e.toString());
+      ToastHelper.showErrorToast(
+        "Something went wrong",
+        subMessage: e.toString(),
+      );
     }
   }
 
@@ -80,12 +85,12 @@ class ProfileController extends GetxController {
           profile.value = profileData;
 
           // Sync online status with backend value, but ignore if a toggle just happened
-          // (Wait at least 5 seconds for backend to reflect changes)
+          // or if the app just started (wait at least 15 seconds for stability)
           final timeSinceToggle = _lastToggleTime == null
-              ? const Duration(seconds: 10)
+              ? const Duration(seconds: 0)
               : DateTime.now().difference(_lastToggleTime!);
 
-          if (timeSinceToggle.inSeconds > 5) {
+          if (timeSinceToggle.inSeconds > 15) {
             if (isOnline.value != profileData.isOnline) {
               isOnline.value = profileData.isOnline;
               _box.write('isOnline', profileData.isOnline);
@@ -99,6 +104,52 @@ class ProfileController extends GetxController {
       Get.snackbar("Error", "Something went wrong: $e");
     } finally {
       isLoading(false);
+    }
+  }
+
+  Future<void> deleteProfile() async {
+    isLoading(true);
+    try {
+      print("=== DELETE PROFILE START ===");
+      print("Partner ID: ${profile.value!.partnerId}");
+
+      final response = await _registrationApiService.deleteProfile(
+        profile.value!.partnerId,
+      );
+
+      print("DELETE RESPONSE Status Code: ${response.statusCode}");
+      print("DELETE RESPONSE Body: ${response.body}");
+      print("DELETE RESPONSE Body Type: ${response.body.runtimeType}");
+
+      if (response.body != null && response.body is Map) {
+        print("DELETE RESPONSE Status Field: ${response.body['status']}");
+        print("DELETE RESPONSE Message Field: ${response.body['message']}");
+      }
+
+      if (response.statusCode == 200 && response.body['status'] == 'success') {
+        print("✅ DELETE SUCCESS - Navigating to login");
+        ToastHelper.showSuccessToast(
+          message: response.body['message'] ?? "Profile deleted successfully!",
+        );
+        _box.write('isOnline', false);
+        Get.offAllNamed('/login');
+      } else {
+        print(
+          "❌ DELETE FAILED - Status: ${response.statusCode}, Body Status: ${response.body?['status']}",
+        );
+        ToastHelper.showErrorToast(
+          response.body['message'] ?? "Failed to delete profile",
+        );
+      }
+    } catch (e) {
+      print("❌ DELETE ERROR - Exception: $e");
+      ToastHelper.showErrorToast(
+        "Something went wrong",
+        subMessage: e.toString(),
+      );
+    } finally {
+      isLoading(false);
+      print("=== DELETE PROFILE END ===");
     }
   }
 
@@ -147,11 +198,13 @@ class ProfileController extends GetxController {
         print("UPDATE ${response.status} ${response.body}");
         ToastHelper.showErrorToast(
           response.body['message'] ?? "Failed to update profile",
-          message: '',
         );
       }
     } catch (e) {
-      ToastHelper.showErrorToast("Something went wrong: $e", message: '');
+      ToastHelper.showErrorToast(
+        "Something went wrong",
+        subMessage: e.toString(),
+      );
     } finally {
       isLoading(false);
     }

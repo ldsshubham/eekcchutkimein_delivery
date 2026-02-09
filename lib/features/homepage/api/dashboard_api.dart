@@ -9,10 +9,9 @@ class DashboardApi {
   final storage = FlutterSecureStorage();
   Future<DashboardModel> fetchDashboardDetails() async {
     final String? token = await storage.read(key: "accessToken");
-    final String url = '${AppString.baseUrl}vendor/dashboard';
+    final String url = '${AppString.baseUrl}/delivery/employee/rider/dashboard';
 
     try {
-      print('Dashboard APi is beingh called');
       final response = await http.get(
         Uri.parse(url),
         headers: {
@@ -24,7 +23,7 @@ class DashboardApi {
       if (response.statusCode == 200) {
         final jsonData = jsonDecode(response.body);
         print(jsonData);
-        return DashboardModel.fromJson(jsonData['data']);
+        return DashboardModel.fromjson(jsonData['data'][0]);
       } else {
         print('Failed to fetch dashboard details');
         throw Exception('Failed to load dashboard details');

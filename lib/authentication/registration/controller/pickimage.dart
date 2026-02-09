@@ -59,7 +59,7 @@ class PickImageController extends GetxController {
   Future<void> uploadCapturedImage(String type) async {
     final file = type == 'selfie' ? selfieImage.value : panImage.value;
     if (file == null) {
-      ToastHelper.showErrorToast("No $type image selected", message: '');
+      ToastHelper.showErrorToast("No $type image selected");
       return;
     }
 
@@ -101,10 +101,7 @@ class PickImageController extends GetxController {
           debugPrint("UPLOAD SUCCESS ($type): ID set to $id");
         } else {
           debugPrint("FAILED TO PARSE ID ($type): rawId was $rawId");
-          ToastHelper.showErrorToast(
-            "Failed to parse $type ID from response",
-            message: '',
-          );
+          ToastHelper.showErrorToast("Failed to parse $type ID from response");
         }
       } else {
         final errorMsg =
@@ -113,14 +110,17 @@ class PickImageController extends GetxController {
             : "Server error (${response.statusCode})";
         debugPrint("UPLOAD FAILED ($type): $errorMsg");
         ToastHelper.showErrorToast(
-          "Failed to upload $type: $errorMsg",
-          message: '',
+          "Failed to upload $type",
+          subMessage: errorMsg,
         );
       }
     } catch (e, stackTrace) {
       debugPrint("UPLOAD ERROR ($type) EXCEPTION: $e");
       debugPrint("UPLOAD ERROR ($type) STACKTRACE: $stackTrace");
-      ToastHelper.showErrorToast("Error uploading $type: $e", message: '');
+      ToastHelper.showErrorToast(
+        "Error uploading $type",
+        subMessage: e.toString(),
+      );
     } finally {
       if (type == 'selfie') {
         isSelfieUploading.value = false;

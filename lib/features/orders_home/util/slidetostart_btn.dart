@@ -53,6 +53,8 @@ class _SlideToStartButtonState extends State<SlideToStartButton> {
               onHorizontalDragEnd: (_) {
                 if (dragPosition >= maxWidth - 70) {
                   widget.onSlideComplete();
+                  // Reset position so it's ready if the user returns to this screen
+                  setState(() => dragPosition = 0);
                 } else {
                   setState(() => dragPosition = 0);
                 }

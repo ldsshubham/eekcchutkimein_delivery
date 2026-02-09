@@ -5,18 +5,23 @@ import 'package:get/get.dart';
 class ProfileApiService extends GetConnect {
   final String _baseUrl = AppString.baseUrl;
 
-  Future<Response> deleteProfile() async {
+  Future<Response> deleteProfile(int orderId) async {
+    print("deleteProfile start");
     try {
       final token = await TokenService.getAccessToken();
-      return delete(
-        '$_baseUrl/delivery/employee/rider/profile',
+      print("token mil gaya");
+      final body = {'id': orderId};
+      return post(
+        '$_baseUrl/delivery/employee/rider/delete/profile',
+        body,
         headers: {
-          if (token != null) 'Authorization': 'Bearer $token',
+          'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',
         },
       );
     } catch (e) {
-      return Response(statusCode: 500, statusText: e.toString());
+      print("catch mila");
+      throw Exception(e.toString());
     }
   }
 

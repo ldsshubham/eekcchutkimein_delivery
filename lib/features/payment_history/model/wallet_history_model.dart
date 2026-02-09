@@ -25,12 +25,14 @@ class WalletHistoryItem {
   final String orderId;
   final String amount;
   final DateTime createdAt;
+  final String status;
 
   WalletHistoryItem({
     required this.id,
     required this.orderId,
     required this.amount,
     required this.createdAt,
+    required this.status,
   });
 
   factory WalletHistoryItem.fromJson(Map<String, dynamic> json) {
@@ -39,6 +41,7 @@ class WalletHistoryItem {
       orderId: json['order_id']?.toString() ?? '',
       amount: json['amount']?.toString() ?? '0.00',
       createdAt: DateTime.tryParse(json['created_at'] ?? '') ?? DateTime.now(),
+      status: json['status'] ?? '',
     );
   }
 }

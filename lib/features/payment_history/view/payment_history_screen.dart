@@ -25,7 +25,7 @@ class PaymentHistoryScreen extends StatelessWidget {
       ),
       body: Obx(() {
         if (controller.isLoading.value) {
-          return const Center(child: CircularProgressIndicator());
+          return Scaffold(body: Center(child: CircularProgressIndicator()));
         }
 
         if (controller.historyList.isEmpty) {

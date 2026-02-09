@@ -1,3 +1,4 @@
+import 'package:eekcchutkimein_delivery/constants/colors.dart';
 import 'package:eekcchutkimein_delivery/features/profile/api/profile_api_service.dart';
 import 'package:eekcchutkimein_delivery/features/profile/controller/profile_controller.dart';
 import 'package:eekcchutkimein_delivery/features/profile/profile_model.dart';
@@ -7,6 +8,7 @@ import 'package:eekcchutkimein_delivery/services/token_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -19,12 +21,15 @@ class ProfileScreen extends StatelessWidget {
       color: const Color(0xffF6F7F9),
       child: Obx(() {
         if (controller.isLoading.value) {
-          return const Center(child: CircularProgressIndicator());
+          return LoadingAnimationWidget.fourRotatingDots(
+            color: AppColors.primaryColor,
+            size: 48,
+          );
         }
 
         final profile = controller.profile.value;
         if (profile == null) {
-          return const Center(child: Text("Failed to load profile"));
+          return Scaffold(body: Center(child: Text("Failed to load profile")));
         }
 
         return ListView(
@@ -32,7 +37,7 @@ class ProfileScreen extends StatelessWidget {
           children: [
             _profileHeader(profile),
             const SizedBox(height: 12),
-            _statsCard(profile),
+            // _statsCard(profile),
             const SizedBox(height: 12),
             _infoCard("Personal Details", [
               _infoTile(
@@ -63,33 +68,16 @@ class ProfileScreen extends StatelessWidget {
       decoration: _cardDecoration(),
       child: Row(
         children: [
-          Stack(
-            children: [
-              const CircleAvatar(
-                radius: 28,
-                backgroundColor: Color(0xffEDEDED),
-                child: Icon(
-                  Icons.person_outline,
-                  size: 30,
-                  color: Colors.black54,
-                ),
-              ),
-              Positioned(
-                bottom: 2,
-                right: 2,
-                child: Container(
-                  width: 10,
-                  height: 10,
-                  decoration: BoxDecoration(
-                    color: profile.isOnline ? Colors.green : Colors.grey,
-                    shape: BoxShape.circle,
-                    border: Border.all(color: Colors.white, width: 1.5),
-                  ),
-                ),
-              ),
-            ],
+          // Accent Bar
+          Container(
+            width: 4,
+            height: 48,
+            decoration: BoxDecoration(
+              color: AppColors.primaryColor,
+              borderRadius: BorderRadius.circular(2),
+            ),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: 14),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -97,22 +85,63 @@ class ProfileScreen extends StatelessWidget {
                 Text(
                   profile.name,
                   style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
+                    fontSize: 20,
+                    fontWeight: FontWeight.w900,
+                    color: Colors.black,
+                    letterSpacing: -0.5,
                   ),
                 ),
                 const SizedBox(height: 2),
                 Text(
                   profile.phone,
-                  style: const TextStyle(fontSize: 14, color: Colors.black54),
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.grey.shade600,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
                 const SizedBox(height: 2),
                 Text(
                   "Partner ID: ${profile.partnerId}",
-                  style: const TextStyle(fontSize: 13, color: Colors.black45),
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.grey.shade400,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
               ],
             ),
+          ),
+          Stack(
+            children: [
+              CircleAvatar(
+                radius: 28,
+                backgroundColor: const Color(0xffEDEDED),
+                backgroundImage: profile.imageUrl != null
+                    ? NetworkImage(profile.imageUrl!)
+                    : null,
+                child: profile.imageUrl == null
+                    ? const Icon(
+                        Icons.person_outline,
+                        size: 30,
+                        color: Colors.black54,
+                      )
+                    : null,
+              ),
+              Positioned(
+                bottom: 2,
+                right: 2,
+                child: Container(
+                  width: 12,
+                  height: 12,
+                  decoration: BoxDecoration(
+                    color: profile.isOnline ? Colors.green : Colors.grey,
+                    shape: BoxShape.circle,
+                    border: Border.all(color: Colors.white, width: 2),
+                  ),
+                ),
+              ),
+            ],
           ),
         ],
       ),
@@ -189,13 +218,27 @@ class ProfileScreen extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
-            padding: const EdgeInsets.fromLTRB(14, 12, 14, 8),
-            child: Text(
-              title,
-              style: const TextStyle(
-                fontSize: 15, // +2
-                fontWeight: FontWeight.w500,
-              ),
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+            child: Row(
+              children: [
+                Container(
+                  width: 3,
+                  height: 16,
+                  decoration: BoxDecoration(
+                    color: AppColors.primaryColor,
+                    borderRadius: BorderRadius.circular(1.5),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  title,
+                  style: const TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w800,
+                    color: Colors.black87,
+                  ),
+                ),
+              ],
             ),
           ),
           _divider(),
@@ -265,7 +308,7 @@ class ProfileScreen extends StatelessWidget {
             Icons.delete_outline,
             "Delete Account",
             isLogout: true, // Reuse red styling
-            onTap: () => _showDeleteAccountAlert(context),
+            onTap: () => _showDeleteAccountAlert(context, profile!.partnerId),
           ),
         ],
       ),
@@ -354,7 +397,7 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
-  void _showDeleteAccountAlert(BuildContext context) {
+  void _showDeleteAccountAlert(BuildContext context, String partnerId) {
     Get.dialog(
       AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -375,30 +418,44 @@ class ProfileScreen extends StatelessWidget {
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
             onPressed: () async {
-              // 1. Close dialog
-              Get.back();
-
-              // 2. Call API
+              print("Delete button pressed");
               try {
                 final apiService = ProfileApiService();
-                final response = await apiService.deleteProfile();
+                print("API service created");
+
+                // Extract numeric ID from partnerId (e.g., "DP123" -> 123)
+                print("partnerId: $partnerId");
+                final id = int.parse(partnerId.replaceFirst('DP', ''));
+                print("Parsed ID: $id");
+
+                final response = await apiService.deleteProfile(id);
+                print("API response received");
+                print("Response body: ${response.body}");
+                print("Response status: ${response.statusCode}");
 
                 if (response.statusCode == 200) {
-                  // 3. Clear data and navigate to Splash
                   await TokenService.clearTokens();
+                  print("Token cleared");
                   await GetStorage().erase();
                   Get.offAllNamed(AppRoutes.notReg);
                 } else {
                   Get.snackbar(
                     "Error",
-                    "Failed to delete account. Please try again.",
+                    "Failed to delete account: ${response.statusCode}",
                     snackPosition: SnackPosition.BOTTOM,
                     backgroundColor: Colors.red,
                     colorText: Colors.white,
                   );
                 }
               } catch (e) {
-                Get.snackbar("Error", "Something went wrong.");
+                print("Error in delete profile: $e");
+                Get.snackbar(
+                  "Error",
+                  "Something went wrong: $e",
+                  snackPosition: SnackPosition.BOTTOM,
+                  backgroundColor: Colors.red,
+                  colorText: Colors.white,
+                );
               }
             },
             child: const Text('Delete', style: TextStyle(color: Colors.white)),

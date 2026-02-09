@@ -4,6 +4,7 @@ class PaymentHistoryItem {
   final String date;
   final bool isCredit;
   final String description;
+  final String status;
 
   PaymentHistoryItem({
     required this.orderId,
@@ -11,5 +12,6 @@ class PaymentHistoryItem {
     required this.date,
     required this.isCredit,
     required this.description,
+    required this.status,
   });
 }

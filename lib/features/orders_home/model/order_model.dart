@@ -1,16 +1,22 @@
+import 'package:flutter/foundation.dart';
+
 class OrderModel {
   final int orderId;
   final String orderDate;
   final String orderTime;
   final double orderAmount;
-  final String orderStatus;
+  final bool orderStatus;
   final String vendorName;
   final String vendorAddress;
+  final String vendorPhone;
   final String customerName;
   final String customerAddress;
   final String customerPhone;
   final List<OrderItem> productList;
+  final String paymentStatus;
   final String paymentGateway;
+  final String? vendorLatitude;
+  final String? vendorLongitude;
 
   OrderModel({
     required this.orderId,
@@ -20,28 +26,35 @@ class OrderModel {
     required this.orderStatus,
     required this.vendorName,
     required this.vendorAddress,
+    required this.vendorPhone,
     required this.customerName,
     required this.customerAddress,
     required this.customerPhone,
     required this.productList,
+    required this.paymentStatus,
     required this.paymentGateway,
+    this.vendorLatitude,
+    this.vendorLongitude,
   });
 
   factory OrderModel.fromJson(Map<String, dynamic> json) {
     // Basic Date Parsing
-    String dateStr = json['Date'] ?? '';
+    String dateStr =
+        (json['Date'] ??
+                json['date'] ??
+                json['orderdate'] ??
+                json['created_at'] ??
+                '')
+            .toString();
     String formattedDate = dateStr;
     String formattedTime = '';
 
     if (dateStr.isNotEmpty) {
       try {
         final dt = DateTime.parse(dateStr).toLocal();
-        // Simple manual formatting to avoid external dependencies for now
-        // Format: DD/MM/YYYY
         formattedDate =
             "${dt.day.toString().padLeft(2, '0')}/${dt.month.toString().padLeft(2, '0')}/${dt.year}";
 
-        // Format: HH:MM AM/PM
         int hour = dt.hour;
         String ampm = 'AM';
         if (hour >= 12) {
@@ -52,34 +65,85 @@ class OrderModel {
         formattedTime =
             "${hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')} $ampm";
       } catch (e) {
-        // Fallback checks could go here
+        debugPrint("Error parsing date: $dateStr - $e");
       }
     }
 
     // Maps
-    final customer = json['Customer'] is Map ? json['Customer'] : {};
-    final vendor = json['Vendor'] is Map ? json['Vendor'] : {};
+    final customer = json['Customer'] is Map
+        ? json['Customer']
+        : (json['customer'] is Map ? json['customer'] : {});
+    final vendor = json['Vendor'] is Map
+        ? json['Vendor']
+        : (json['vendor'] is Map ? json['vendor'] : {});
 
     // Items
-    var list = json['Items'] as List? ?? [];
-    List<OrderItem> itemsList = list.map((i) => OrderItem.fromJson(i)).toList();
+    var list = json['Items'] ?? json['items'] ?? json['productList'] ?? [];
+    List<OrderItem> itemsList = [];
+    if (list is List) {
+      itemsList = list
+          .whereType<Map<String, dynamic>>()
+          .map((i) => OrderItem.fromJson(i))
+          .toList();
+    }
 
     return OrderModel(
-      orderId: (json['OrderId'] is int)
-          ? json['OrderId']
-          : int.tryParse(json['OrderId']?.toString() ?? '0') ?? 0,
-      orderDate: formattedDate,
-      orderTime: formattedTime,
+      orderId:
+          (json['OrderId'] ?? json['orderid'] ?? json['order_id'] ?? 0) is int
+          ? (json['OrderId'] ?? json['orderid'] ?? json['order_id'] ?? 0)
+          : int.tryParse(
+                  (json['OrderId'] ??
+                          json['orderid'] ??
+                          json['order_id'] ??
+                          '0')
+                      .toString(),
+                ) ??
+                0,
+      orderDate: formattedDate.toString(),
+      orderTime: formattedTime.toString(),
       orderAmount:
-          double.tryParse(json['OrderTotal']?.toString() ?? '0') ?? 0.0,
-      orderStatus: json['OrderStatus'] ?? 'Pending',
-      vendorName: vendor['name'] ?? 'Multiple Vendors',
-      vendorAddress: vendor['address'] ?? '',
-      customerName: customer['name'] ?? 'Unknown',
-      customerAddress: customer['address'] ?? '',
-      customerPhone: customer['phone'] ?? '',
+          double.tryParse(
+            (json['OrderTotal'] ??
+                    json['orderamount'] ??
+                    json['total_amount'] ??
+                    '0')
+                .toString(),
+          ) ??
+          0.0,
+      orderStatus:
+          (json['OrderStatus'] ??
+                      json['orderstatus'] ??
+                      json['status'] ??
+                      'Pending')
+                  .toString()
+                  .toLowerCase() ==
+              'delivered' ||
+          (json['OrderStatus'] ?? json['orderstatus'] ?? json['status']) ==
+              true,
+      vendorName: (vendor['name'] ?? vendor['vendorname'] ?? 'Multiple Vendors')
+          .toString(),
+      vendorAddress: (vendor['address'] ?? vendor['vendoraddress'] ?? '')
+          .toString(),
+      vendorPhone: (vendor['phone'] ?? vendor['vendorphone'] ?? '').toString(),
+      customerName: (customer['name'] ?? customer['customername'] ?? 'Unknown')
+          .toString(),
+      customerAddress:
+          (customer['address'] ?? customer['customeraddress'] ?? '').toString(),
+      customerPhone: (customer['phone'] ?? customer['customerphone'] ?? '')
+          .toString(),
       productList: itemsList,
-      paymentGateway: json['PaymentGateway'] ?? 'Cash On Delivery',
+      paymentGateway:
+          (json['PaymentGateway'] ?? json['payment_mode'] ?? 'Cash On Delivery')
+              .toString(),
+      paymentStatus:
+          (json['PaymentStatus'] ?? json['payment_status'] ?? 'Pending')
+              .toString(),
+      vendorLatitude:
+          (vendor['latitude'] ?? vendor['vendor_latitude'] ?? vendor['lat'])
+              ?.toString(),
+      vendorLongitude:
+          (vendor['longitude'] ?? vendor['vendor_longitude'] ?? vendor['long'])
+              ?.toString(),
     );
   }
 }
@@ -101,15 +165,22 @@ class OrderItem {
 
   factory OrderItem.fromJson(Map<String, dynamic> json) {
     return OrderItem(
-      itemId: (json['item_id'] is int)
-          ? json['item_id']
-          : int.tryParse(json['item_id']?.toString() ?? '0') ?? 0,
-      productName: json['item_name'] ?? '',
-      productQuantity: (json['quantity'] is int)
-          ? json['quantity']
-          : int.tryParse(json['quantity']?.toString() ?? '0') ?? 0,
-      price: double.tryParse(json['price']?.toString() ?? '0') ?? 0.0,
-      total: double.tryParse(json['total']?.toString() ?? '0') ?? 0.0,
+      itemId: (json['item_id'] ?? json['productid'] ?? 0) is int
+          ? (json['item_id'] ?? json['productid'] ?? 0)
+          : int.tryParse(
+                  (json['item_id'] ?? json['productid'] ?? '0').toString(),
+                ) ??
+                0,
+      productName: (json['item_name'] ?? json['productname'] ?? '').toString(),
+      productQuantity: (json['quantity'] ?? json['productquantity'] ?? 0) is int
+          ? (json['quantity'] ?? json['productquantity'] ?? 0)
+          : int.tryParse(
+                  (json['quantity'] ?? json['productquantity'] ?? '0')
+                      .toString(),
+                ) ??
+                0,
+      price: double.tryParse((json['price'] ?? '0').toString()) ?? 0.0,
+      total: double.tryParse((json['total'] ?? '0').toString()) ?? 0.0,
     );
   }
 }
