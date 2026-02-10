@@ -54,7 +54,7 @@ class DefaultFirebaseOptions {
     messagingSenderId: '1015878662447',
     projectId: 'ecm-delivery',
     storageBucket: 'ecm-delivery.firebasestorage.app',
-    iosBundleId: 'com.eekcchutimein.delivery',
+    iosBundleId: 'com.eekcchutkimein.delivery',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
@@ -63,7 +63,7 @@ class DefaultFirebaseOptions {
     messagingSenderId: '1015878662447',
     projectId: 'ecm-delivery',
     storageBucket: 'ecm-delivery.firebasestorage.app',
-    iosBundleId: 'com.eekcchutimein.delivery',
+    iosBundleId: 'com.eekcchutkimein.delivery',
   );
 
   static const FirebaseOptions windows = FirebaseOptions(
@@ -75,5 +75,4 @@ class DefaultFirebaseOptions {
     storageBucket: 'ecm-delivery.firebasestorage.app',
     measurementId: 'G-V0MX3KX12E',
   );
-
 }
