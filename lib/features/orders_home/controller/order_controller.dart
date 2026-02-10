@@ -10,20 +10,15 @@ class OrderController extends GetxController {
 
   // TEMPORARY: Add specific order IDs you want to show here
   final List<int> selectiveOrderIds = [
-    2240,
-    2241,
-    2242,
-    2243,
-    2244,
-    2263,
-    2264,
-    2265,
-    2266,
-    2267,
-    2268,
-    2269,
-    2270,
     2271,
+    2270,
+    2269,
+    2268,
+    2267,
+    2266,
+    2265,
+    2264,
+    2263,
   ];
 
   @override
@@ -65,13 +60,18 @@ class OrderController extends GetxController {
             orders.value = allOrders
                 .where((order) => selectiveOrderIds.contains(order.orderId))
                 .toList();
+            // Sort filtered orders by orderId in ascending order
+            orders.sort((a, b) => a.orderId.compareTo(b.orderId));
             debugPrint(
-              "FILTERED ${orders.length} ORDERS from selective IDs: $selectiveOrderIds",
+              "FILTERED AND SORTED ${orders.length} ORDERS from selective IDs: $selectiveOrderIds",
             );
           } else {
-            // If no selective IDs, show all orders (old behavior without .take(5))
+            // Sort orders by orderId in ascending order
+            allOrders.sort((a, b) => a.orderId.compareTo(b.orderId));
             orders.value = allOrders;
-            debugPrint("PARSED ${orders.length} ORDERS (no filter applied)");
+            debugPrint(
+              "PARSED AND SORTED ${orders.length} ORDERS (no filter applied)",
+            );
           }
         } else {
           debugPrint("NO ORDER LIST FOUND IN RESPONSE DATA");
