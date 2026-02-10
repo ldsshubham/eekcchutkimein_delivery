@@ -28,6 +28,8 @@ android {
     kotlinOptions { jvmTarget = JavaVersion.VERSION_11.toString() }
 
     defaultConfig {
+         minSdk = flutter.minSdkVersion
+        targetSdk = 34
         applicationId = "com.eekcchutimein.delivery"
 
         versionCode = flutter.versionCode
