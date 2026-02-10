@@ -38,10 +38,10 @@ class WalletHistoryItem {
   factory WalletHistoryItem.fromJson(Map<String, dynamic> json) {
     return WalletHistoryItem(
       id: json['id']?.toString() ?? '',
-      orderId: json['order_id']?.toString() ?? '',
-      amount: json['amount']?.toString() ?? '0.00',
-      createdAt: DateTime.tryParse(json['created_at'] ?? '') ?? DateTime.now(),
-      status: json['status'] ?? '',
+      orderId: json['OrderId']?.toString() ?? '',
+      amount: json['OrderTotal']?.toString() ?? '0.00',
+      createdAt: DateTime.tryParse(json['Date'] ?? '') ?? DateTime.now(),
+      status: json['order_delivery'] ?? '',
     );
   }
 }

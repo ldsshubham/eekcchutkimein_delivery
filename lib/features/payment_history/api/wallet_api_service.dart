@@ -9,7 +9,7 @@ class WalletApiService extends GetConnect {
     try {
       final token = await TokenService.getAccessToken();
       return get(
-        '$_baseUrl/delivery/employee/rider/wallet/history',
+        '$_baseUrl/delivery/employee/rider/order/history',
         headers: {
           if (token != null) 'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',

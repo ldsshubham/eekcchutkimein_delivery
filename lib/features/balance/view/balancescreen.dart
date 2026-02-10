@@ -249,11 +249,11 @@ class _PaymentTile extends StatelessWidget {
             ),
           ),
           Text(
-            "+₹${item.amount}",
-            style: const TextStyle(
+            "₹${item.amount}",
+            style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w900,
-              color: Colors.green,
+              color: item.status == "cancelled" ? Colors.red : Colors.green,
             ),
           ),
         ],
