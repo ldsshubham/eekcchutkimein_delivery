@@ -23,6 +23,8 @@ class PaymentHistoryController extends GetxController {
       if (response.statusCode == 200 && response.body != null) {
         final walletResponse = WalletHistoryResponse.fromJson(response.body);
         historyList.assignAll(walletResponse.data);
+      } else if (response.statusCode == 404) {
+        historyList.clear();
       } else {
         ToastHelper.showErrorToast(
           "Failed to fetch history: ${{response.statusText}}",

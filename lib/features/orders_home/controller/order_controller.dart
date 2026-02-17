@@ -57,7 +57,7 @@ class OrderController extends GetxController {
           //   );
           // } else {
           // Sort orders by orderId in ascending order
-          allOrders.sort((a, b) => a.orderId.compareTo(b.orderId));
+          // allOrders.sort((a, b) => a.orderId.compareTo(b.orderId));
           orders.value = allOrders;
           debugPrint(
             "PARSED AND SORTED ${orders.length} ORDERS (no filter applied)",
