@@ -1,6 +1,6 @@
 import 'package:eekcchutkimein_delivery/features/homepage/controller/dashboard_controller.dart';
-import 'package:eekcchutkimein_delivery/features/payment_history/controller/payment_history_controller.dart';
-import 'package:eekcchutkimein_delivery/features/payment_history/model/wallet_history_model.dart';
+import 'package:eekcchutkimein_delivery/features/wallet_history/payment/payment_history_controller.dart';
+import 'package:eekcchutkimein_delivery/features/wallet_history/wallet_history_model.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -29,7 +29,7 @@ class BalanceScreen extends StatelessWidget {
         padding: const EdgeInsets.all(16),
         child: Obx(() {
           final dashboard = dashboardController.dashboardData.value;
-          final balance = dashboard?.totalEarnings ?? "0.00";
+          final balance = dashboard.totalEarnings;
           final isLoading =
               dashboardController.isLoadining.value ||
               historyController.isLoading.value;
@@ -37,86 +37,6 @@ class BalanceScreen extends StatelessWidget {
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              /// BALANCE CARD
-              // Container(
-              //   width: double.infinity,
-              //   padding: const EdgeInsets.all(24),
-              //   decoration: BoxDecoration(
-              //     gradient: LinearGradient(
-              //       colors: [
-              //         AppColors.primaryColor,
-              //         AppColors.primaryColor.withOpacity(0.8),
-              //       ],
-              //       begin: Alignment.topLeft,
-              //       end: Alignment.bottomRight,
-              //     ),
-              //     borderRadius: BorderRadius.circular(24),
-              //     boxShadow: [
-              //       BoxShadow(
-              //         color: AppColors.primaryColor.withOpacity(0.3),
-              //         blurRadius: 6,
-              //         offset: const Offset(0, 4),
-              //       ),
-              //     ],
-              //   ),
-              //   child: Column(
-              //     crossAxisAlignment: CrossAxisAlignment.start,
-              //     children: [
-              //       const Text(
-              //         "TOTAL EARNINGS",
-              //         style: TextStyle(
-              //           color: Colors.white70,
-              //           fontSize: 12,
-              //           fontWeight: FontWeight.w600,
-              //           letterSpacing: 1.2,
-              //         ),
-              //       ),
-              //       const SizedBox(height: 12),
-              //       Text(
-              //         "₹$balance",
-              //         style: const TextStyle(
-              //           color: Colors.white,
-              //           fontSize: 36,
-              //           fontWeight: FontWeight.w900,
-              //         ),
-              //       ),
-              //       const SizedBox(height: 12),
-              //       Row(
-              //         children: [
-              //           const Icon(
-              //             Icons.update,
-              //             color: Colors.white70,
-              //             size: 14,
-              //           ),
-              //           const SizedBox(width: 4),
-              //           Text(
-              //             "Last updated: ${DateFormat('hh:mm a').format(DateTime.now())}",
-              //             style: const TextStyle(
-              //               color: Colors.white70,
-              //               fontSize: 11,
-              //             ),
-              //           ),
-              //         ],
-              //       ),
-              //     ],
-              //   ),
-              // ),
-
-              // const SizedBox(height: 24),
-
-              /// QUICK STATS
-              // if (dashboard != null)
-              //   Row(
-              //     children: [
-              //       _StatTile(title: "Orders", value: dashboard.totalOrders),
-              //       _StatTile(title: "Today", value: dashboard.assignedToday),
-              //       _StatTile(title: "Pending", value: dashboard.pendingOrders),
-              //     ],
-              //   ),
-
-              // const SizedBox(height: 32),
-
-              /// TRANSACTIONS TITLE
               Row(
                 children: [
                   Container(
@@ -170,7 +90,7 @@ class BalanceScreen extends StatelessWidget {
                     child: Padding(
                       padding: EdgeInsets.symmetric(vertical: 40),
                       child: Text(
-                        "No transactions found",
+                        "No delivery done yet",
                         style: TextStyle(color: Colors.grey),
                       ),
                     ),

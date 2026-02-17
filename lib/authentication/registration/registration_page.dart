@@ -316,16 +316,18 @@ class _RegistrationPageState extends State<RegistrationPage> {
       };
 
       debugPrint('Collected Registration Data: $data');
+      print("RESISTRATION DATA : ${data.toString()}");
       _controller.registerEmployee(data);
     } catch (e) {
       debugPrint('Error during registration submission: $e');
-      Get.snackbar(
-        "Error",
-        "Something went wrong. Please try again.",
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.red.withOpacity(0.8),
-        colorText: Colors.white,
-      );
+      ToastHelper.showErrorToast("Something went wrong. Please try again.");
+      // Get.snackbar(
+      //   "Error",
+      //   "Something went wrong. Please try again.",
+      //   snackPosition: SnackPosition.BOTTOM,
+      //   backgroundColor: Colors.red.withOpacity(0.8),
+      //   colorText: Colors.white,
+      // );
     }
   }
 

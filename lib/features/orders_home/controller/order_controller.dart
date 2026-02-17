@@ -9,17 +9,7 @@ class OrderController extends GetxController {
   var isLoading = false.obs;
 
   // TEMPORARY: Add specific order IDs you want to show here
-  final List<int> selectiveOrderIds = [
-    2271,
-    2270,
-    2269,
-    2268,
-    2267,
-    2266,
-    2265,
-    2264,
-    2263,
-  ];
+  final List<int> selectiveOrderIds = [2665, 2666, 2667];
 
   @override
   void onInit() {
@@ -56,23 +46,23 @@ class OrderController extends GetxController {
               .toList();
 
           // TEMPORARY: Filter by selective order IDs if list is not empty
-          if (selectiveOrderIds.isNotEmpty) {
-            orders.value = allOrders
-                .where((order) => selectiveOrderIds.contains(order.orderId))
-                .toList();
-            // Sort filtered orders by orderId in ascending order
-            orders.sort((a, b) => a.orderId.compareTo(b.orderId));
-            debugPrint(
-              "FILTERED AND SORTED ${orders.length} ORDERS from selective IDs: $selectiveOrderIds",
-            );
-          } else {
-            // Sort orders by orderId in ascending order
-            allOrders.sort((a, b) => a.orderId.compareTo(b.orderId));
-            orders.value = allOrders;
-            debugPrint(
-              "PARSED AND SORTED ${orders.length} ORDERS (no filter applied)",
-            );
-          }
+          // if (selectiveOrderIds.isNotEmpty) {
+          //   orders.value = allOrders
+          //       .where((order) => selectiveOrderIds.contains(order.orderId))
+          //       .toList();
+          //   // Sort filtered orders by orderId in ascending order
+          //   orders.sort((a, b) => a.orderId.compareTo(b.orderId));
+          //   debugPrint(
+          //     "FILTERED AND SORTED ${orders.length} ORDERS from selective IDs: $selectiveOrderIds",
+          //   );
+          // } else {
+          // Sort orders by orderId in ascending order
+          allOrders.sort((a, b) => a.orderId.compareTo(b.orderId));
+          orders.value = allOrders;
+          debugPrint(
+            "PARSED AND SORTED ${orders.length} ORDERS (no filter applied)",
+          );
+          // }
         } else {
           debugPrint("NO ORDER LIST FOUND IN RESPONSE DATA");
           orders.clear();

@@ -1,9 +1,9 @@
 import 'package:eekcchutkimein_delivery/constants/colors.dart';
-import 'package:eekcchutkimein_delivery/features/payment_history/model/wallet_history_model.dart';
+import 'package:eekcchutkimein_delivery/features/wallet_history/wallet_history_model.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import '../controller/payment_history_controller.dart';
+import 'payment_history_controller.dart';
 
 class PaymentHistoryScreen extends StatelessWidget {
   const PaymentHistoryScreen({super.key});
