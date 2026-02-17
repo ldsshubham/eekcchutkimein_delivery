@@ -54,6 +54,29 @@ class ProfileScreen extends StatelessWidget {
               _divider(),
               _infoTile(Icons.email_outlined, "Email Address", profile.email),
             ]),
+
+            const SizedBox(height: 12),
+            _infoCard("Vehicle Details", [
+              _infoTile(
+                Icons.security,
+                "Licence Number",
+                profile.licenseNumber,
+              ),
+              _divider(),
+              _infoTile(Icons.power, "Vehicle Type", profile.vehicleType),
+              _divider(),
+              _infoTile(
+                Icons.motorcycle_outlined,
+                "Vehicle Name",
+                profile.vehicleName,
+              ),
+              _divider(),
+              _infoTile(
+                Icons.description_outlined,
+                "Vehicle Number",
+                profile.vehicleNumber,
+              ),
+            ]),
             const SizedBox(height: 12),
             _actionsCard(context, profile),
           ],
@@ -100,15 +123,15 @@ class ProfileScreen extends StatelessWidget {
                     fontWeight: FontWeight.w500,
                   ),
                 ),
-                const SizedBox(height: 2),
-                Text(
-                  "Partner ID: ${profile.partnerId}",
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Colors.grey.shade400,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
+                // const SizedBox(height: 2),
+                // Text(
+                //   "Partner ID: ${profile.partnerId}",
+                //   style: TextStyle(
+                //     fontSize: 12,
+                //     color: Colors.grey.shade400,
+                //     fontWeight: FontWeight.w500,
+                //   ),
+                // ),
               ],
             ),
           ),

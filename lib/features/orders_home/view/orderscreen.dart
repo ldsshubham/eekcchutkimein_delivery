@@ -8,7 +8,6 @@ import 'package:flutter/material.dart';
 
 import 'package:eekcchutkimein_delivery/features/orders_home/controller/order_controller.dart';
 import 'package:get/get.dart';
-import 'package:get_storage/get_storage.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 import 'package:eekcchutkimein_delivery/features/towards_customer/util/toastification_helper.dart';
@@ -19,7 +18,6 @@ class OrderDetails extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // final ProfileController profileController = Get.find<ProfileController>();
     final OrderController controller = Get.find<OrderController>();
 
     return Obx(() {
@@ -33,7 +31,19 @@ class OrderDetails extends StatelessWidget {
       }
       print('ORDER LIST ${controller.orders}');
       if (controller.orders.isEmpty) {
-        return Scaffold(body: const Center(child: Text("No orders found")));
+        return Scaffold(
+          body: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 20, 16, 0),
+                child: _buildHeader(),
+              ),
+              Spacer(),
+              Center(child: Text("No orders found")),
+              Spacer(),
+            ],
+          ),
+        );
       }
 
       return RefreshIndicator(

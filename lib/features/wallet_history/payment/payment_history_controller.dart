@@ -1,6 +1,6 @@
-import 'package:eekcchutkimein_delivery/features/payment_history/api/wallet_api_service.dart';
-import 'package:eekcchutkimein_delivery/features/payment_history/model/wallet_history_model.dart';
-import 'package:flutter/material.dart';
+import 'package:eekcchutkimein_delivery/features/wallet_history/wallet_api_service.dart';
+import 'package:eekcchutkimein_delivery/features/wallet_history/wallet_history_model.dart';
+import 'package:eekcchutkimein_delivery/features/towards_customer/util/toastification_helper.dart';
 import 'package:get/get.dart';
 
 class PaymentHistoryController extends GetxController {
@@ -24,22 +24,12 @@ class PaymentHistoryController extends GetxController {
         final walletResponse = WalletHistoryResponse.fromJson(response.body);
         historyList.assignAll(walletResponse.data);
       } else {
-        Get.snackbar(
-          "Error",
-          "Failed to fetch history: ${response.statusText}",
-          backgroundColor: Colors.red,
-          colorText: Colors.white,
-          snackPosition: SnackPosition.BOTTOM,
+        ToastHelper.showErrorToast(
+          "Failed to fetch history: ${{response.statusText}}",
         );
       }
     } catch (e) {
-      Get.snackbar(
-        "Error",
-        "An unexpected error occurred",
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
-        snackPosition: SnackPosition.BOTTOM,
-      );
+      ToastHelper.showErrorToast("An unexpected error occurred");
     } finally {
       isLoading.value = false;
     }
