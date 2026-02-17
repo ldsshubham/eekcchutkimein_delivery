@@ -9,7 +9,7 @@
 
 
     <application
-        android:label="eekcchutkimein_delivery"
+        android:label="ECM delivery partner"
         android:name="${applicationName}"
         android:icon="@mipmap/launcher_icon"
         android:usesCleartextTraffic="true"

@@ -72,12 +72,12 @@ class BalanceScreen extends StatelessWidget {
                       ],
                     ),
                   ),
-                  if (isLoading)
-                    const SizedBox(
-                      width: 16,
-                      height: 16,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    ),
+                  // if (isLoading)
+                  //   const SizedBox(
+                  //     width: 16,
+                  //     height: 16,
+                  //     child: CircularProgressIndicator(strokeWidth: 2),
+                  //   ),
                 ],
               ),
 
@@ -85,14 +85,12 @@ class BalanceScreen extends StatelessWidget {
 
               /// TRANSACTIONS LIST
               if (historyController.historyList.isEmpty && !isLoading)
-                Scaffold(
-                  body: const Center(
-                    child: Padding(
-                      padding: EdgeInsets.symmetric(vertical: 40),
-                      child: Text(
-                        "No delivery done yet",
-                        style: TextStyle(color: Colors.grey),
-                      ),
+                Center(
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(vertical: 100),
+                    child: Text(
+                      "No delivery done yet",
+                      style: TextStyle(color: Colors.grey),
                     ),
                   ),
                 )
