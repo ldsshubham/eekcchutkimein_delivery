@@ -1,5 +1,5 @@
-import 'package:eekcchutkimein_delivery/authentication/registration/controller/registration_controller.dart';
-import 'package:eekcchutkimein_delivery/features/towards_customer/util/textinput.dart';
+import 'package:eekcchutkimein_delivery/authentication/controller/registration_controller.dart';
+import 'package:eekcchutkimein_delivery/helper/textinput.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 

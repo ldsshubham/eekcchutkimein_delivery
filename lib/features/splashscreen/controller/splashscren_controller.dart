@@ -1,6 +1,6 @@
 import 'package:eekcchutkimein_delivery/routes/routes.dart';
 import 'package:eekcchutkimein_delivery/services/token_service.dart';
-import 'package:eekcchutkimein_delivery/authentication/registration/api/registration_api_service.dart';
+import 'package:eekcchutkimein_delivery/authentication/api/registration_api_service.dart';
 import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 

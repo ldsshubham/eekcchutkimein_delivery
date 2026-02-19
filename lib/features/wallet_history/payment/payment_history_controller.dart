@@ -1,6 +1,6 @@
 import 'package:eekcchutkimein_delivery/features/wallet_history/wallet_api_service.dart';
 import 'package:eekcchutkimein_delivery/features/wallet_history/wallet_history_model.dart';
-import 'package:eekcchutkimein_delivery/features/towards_customer/util/toastification_helper.dart';
+import 'package:eekcchutkimein_delivery/helper/toastification_helper.dart';
 import 'package:get/get.dart';
 
 class PaymentHistoryController extends GetxController {

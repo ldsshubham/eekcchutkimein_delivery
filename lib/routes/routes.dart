@@ -1,5 +1,5 @@
-import 'package:eekcchutkimein_delivery/authentication/registration/loginwith_otp.dart';
-import 'package:eekcchutkimein_delivery/authentication/registration/registration_page.dart';
+import 'package:eekcchutkimein_delivery/authentication/loginwith_otp.dart';
+import 'package:eekcchutkimein_delivery/authentication/registration_page.dart';
 import 'package:eekcchutkimein_delivery/features/homepage/view/homepage.dart';
 import 'package:eekcchutkimein_delivery/features/ordersummry/view/ordersummery_screen.dart';
 import 'package:eekcchutkimein_delivery/features/splashscreen/view/splashscreen.dart';

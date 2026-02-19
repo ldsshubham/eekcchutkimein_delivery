@@ -1,5 +1,5 @@
 import 'package:eekcchutkimein_delivery/features/profile/controller/profile_controller.dart';
-import 'package:eekcchutkimein_delivery/features/towards_customer/util/textinput.dart';
+import 'package:eekcchutkimein_delivery/helper/textinput.dart';
 import 'package:eekcchutkimein_delivery/features/profile/profile_model.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';

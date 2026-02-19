@@ -1,6 +1,6 @@
 import 'package:eekcchutkimein_delivery/constants/colors.dart';
 import 'package:eekcchutkimein_delivery/features/profile/controller/bankdetails_controller.dart';
-import 'package:eekcchutkimein_delivery/features/towards_customer/util/toastification_helper.dart';
+import 'package:eekcchutkimein_delivery/helper/toastification_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -221,6 +221,7 @@ class PaymentpageCod extends StatelessWidget {
                       //   message: "Payment marked as collected",
                       // );
                     },
+
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.green,
                       shape: RoundedRectangleBorder(

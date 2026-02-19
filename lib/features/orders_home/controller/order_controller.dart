@@ -38,6 +38,16 @@ class OrderController extends GetxController {
             orderList = responseData['orders'];
           }
         }
+        if (responseData is List) {
+          orderList = responseData;
+        } else if (response is Map) {
+          if (responseData['data'] != null && responseData['data'] is List) {
+            orderList = responseData['orders'];
+          } else if (responseData['orders'] != null &&
+              responseData['orders'] is List) {
+            orderList = responseData['orders'];
+          }
+        }
 
         if (orderList != null) {
           var allOrders = orderList

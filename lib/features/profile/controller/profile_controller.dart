@@ -1,7 +1,7 @@
-import 'package:eekcchutkimein_delivery/authentication/registration/api/registration_api_service.dart';
+import 'package:eekcchutkimein_delivery/authentication/api/registration_api_service.dart';
 import 'package:eekcchutkimein_delivery/features/profile/profile_model.dart';
 import 'package:eekcchutkimein_delivery/features/profile/api/profile_api_service.dart';
-import 'package:eekcchutkimein_delivery/features/towards_customer/util/toastification_helper.dart';
+import 'package:eekcchutkimein_delivery/helper/toastification_helper.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 

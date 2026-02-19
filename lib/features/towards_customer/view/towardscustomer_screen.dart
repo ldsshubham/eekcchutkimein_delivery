@@ -1,7 +1,7 @@
 // Towards Customer Screen
 import 'package:eekcchutkimein_delivery/constants/colors.dart';
 import 'package:eekcchutkimein_delivery/features/orders_home/util/slidetostart_btn.dart';
-import 'package:eekcchutkimein_delivery/features/ordercompleted/view/ordercomplete_screen.dart';
+import 'package:eekcchutkimein_delivery/features/ordercompleted/ordercomplete_screen.dart';
 import 'package:eekcchutkimein_delivery/features/towards_customer/controller/towardscustomer_controller.dart';
 import 'package:eekcchutkimein_delivery/features/towards_customer/model/order_detail_model.dart';
 import 'package:eekcchutkimein_delivery/features/towards_customer/util/otpverification.dart';

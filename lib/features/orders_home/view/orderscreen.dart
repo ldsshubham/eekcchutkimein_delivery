@@ -2,6 +2,7 @@ import 'package:eekcchutkimein_delivery/constants/colors.dart';
 
 import 'package:eekcchutkimein_delivery/features/orders_home/model/order_model.dart';
 import 'package:eekcchutkimein_delivery/features/orders_home/util/slidetostart_btn.dart';
+import 'package:eekcchutkimein_delivery/features/ordersummry/view/multiplevendor_orderpickup.dart';
 import 'package:eekcchutkimein_delivery/features/ordersummry/view/ordersummery_screen.dart';
 import 'package:eekcchutkimein_delivery/features/profile/controller/profile_controller.dart';
 import 'package:flutter/material.dart';
@@ -10,7 +11,7 @@ import 'package:eekcchutkimein_delivery/features/orders_home/controller/order_co
 import 'package:get/get.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 
-import 'package:eekcchutkimein_delivery/features/towards_customer/util/toastification_helper.dart';
+import 'package:eekcchutkimein_delivery/helper/toastification_helper.dart';
 
 class OrderDetails extends StatelessWidget {
   final ProfileController profileController = Get.find<ProfileController>();
@@ -68,14 +69,22 @@ class OrderDetails extends StatelessWidget {
                     order: order,
                     onTap: () {
                       print("order.vendorName ${order.vendorName}");
-                      if (order.vendorName == "Multiple Vendors") {
-                        ToastHelper.showErrorToast(
-                          "Human Error",
-                          subMessage:
-                              "Multiple vendor orders cannot be processed by riders.",
-                        );
+                      // if (order.vendorName == "Multiple Vendors") {
+                      //   ToastHelper.showErrorToast(
+                      //     "Human Error",
+                      //     subMessage:
+                      //         "Multiple vendor orders cannot be processed by riders.",
+                      //   );
+                      //   return;
+                      // }
+
+                      if ((order.vendorName).toLowerCase() == "multiple") {
+                        Get.to(() => MultipleVendorPickup(order: order));
                         return;
                       }
+
+                      // if (order.vendorName == "Multiple Vendors") {
+                      // }
 
                       if (profileController.isOnline.value) {
                         showModalBottomSheet(
@@ -353,6 +362,13 @@ class OrderCard extends StatelessWidget {
             ),
           ),
 
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Text(
+              "Items(${order.productList.length})",
+              style: TextStyle(fontWeight: FontWeight.w700),
+            ),
+          ),
           // Items Preview (Compact)
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),

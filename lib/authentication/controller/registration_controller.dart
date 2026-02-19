@@ -1,9 +1,9 @@
-import 'package:eekcchutkimein_delivery/authentication/registration/api/otp_verification.dart';
-import 'package:eekcchutkimein_delivery/authentication/registration/api/registration_api_service.dart';
-import 'package:eekcchutkimein_delivery/authentication/registration/otp_verify.dart';
-import 'package:eekcchutkimein_delivery/authentication/registration/registration_page.dart';
+import 'package:eekcchutkimein_delivery/authentication/api/otp_verification.dart';
+import 'package:eekcchutkimein_delivery/authentication/api/registration_api_service.dart';
+import 'package:eekcchutkimein_delivery/authentication/otp_verify.dart';
+import 'package:eekcchutkimein_delivery/authentication/registration_page.dart';
 import 'package:eekcchutkimein_delivery/features/homepage/view/homepage.dart';
-import 'package:eekcchutkimein_delivery/features/towards_customer/util/toastification_helper.dart';
+import 'package:eekcchutkimein_delivery/helper/toastification_helper.dart';
 import 'package:eekcchutkimein_delivery/services/token_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';

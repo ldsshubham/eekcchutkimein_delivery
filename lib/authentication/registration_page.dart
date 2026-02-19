@@ -1,9 +1,9 @@
 import 'dart:io';
 
-import 'package:eekcchutkimein_delivery/authentication/registration/controller/pickimage.dart';
-import 'package:eekcchutkimein_delivery/authentication/registration/controller/registration_controller.dart';
-import 'package:eekcchutkimein_delivery/features/towards_customer/util/textinput.dart';
-import 'package:eekcchutkimein_delivery/features/towards_customer/util/toastification_helper.dart';
+import 'package:eekcchutkimein_delivery/authentication/controller/pickimage.dart';
+import 'package:eekcchutkimein_delivery/authentication/controller/registration_controller.dart';
+import 'package:eekcchutkimein_delivery/helper/textinput.dart';
+import 'package:eekcchutkimein_delivery/helper/toastification_helper.dart';
 import 'package:eekcchutkimein_delivery/services/token_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';

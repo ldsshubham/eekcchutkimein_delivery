@@ -1,5 +1,5 @@
-import 'package:eekcchutkimein_delivery/authentication/registration/api/registration_api_service.dart';
-import 'package:eekcchutkimein_delivery/features/towards_customer/util/toastification_helper.dart';
+import 'package:eekcchutkimein_delivery/authentication/api/registration_api_service.dart';
+import 'package:eekcchutkimein_delivery/helper/toastification_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';

@@ -6,6 +6,7 @@ class OrderModel {
   final String orderTime;
   final double orderAmount;
   final bool orderStatus;
+  final String orderType;
   final String vendorName;
   final String vendorAddress;
   final String vendorPhone;
@@ -24,6 +25,7 @@ class OrderModel {
     required this.orderTime,
     required this.orderAmount,
     required this.orderStatus,
+    required this.orderType,
     required this.vendorName,
     required this.vendorAddress,
     required this.vendorPhone,
@@ -88,17 +90,16 @@ class OrderModel {
     }
 
     return OrderModel(
-      orderId:
-          (json['OrderId'] ?? json['orderid'] ?? json['order_id'] ?? 0) is int
-          ? (json['OrderId'] ?? json['orderid'] ?? json['order_id'] ?? 0)
-          : int.tryParse(
-                  (json['OrderId'] ??
-                          json['orderid'] ??
-                          json['order_id'] ??
-                          '0')
-                      .toString(),
-                ) ??
-                0,
+      orderId: (json['OrderId'] ?? 0),
+      // ? (json['OrderId'] ?? json['orderid'] ?? json['order_id'] ?? 0)
+      // : int.tryParse(
+      //         (json['OrderId'] ??
+      //                 json['orderid'] ??
+      //                 json['order_id'] ??
+      //                 '0')
+      //             .toString(),
+      //       ) ??
+      //       0,
       orderDate: formattedDate.toString(),
       orderTime: formattedTime.toString(),
       orderAmount:
@@ -120,13 +121,11 @@ class OrderModel {
               'delivered' ||
           (json['OrderStatus'] ?? json['orderstatus'] ?? json['status']) ==
               true,
-      vendorName: (vendor['name'] ?? vendor['vendorname'] ?? 'Multiple Vendors')
-          .toString(),
-      vendorAddress: (vendor['address'] ?? vendor['vendoraddress'] ?? '')
-          .toString(),
-      vendorPhone: (vendor['phone'] ?? vendor['vendorphone'] ?? '').toString(),
-      customerName: (customer['name'] ?? customer['customername'] ?? 'Unknown')
-          .toString(),
+      orderType: (json['OrderType'] ?? "single"),
+      vendorName: (vendor['name'] ?? 'Multiple Vendors').toString(),
+      vendorAddress: (vendor['address'] ?? '').toString(),
+      vendorPhone: (vendor['phone'] ?? '').toString(),
+      customerName: (customer['name'] ?? 'Unknown').toString(),
       customerAddress:
           (customer['address'] ?? customer['customeraddress'] ?? '').toString(),
       customerPhone: (customer['phone'] ?? customer['customerphone'] ?? '')

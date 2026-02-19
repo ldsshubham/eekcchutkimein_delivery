@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:eekcchutkimein_delivery/features/orders_home/api/order_api_service.dart';
 import 'package:eekcchutkimein_delivery/features/towards_customer/model/order_detail_model.dart';
-import 'package:eekcchutkimein_delivery/features/towards_customer/util/toastification_helper.dart';
+import 'package:eekcchutkimein_delivery/helper/toastification_helper.dart';
 import 'package:get/get.dart';
 
 class TowardsCustomerController extends GetxController {

@@ -1,6 +1,6 @@
-import 'package:eekcchutkimein_delivery/features/ordercompleted/view/ordercomplete_screen.dart';
+import 'package:eekcchutkimein_delivery/features/ordercompleted/ordercomplete_screen.dart';
 import 'package:eekcchutkimein_delivery/features/towards_customer/controller/towardscustomer_controller.dart';
-import 'package:eekcchutkimein_delivery/features/towards_customer/util/textinput.dart';
+import 'package:eekcchutkimein_delivery/helper/textinput.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -108,7 +108,24 @@ class _OtpVerificationSheetState extends State<OtpVerificationSheet> {
             maxLength: 4,
           ),
 
-          const SizedBox(height: 30),
+          const SizedBox(height: 10),
+
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Text("Didn't receive the code? "),
+              TextButton(
+                onPressed: () {},
+                child: const Text(
+                  "Resend",
+                  style: TextStyle(
+                    color: Colors.black87,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ],
+          ),
 
           /// VERIFY BUTTON
           SizedBox(
@@ -145,40 +162,6 @@ class _OtpVerificationSheetState extends State<OtpVerificationSheet> {
 
           const SizedBox(height: 10),
         ],
-      ),
-    );
-  }
-
-  Widget _otpBox(int index) {
-    return SizedBox(
-      width: 60,
-      height: 56,
-      child: TextField(
-        controller: controllers[index],
-        focusNode: focusNodes[index],
-        keyboardType: TextInputType.number,
-        textAlign: TextAlign.center,
-        maxLength: 1,
-        style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-        inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-        decoration: InputDecoration(
-          counterText: "",
-          filled: true,
-          fillColor: Colors.grey.shade300,
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-            borderSide: BorderSide.none,
-          ),
-        ),
-        onChanged: (value) {
-          if (value.isNotEmpty && index < 3) {
-            focusNodes[index + 1].requestFocus();
-          }
-          if (value.isEmpty && index > 0) {
-            focusNodes[index - 1].requestFocus();
-          }
-          setState(() {});
-        },
       ),
     );
   }

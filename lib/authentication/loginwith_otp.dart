@@ -1,7 +1,7 @@
 import 'package:country_code_picker/country_code_picker.dart';
-import 'package:eekcchutkimein_delivery/authentication/registration/controller/registration_controller.dart';
+import 'package:eekcchutkimein_delivery/authentication/controller/registration_controller.dart';
 import 'package:eekcchutkimein_delivery/constants/colors.dart';
-import 'package:eekcchutkimein_delivery/features/towards_customer/util/toastification_helper.dart';
+import 'package:eekcchutkimein_delivery/helper/toastification_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 

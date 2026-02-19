@@ -5,7 +5,7 @@ import 'package:eekcchutkimein_delivery/features/orders_home/util/slidetostart_b
 import 'package:eekcchutkimein_delivery/features/ordersummry/util/uploadimage.dart';
 import 'package:eekcchutkimein_delivery/features/towards_customer/controller/towardscustomer_controller.dart';
 import 'package:eekcchutkimein_delivery/features/towards_customer/model/order_detail_model.dart';
-import 'package:eekcchutkimein_delivery/features/towards_customer/util/toastification_helper.dart';
+import 'package:eekcchutkimein_delivery/helper/toastification_helper.dart';
 import 'package:eekcchutkimein_delivery/features/towards_customer/view/towardscustomer_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
