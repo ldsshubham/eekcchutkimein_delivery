@@ -79,7 +79,9 @@ class OrderDetails extends StatelessWidget {
                       // }
 
                       if ((order.vendorName).toLowerCase() == "multiple") {
-                        Get.to(() => MultipleVendorPickup(order: order));
+                        Get.to(
+                          () => MultipleVendorPickup(orderId: order.orderId),
+                        );
                         return;
                       }
 
@@ -170,7 +172,7 @@ class OrderDetails extends StatelessWidget {
             radius: 20,
             backgroundImage: NetworkImage(
               profileController.profile.value?.imageUrl ??
-                  'https://ui-avatars.com/api/?name=${profileController.profile.value?.name}&background=0D8ABC&color=fff',
+                  'https://ui-avatars.com/api/?name=${profileController.profile.value?.name ?? "Delivery Hero"}&background=0D8ABC&color=fff',
             ),
           ),
         ),

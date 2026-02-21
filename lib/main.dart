@@ -36,7 +36,6 @@ void main() async {
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
   // TODO: Subscribe to a topic
-
   await GetStorage.init();
   runApp(MyApp());
 }

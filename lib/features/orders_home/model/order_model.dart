@@ -41,13 +41,7 @@ class OrderModel {
 
   factory OrderModel.fromJson(Map<String, dynamic> json) {
     // Basic Date Parsing
-    String dateStr =
-        (json['Date'] ??
-                json['date'] ??
-                json['orderdate'] ??
-                json['created_at'] ??
-                '')
-            .toString();
+    String dateStr = (json['Date']);
     String formattedDate = dateStr;
     String formattedTime = '';
 
