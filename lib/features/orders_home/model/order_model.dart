@@ -7,6 +7,7 @@ class OrderModel {
   final double orderAmount;
   final bool orderStatus;
   final String orderType;
+  final String orderDeliveryStatus;
   final String vendorName;
   final String vendorAddress;
   final String vendorPhone;
@@ -26,6 +27,7 @@ class OrderModel {
     required this.orderAmount,
     required this.orderStatus,
     required this.orderType,
+    required this.orderDeliveryStatus,
     required this.vendorName,
     required this.vendorAddress,
     required this.vendorPhone,
@@ -84,16 +86,7 @@ class OrderModel {
     }
 
     return OrderModel(
-      orderId: (json['OrderId'] ?? 0),
-      // ? (json['OrderId'] ?? json['orderid'] ?? json['order_id'] ?? 0)
-      // : int.tryParse(
-      //         (json['OrderId'] ??
-      //                 json['orderid'] ??
-      //                 json['order_id'] ??
-      //                 '0')
-      //             .toString(),
-      //       ) ??
-      //       0,
+      orderId: (json['OrderId']),
       orderDate: formattedDate.toString(),
       orderTime: formattedTime.toString(),
       orderAmount:
@@ -116,6 +109,7 @@ class OrderModel {
           (json['OrderStatus'] ?? json['orderstatus'] ?? json['status']) ==
               true,
       orderType: (json['OrderType'] ?? "single"),
+      orderDeliveryStatus: (json['order_delivery']),
       vendorName: (vendor['name'] ?? 'Multiple Vendors').toString(),
       vendorAddress: (vendor['address'] ?? '').toString(),
       vendorPhone: (vendor['phone'] ?? '').toString(),

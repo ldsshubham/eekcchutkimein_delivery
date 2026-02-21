@@ -223,7 +223,7 @@ class OrderCard extends StatelessWidget {
     // Current status logic
     final bool isAssigned = order.orderStatus;
     final String statusText;
-    if (!isAssigned) {
+    if (order.orderStatus == "Assigned") {
       statusText = "Assigned";
     } else {
       statusText = "Delivered";
@@ -311,7 +311,7 @@ class OrderCard extends StatelessWidget {
                       ),
                       const SizedBox(width: 4),
                       Text(
-                        statusText,
+                        order.orderDeliveryStatus,
                         style: TextStyle(
                           fontSize: 10,
                           fontWeight: FontWeight.w800,
@@ -365,9 +365,9 @@ class OrderCard extends StatelessWidget {
           ),
 
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: Text(
-              "Items(${order.productList.length})",
+              "Total items(${order.productList.length})",
               style: TextStyle(fontWeight: FontWeight.w700),
             ),
           ),
@@ -383,17 +383,29 @@ class OrderCard extends StatelessWidget {
               child: Column(
                 children: order.productList.map((product) {
                   return Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 2),
+                    padding: const EdgeInsets.symmetric(vertical: 4),
                     child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
                         SizedBox(
-                          width: Get.width * 0.6,
+                          width: Get.width * 0.5,
                           child: Text(
                             product.productName,
                             maxLines: 3,
                             style: TextStyle(
                               fontSize: 13,
+                              color: Colors.grey.shade800,
+                            ),
+                          ),
+                        ),
+                        SizedBox(width: 10),
+                        SizedBox(
+                          width: Get.width * 0.1,
+                          child: Text(
+                            "₹${product.price}",
+                            maxLines: 1,
+                            style: TextStyle(
+                              fontSize: 12,
                               color: Colors.grey.shade800,
                             ),
                           ),
